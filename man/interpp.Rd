@@ -6,7 +6,7 @@
 \alias{interpp.old}
 \alias{interpp.new}
 \usage{
-interpp(x, y, z, xo, yo, ncp=0, extrap=F, duplicate = "error", dupfun = NULL)
+interpp(x, y, z, xo, yo, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
 }
 \arguments{
   \item{x}{

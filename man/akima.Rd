@@ -25,5 +25,5 @@ Smooth Surface Fitting Based on Local Procedures",
 CACM,
 Vol. 17, No. 1, January 1974, pp. 18-20.
 }
-\keyword{sysdata}
+\keyword{datasets}
 % Converted by Sd2Rd version 0.2-a3.

@@ -37,13 +37,13 @@ interp.new(x, y, z, xo=<<see below>>, yo=<<see below>>, linear=FALSE, ncp=NULL, 
   \item{xo}{
     vector of x-coordinates of output grid.  The default is 40 points
     evenly spaced over the range of \code{x}.  If extrapolation is not being
-    used (\code{extrap=F}, the default), \code{xo} should have a range that is
+    used (\code{extrap=FALSE}, the default), \code{xo} should have a range that is
     close to or inside of the range of \code{x} for the results to be meaningful.
   }
   \item{yo}{
     vector of y-coordinates of output grid.  The default is 40 points
     evenly spaced over the range of \code{y}.  If extrapolation is not being
-    used (\code{extrap=F}, the default), \code{yo} should have a range that is
+    used (\code{extrap=FALSE}, the default), \code{yo} should have a range that is
     close to or inside of the range of \code{y} for the results to be meaningful.
   }
   \item{linear}{logical, switch to linear interpolation in \code{interp.new}}
@@ -144,24 +144,24 @@ data(akima)
 # linear interpolation
 akima.li <- interp(akima$x, akima$y, akima$z)
 image(akima.li$x,akima.li$y,akima.li$z)
-contour(akima.li$x,akima.li$y,akima.li$z,add=T)
+contour(akima.li$x,akima.li$y,akima.li$z,add=TRUE)
 points(akima$x,akima$y)
 
 # increase smoothness
 akima.smooth <- interp(akima$x, akima$y, akima$z,
       xo=seq(0,25, length=100),  yo=seq(0,20, length=100))
 image(akima.smooth$x,akima.smooth$y,akima.smooth$z)
-contour(akima.smooth$x,akima.smooth$y,akima.smooth$z,add=T)
+contour(akima.smooth$x,akima.smooth$y,akima.smooth$z,add=TRUE)
 points(akima$x,akima$y)
 # use triangulation library to
 # show underlying triangulation:
-if(library(tripack, logical.return=T))
-  plot(tri.mesh(akima),add=T,lty="dashed")
+if(library(tripack, logical.return=TRUE))
+  plot(tri.mesh(akima),add=TRUE,lty="dashed")
 
 # use only 15 points (interpolation only within convex hull!)
 akima.part <- interp(akima$x[1:15],akima$y[1:15],akima$z[1:15])
 image(akima.part$x,akima.part$y,akima.part$z)
-contour(akima.part$x,akima.part$y,akima.part$z,add=T)
+contour(akima.part$x,akima.part$y,akima.part$z,add=TRUE)
 points(akima$x[1:15],akima$y[1:15])
 
 # spline interpolation, use 5 points to calculate derivatives
@@ -169,7 +169,7 @@ points(akima$x[1:15],akima$y[1:15])
 akima.spl <- interp.old(akima$x, akima$y, akima$z,
       xo=seq(0,25, length=100),  yo=seq(0,20, length=100),ncp=5)
 image(akima.spl$x,akima.spl$y,akima.spl$z)
-contour(akima.spl$x,akima.spl$y,akima.spl$z,add=T)
+contour(akima.spl$x,akima.spl$y,akima.spl$z,add=TRUE)
 points(akima$x,akima$y)
 
 # example with duplicate points

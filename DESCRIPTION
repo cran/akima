@@ -1,5 +1,5 @@
 Package: akima
-Version: 0.3-3
+Version: 0.3-4
 Title: Interpolation of irregularly spaced data
 Author: Fortran code by H. Akima
  R port by Albrecht Gebhardt <albrecht.gebhardt@uni-klu.ac.at>
