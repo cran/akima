@@ -6,9 +6,9 @@
 \alias{interp.new}
 \alias{interp.old}
 \usage{
-interp(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=F)
-interp.old(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=F)
-interp.new(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=F)
+interp(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
+interp.old(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
+interp.new(x, y, z, xo=<<see below>>, yo=<<see below>>, linear=FALSE, ncp=NULL, extrap=FALSE, duplicate = "error", dupfun = NULL)
 }
 \arguments{
   \item{x}{
@@ -46,6 +46,7 @@ interp.new(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=F)
     used (\code{extrap=F}, the default), \code{yo} should have a range that is
     close to or inside of the range of \code{y} for the results to be meaningful.
   }
+  \item{linear}{logical, switch to linear interpolation in \code{interp.new}}
   \item{ncp}{
     number of additional points to be used in computing partial
     derivatives at each data point.  

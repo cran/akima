@@ -1,21 +1,17 @@
-2001-01-10  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+2001-06-18  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* /usr/local/cvsroot/akima/DESCRIPTION:
-	new version. problem with tripack on tru64 solved.
+	* /usr/local/cvsroot/akima/DESCRIPTION: new release number
+
+	* /usr/local/cvsroot/akima/man/interp.Rd, /usr/local/cvsroot/akima/man/interpp.Rd:
+	ready for 1.3
+
+2001-01-10  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
 	* /usr/local/cvsroot/akima/src/tripack.subset.f, /usr/local/cvsroot/akima/src/tripack.f, /usr/local/cvsroot/akima/R/interpp.old.R, /usr/local/cvsroot/akima/src/akima.new.f, /usr/local/cvsroot/akima/R/interp.new.R, /usr/local/cvsroot/akima/R/interp.old.R, /usr/local/cvsroot/akima/R/interpp.new.R:
 	updated to use the same TRIPACK functions as package tripack.
 	works also with crosslinking aklima against tripack (R-genlibs patch at
 	ftp://ftp-stat.uni.klu.ac.at/pub/R/contrib). In this case src/tripack.f
 	can be removed.
-
-2001-01-08  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
-
-	* /usr/local/cvsroot/akima/man/interp.Rd, /usr/local/cvsroot/akima/man/interpp.Rd:
-	changes for upcoming R 1.2.1
-	tripack.subset.f clashes with tripack! at least on the alpha :(
-	something to do with library load order or so. need a resync between
-	tripck.f and tripack.subset.f
 
 2000-12-30  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
@@ -31,10 +27,7 @@
 
 	* /usr/local/cvsroot/akima/R/zzz.R: dropped old sharedlib loading
 
-2000-06-03  khornik  <khornik@alpha5-stat>
-
-	* /usr/local/cvsroot/akima/src-c/ttidbs.c, /usr/local/cvsroot/akima/src-c/tripack.subset.c, /usr/local/cvsroot/akima/src-c/idxchg.c, /usr/local/cvsroot/akima/src-c/idtang.c, /usr/local/cvsroot/akima/src-c/idsfft.c, /usr/local/cvsroot/akima/src-c/idptli.c, /usr/local/cvsroot/akima/src-c/idptip.c, /usr/local/cvsroot/akima/src-c/idpdrv.c, /usr/local/cvsroot/akima/src-c/idlctn.c, /usr/local/cvsroot/akima/src-c/idgrid.c, /usr/local/cvsroot/akima/src-c/idcldp.c, /usr/local/cvsroot/akima/src-c/idbvip.c, /usr/local/cvsroot/akima/src-c/driver.c, /usr/local/cvsroot/akima/src-c/akima.new.c, /usr/local/cvsroot/akima/src-c/Makefile:
-	f2c parts removed
+2000-06-03  khornik  <khornik@omega.home.algepop.net>
 
 	* /usr/local/cvsroot/akima/src/idbvip.f, /usr/local/cvsroot/akima/src/Makefile:
 	New version is 0.2-4
