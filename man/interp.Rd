@@ -154,8 +154,8 @@ contour(akima.smooth$x,akima.smooth$y,akima.smooth$z,add=T)
 points(akima$x,akima$y)
 # use triangulation library to
 # show underlying triangulation:
-library(tripack)
-plot(tri.mesh(akima),add=T,lty="dashed")
+if(library(tripack, logical.return=T))
+  plot(tri.mesh(akima),add=T,lty="dashed")
 
 # use only 15 points (interpolation only within convex hull!)
 akima.part <- interp(akima$x[1:15],akima$y[1:15],akima$z[1:15])
@@ -164,7 +164,8 @@ contour(akima.part$x,akima.part$y,akima.part$z,add=T)
 points(akima$x[1:15],akima$y[1:15])
 
 # spline interpolation, use 5 points to calculate derivatives
-akima.spl <- interp(akima$x, akima$y, akima$z,
+# interp gives `linear interpolation not yet implemented with interp.new()'
+akima.spl <- interp.old(akima$x, akima$y, akima$z,
       xo=seq(0,25, length=100),  yo=seq(0,20, length=100),ncp=5)
 image(akima.spl$x,akima.spl$y,akima.spl$z)
 contour(akima.spl$x,akima.spl$y,akima.spl$z,add=T)
@@ -176,7 +177,7 @@ air <- airquality[(!is.na(airquality$Temp) &
                    !is.na(airquality$Ozone) & 
                    !is.na(airquality$Solar.R)),]
 # gives an error:
-air.ip <- interp(air$Temp,air$Solar.R,air$Ozone)
+\dontrun{air.ip <- interp(air$Temp,air$Solar.R,air$Ozone)}
 # use mean of duplicate points:
 air.ip <- interp(air$Temp,air$Solar.R,air$Ozone,duplicate="mean")
 }
