@@ -15,11 +15,17 @@ interp() actually calls interp.new() or interp.old() depending on its arguments,
 linear interpolation is done by interp.old(), spline interpolation by interp.new
 .
 
+UPDATE (13.12.2004):
+
+Thomas Petzoldt <petzoldt@rcs.urz.tu-dresden.de> provided an R interface to
+Akimas univariate spline interpolation functions (aspline) which has been 
+included into this library.
+
 ------------------------------------------------------------------------------
 Albrecht Gebhardt          email: albrecht.gebhardt@uni-klu.ac.at
-Institut fuer Mathematik   Tel. : (++43 463) 2700/837
-Universitaet Klagenfurt    Fax  : (++43 463) 2700/834
-Villacher Str. 161         WWW  : http://pc02-stat.sci.uni-klu.ac.at/~agebhard
+Institut fuer Mathematik   Tel. : (++43 463) 2700/3118
+Universitaet Klagenfurt    Fax  : (++43 463) 2700/3198
+Universitaetsstr. 65-67    WWW  : http://www.math.uni-klu.ac.at/~agebhard
 A-9020 Klagenfurt, Austria
 ------------------------------------------------------------------------------
 

@@ -1,6 +1,7 @@
 akima                   Waveform Distortion Data for Bivariate
-                        Interpolation 
+                        Interpolation
+aspline                 Univariate Akima interpolation
 interp                  Gridded Bivariate Interpolation for Irregular
-                        Data 
-interpp                 Pointwise Bivariate Interpolation for Irregular
-                        Data 
+                        Data
+interpp                 Pointwise Bivariate Interpolation for
+                        Irregular Data

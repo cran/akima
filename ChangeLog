@@ -1,16 +1,27 @@
+2005-01-09  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* DESCRIPTION, R/aspline.R, man/aspline.Rd, src/akima433.f, src/akima697.f:
+	final changes before upload of akima 0.4
+
+2004-12-13  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* INDEX, README, orig/433, orig/697:
+	add aspline interface to Akimas univariate interpolation functions,
+	provided by Thomas Petzoldt <petzoldt@rcs.urz.tu-dresden.de>.
+
 2002-05-06  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
 	* data/00Index: indec update
 
-2002-05-06  Debian User  <alge@epsilon.home.algepop.net>
+2002-05-06  alge  <alge@omega.home.algepop.dyndns.org>
 
 	* man/akima.Rd: last ? change for 1.5.0
 
-2002-05-05  Debian User  <alge@epsilon.home.algepop.net>
+2002-05-05  alge  <alge@omega.home.algepop.dyndns.org>
 
 	* man/interp.Rd: last T/F changes
 
-	* man/interpp.Rd, INDEX, DESCRIPTION: T/F changes (1.5.0)
+	* man/interpp.Rd: T/F changes (1.5.0)
 
 2002-01-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
@@ -19,7 +30,7 @@
 
 2001-01-10  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* src/tripack.subset.f, src/tripack.f, src/akima.new.f:
+	* src/akima.new.f, src/tripack.f, src/tripack.subset.f:
 	updated to use the same TRIPACK functions as package tripack.
 	works also with crosslinking aklima against tripack (R-genlibs patch at
 	ftp://ftp-stat.uni.klu.ac.at/pub/R/contrib). In this case src/tripack.f
@@ -27,15 +38,15 @@
 
 2000-06-04  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* data/index.doc, TITLE: last changes to make "R CMD build" happy
+	* TITLE, data/index.doc: last changes to make "R CMD build" happy
 
 2000-06-03  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
 	* R/zzz.R: dropped old sharedlib loading
 
-2000-06-03  Kurt Hornik  <khornik@epsilon.home.algepop.net>
+2000-06-03  khornik  <khornik@omega.home.algepop.dyndns.org>
 
-	* src/idbvip.f, src/Makefile: New version is 0.2-4
+	* src/Makefile, src/idbvip.f: New version is 0.2-4
 	COMMON/IDLC/N -> COMMON/IDLC/NIT, idummy in idbvip.f
 	Fix problems with \example in interp.Rd
 
@@ -49,7 +60,7 @@
 
 1998-03-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* orig/akima.bib, orig/761, PORTING, README:
+	* orig/761, orig/akima.bib, PORTING:
 	src-c now works, f2c problem vanished
 
 1998-02-28  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
@@ -60,13 +71,9 @@
 
 	* 526: Added new spline interpolation code from Akima 1996
 
-	* src/idptli.f: Imported sources
-
-	* src/idptli.f: New file.
-
-	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
+	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idptli.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
 	Imported sources
 
-	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
+	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idptli.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
 	New file.
 
