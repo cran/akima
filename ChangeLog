@@ -1,0 +1,43 @@
+Wed Aug 19 21:54:17 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* src/idlctn.f, src/Makefile:
+	interpp.old works now (COMMON variable added)
+
+	* R/interpp.new.R, R/interp.new.R:
+	wrong types (double <-> integer corrected. interpp.new.R still crashes!
+
+	* DESCRIPTION: new release
+
+Sun May 24 21:00:24 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* R/zzz.R: First.lib added for R > 0.61
+
+	* Attic/ChangeLog: removed from CVS
+
+Sun Mar  1 10:32:07 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* src-c/Makefile, src-c/driver.c, orig/akima.bib, orig/761, man/interp.Rd, PORTING, README:
+	src-c now works, f2c problem vanished
+
+Sat Feb 28 23:38:02 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* src-c/akima.new.c, src-c/tripack.subset.c: f2c version added
+
+	* src/akima.new.f, src/tripack.subset.f, orig/526, man/interpp.Rd, R/interp.old.R, R/interpp.R, R/interpp.old.R, R/interp.R:
+	Added new spline interpolation code from Akima 1996
+	interp() chooses now between old an new version of code
+
+	* Attic/526: Added new spline interpolation code from Akima 1996
+
+	* src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c, src-c/idpdrv.c, src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c, src-c/idtang.c, src-c/idxchg.c, src-c/ttidbs.c, src/idptli.f:
+	Imported sources
+
+	* src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c, src-c/idpdrv.c, src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c, src-c/idtang.c, src-c/idxchg.c, src-c/ttidbs.c, src/idptli.f:
+	Initial revision
+
+	* INDEX, TITLE, data/akima.R, data/index.doc, man/akima.Rd, src/idbvip.f, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
+	Imported sources
+
+	* INDEX, TITLE, data/akima.R, data/index.doc, man/akima.Rd, src/idbvip.f, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
+	Initial revision
+

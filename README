@@ -1,0 +1,25 @@
+This library contains an R implementation of the S-Plus function interp().
+
+I used Fortran code for cubic spline interpolation from H. Akima available 
+at http://www.netlib.org/toms .
+There are two version, one from 1978 (AMS code 526, used in SPlus 3.x) and a 
+newer one (AMS 761) from 1996. The original versions are in the directory orig/.
+
+I only had to write a subroutine idptli.f for linear interpolation within
+triangles from the delauney triangulation.
+
+I added  a function interpp(), which evaluates the interpolated function at 
+arbitraryly choosen points and generates no regular grid as interp() does.
+
+interp() actually calls interp.new() or interp.old() depending on its arguments,
+linear interpolation is done by interp.old(), spline interpolation by interp.new
+.
+
+------------------------------------------------------------------------------
+Albrecht Gebhardt          email: albrecht.gebhardt@uni-klu.ac.at
+Institut fuer Mathematik   Tel. : (++43 463) 2700/837
+Universitaet Klagenfurt    Fax  : (++43 463) 2700/834
+Villacher Str. 161         WWW  : http://pc02-stat.sci.uni-klu.ac.at/~agebhard
+A-9020 Klagenfurt, Austria
+------------------------------------------------------------------------------
+
