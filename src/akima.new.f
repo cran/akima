@@ -1,5 +1,5 @@
       SUBROUTINE SDBI3P(MD,NDP,XD,YD,ZD,NIP,XI,YI, ZI,IER, WK,IWK,
-     +                  EXTRPI)
+     +                  EXTRPI,NEAR,NEXT,DIST)
 *
 * Scattered-data bivariate interpolation
 * (a master subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -48,6 +48,9 @@
 *   IWK = two-dimensional integer array of dimension NDP*25
 *         used internally as a work area.
 *
+* agebhard@uni-klu.ac.at: added from new TRIPACK:
+*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
+*
 * The very first call to this subroutine and the call with a new
 * NDP value or new XD and YD arrays must be made with MD=1.  The
 * call with MD=2 must be preceded by another call with the same
@@ -78,11 +81,12 @@
       PARAMETER        (NIPIMX=51)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IER,MD,NDP,NIP
+      INTEGER          IER,MD,NDP,NIP,NEAR(NDP),NEXT(NDP)
+
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION             WK(NDP,17),XD(NDP),XI(NIP),YD(NDP),
-     +                 YI(NIP),ZD(NDP),ZI(NIP)
+     +                 YI(NIP),ZD(NDP),ZI(NIP),DIST(NDP)
       INTEGER          IWK(NDP,25)
       LOGICAL          EXTRPI(NIP)
 *     ..
@@ -112,7 +116,8 @@
 * Triangulates the x-y plane.  (for MD=1)
       IF (MD.NE.2 .AND. MD.NE.3) THEN
           CALL SDTRAN(NDP,XD,YD, NT,IWK(1,1),NL,IWK(1,7),IERT,
-     +                IWK(1,1),IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9))
+     +                IWK(1,1),IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9),
+     +                NEAR,NEXT,DIST)
 *         CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
 *    +                LIST,LPTR,LEND,LTRI,ITL)
           IF (IERT.GT.0) GO TO 50
@@ -163,7 +168,7 @@
 
 
       SUBROUTINE SDSF3P(MD,NDP,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK,IWK,
-     +                  EXTRPI)
+     +                  EXTRPI,NEAR,NEXT,DIST)
 *
 * Scattered-data smooth surface fitting
 * (a master subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -216,6 +221,9 @@
 *   IWK = two-dimensional integer array of dimension NDP*25
 *         used internally as a work area.
 *
+* agebhard@uni-klu.ac.at: added from new TRIPACK:
+*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
+*
 * The very first call to this subroutine and the call with a new
 * NDP value or new XD and YD arrays must be made with MD=1.  The
 * call with MD=2 must be preceded by another call with the same
@@ -246,11 +254,11 @@
       PARAMETER        (NIPIMX=51)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IER,MD,NDP,NXI,NYI
+      INTEGER          IER,MD,NDP,NXI,NYI,NEAR(NDP),NEXT(NDP)
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION             WK(NDP,17),XD(NDP),XI(NXI),YD(NDP),
-     +                 YI(NYI),ZD(NDP),ZI(NXI,NYI)
+     +                 YI(NYI),ZD(NDP),ZI(NXI,NYI),DIST(NDP)
       INTEGER          IWK(NDP,25)
       LOGICAL          EXTRPI(NXI,NYI)
 *     ..
@@ -282,7 +290,8 @@
 * Triangulates the x-y plane.  (for MD=1)
       IF (MD.NE.2 .AND. MD.NE.3) THEN
           CALL SDTRAN(NDP,XD,YD, NT,IWK(1,1),NL,IWK(1,7),IERT,
-     +                IWK(1,1),IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9))
+     +                IWK(1,1),IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9),
+     +                NEAR,NEXT,DIST)
 *         CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
 *    +                LIST,LPTR,LEND,LTRI,ITL)
           IF (IERT.GT.0) GO TO 80
@@ -344,7 +353,7 @@
 
 
       SUBROUTINE SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT, LIST,LPTR,LEND,
-     +                  LTRI,ITL)
+     +                  LTRI,ITL,NEAR,NEXT,DIST)
 *
 * Triangulation of the data area in a plane with a scattered data
 * point set
@@ -405,13 +414,16 @@
 *   ITL  = integer array of dimension NDP used internally as
 *          a work area.
 *
+* agebhard@uni-klu.ac.at: added from new TRIPACK:
+*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
+*
 *
 * Specification statements
 *     .. Scalar Arguments ..
-      INTEGER          IERT,NDP,NL,NT
+      INTEGER          IERT,NDP,NL,NT,NEAR(NDP),NEXT(NDP)
 *     ..
 *     .. Array Arguments ..
-      DOUBLE PRECISION             XD(NDP),YD(NDP)
+      DOUBLE PRECISION             XD(NDP),YD(NDP),DIST(NDP)
       INTEGER          IPL(2,*),IPT(3,*),ITL(NDP),LEND(NDP),LIST(6,NDP),
      +                 LPTR(6,NDP),LTRI(12,NDP)
 *     ..
@@ -423,7 +435,7 @@
 *     ..
 * Basic triangulation
       CALL SDTRCH(NDP,XD,YD, NT,IPT,NL,IPL,IERTM,IERTL, LIST,LPTR,LEND,
-     +            LTRI)
+     +            LTRI,NEAR,NEXT,DIST)
       IF (IERTM.NE.0) GO TO 10
       IF (IERTL.NE.0) GO TO 20
       IERT = 0
@@ -467,7 +479,7 @@
 
 
       SUBROUTINE SDTRCH(NDP,XD,YD, NT,IPT,NL,IPL,IERTM,IERTL,
-     +                  LIST,LPTR,LEND,LTRI)
+     +                  LIST,LPTR,LEND,LTRI,NEAR,NEXT,DIST)
 *
 * Basic triangulation in the convex hull of a scattered data point
 * set in a plane
@@ -531,6 +543,8 @@
 *   LTRI  = two-dimensional integer array of dimension 12*NDP
 *           used internally as a work area.
 *
+* agebhard@uni-klu.ac.at: added from new TRIPACK:
+*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
 *
 * Specification statements
 *     .. Parameters ..
@@ -538,10 +552,10 @@
       PARAMETER        (NCC=0,NROW=6)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IERTL,IERTM,NDP,NL,NT
+      INTEGER          IERTL,IERTM,NDP,NL,NT,NEAR(NDP),NEXT(NDP)
 *     ..
 *     .. Array Arguments ..
-      DOUBLE PRECISION             XD(NDP),YD(NDP)
+      DOUBLE PRECISION             XD(NDP),YD(NDP),DIST(NDP)
       INTEGER          IPL(2,*),IPT(3,*),LEND(NDP),LIST(*),LPTR(*),
      +                 LTRI(NROW,*)
 *     ..
@@ -558,7 +572,7 @@
       INTRINSIC        MOD
 *     ..
 * Performs basic triangulation.
-      CALL TRMESH(NDP,XD,YD, LIST,LPTR,LEND,LNEW,IERTM)
+      CALL TRMESH(NDP,XD,YD, LIST,LPTR,LEND,LNEW,NEAR,NEXT,DIST,IERTM)
       IF (IERTM.NE.0) RETURN
       CALL TRLIST(NCC,LCC,NDP,LIST,LPTR,LEND,NROW, NT,LTRI,LCT,IERTL)
       IF (IERTL.NE.0) RETURN

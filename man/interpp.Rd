@@ -109,7 +109,7 @@ interpp(x, y, z, xo, yo, ncp=0, extrap=F)
   \bold{22}, 362-371.
 }
 \seealso{
-  \code{\link{contour}}, \code{\link{image}}, \code{\link{approx}}, \code{\link{spline}}, \code{\link{outer}}, \code{\link{expand.grid}},\code{\link{interp}}.
+  \code{\link[base]{contour}}, \code{\link[base]{image}}, \code{\link[base]{approx}}, \code{\link[base]{spline}}, \code{\link[base]{outer}}, \code{\link[base]{expand.grid}},\code{\link{interp}}.
 }
 \examples{
 data(akima)

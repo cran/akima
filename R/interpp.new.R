@@ -73,7 +73,11 @@
                   z = zo,
                   double(17 * n),
                   integer(25 * n),
-                  extrap = as.logical(extrap))
+                  extrap = as.logical(extrap),
+                  near = integer(n),
+                  net = integer(n),
+                  dist = double(n),
+                  PACKAGE = "akima")
   temp <- ans[c("x", "y", "z", "extrap")]
   if(miss)
     temp$z[temp$extrap]<-NA

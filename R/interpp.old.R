@@ -73,7 +73,8 @@
                   z = zo,
                   integer((31 + ncp) * n + np),
                   double(8 * n),
-                  misso = as.logical(misso))
+                  misso = as.logical(misso),
+                  PACKAGE = "akima")
   temp <- ans[c("x", "y", "z", "misso")]
   temp$z[temp$misso]<-NA
   temp[c("x", "y", "z")]

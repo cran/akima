@@ -74,7 +74,6 @@
   }
   ans <- .Fortran("sdsf3p",
                   as.integer(1),
-#                  as.integer(ncp),
                   as.integer(n),
                   as.double(x),
                   as.double(y),
@@ -87,8 +86,11 @@
                   ier = integer(1),
                   double(36 * n),
                   integer(25 * n),
-                  extrap = as.logical(extrap)
-                  )
+                  extrap = as.logical(extrap),
+                  near = integer(n),
+                  nxt = integer(n),
+                  dist = double(n),
+                  PACKAGE = "akima")
   temp <- ans[c("x", "y", "z", "extrap")]
   if(miss)
     temp$z[temp$extrap]<-NA
