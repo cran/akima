@@ -1,69 +1,56 @@
-Wed Aug 18 21:23:17 1999  Kurt Hornik  <Kurt.Hornik@ci.tuwien.ac.at>
+2000-06-04  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* DESCRIPTION (Version): New version is 0.2-4.
+	* /usr/local/cvsroot/akima/man/akima.Rd, /usr/local/cvsroot/akima/data/00Index, /usr/local/cvsroot/akima/data/index.doc, /usr/local/cvsroot/akima/TITLE, /usr/local/cvsroot/akima/INDEX, /usr/local/cvsroot/akima/DESCRIPTION:
+	last changes to make "R CMD build" happy
 
-	* src-c, src/Makefile: Removed.
+2000-06-03  Kurt Hornik  <khornik@epsilon>
 
-	* src/idbvip.f: Replace the line 
-	  COMMON/IDLC/NIT
-	by
-	  COMMON/IDLC/NIT, idummy
+	* /usr/local/cvsroot/akima/man/interp.Rd: last problem with example
 
-	* man/interp.Rd: Fix problems with \example.
+2000-06-03  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-Wed Aug 19 21:54:17 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+	* /usr/local/cvsroot/akima/R/zzz.R: dropped old sharedlib loading
 
-	* src/idlctn.f, src/Makefile:
+2000-06-03  Kurt Hornik  <khornik@epsilon>
+
+	* /usr/local/cvsroot/akima/src/idbvip.f, /usr/local/cvsroot/akima/src/Makefile:
+	New version is 0.2-4
+	COMMON/IDLC/N -> COMMON/IDLC/NIT, idummy in idbvip.f
+	Fix problems with \example in interp.Rd
+
+1998-08-19  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* /usr/local/cvsroot/akima/src/idlctn.f:
 	interpp.old works now (COMMON variable added)
 
-	* R/interpp.new.R, R/interp.new.R:
-	wrong types (double <-> integer corrected. interpp.new.R still
-	crashes!
+	* /usr/local/cvsroot/akima/R/interpp.new.R, /usr/local/cvsroot/akima/R/interp.new.R:
+	wrong types (double <-> integer corrected. interpp.new.R still crashes!
 
-	* DESCRIPTION: new release
+1998-05-24  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-Sun May 24 21:00:24 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+	* /usr/local/cvsroot/akima/ChangeLog: removed from CVS
 
-	* R/zzz.R: First.lib added for R > 0.61
+1998-03-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* Attic/ChangeLog: removed from CVS
+	* /usr/local/cvsroot/akima/orig/akima.bib, /usr/local/cvsroot/akima/orig/761, /usr/local/cvsroot/akima/PORTING, /usr/local/cvsroot/akima/README:
+	src-c now works, f2c problem vanished
 
-Sun Mar  1 10:32:07 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+1998-02-28  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* src-c/Makefile, src-c/driver.c, orig/akima.bib, orig/761,
-	man/interp.Rd, PORTING, README: src-c now works, f2c problem
-	vanished
+	* /usr/local/cvsroot/akima/src/akima.new.f, /usr/local/cvsroot/akima/src/tripack.subset.f, /usr/local/cvsroot/akima/orig/526, /usr/local/cvsroot/akima/man/interpp.Rd, /usr/local/cvsroot/akima/R/interp.old.R, /usr/local/cvsroot/akima/R/interpp.R, /usr/local/cvsroot/akima/R/interpp.old.R, /usr/local/cvsroot/akima/R/interp.R:
+	Added new spline interpolation code from Akima 1996
+	interp() chooses now between old an new version of code
 
-Sat Feb 28 23:38:02 1998  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+	* /usr/local/cvsroot/akima/526:
+	Added new spline interpolation code from Akima 1996
 
-	* src-c/akima.new.c, src-c/tripack.subset.c: f2c version added
+	* /usr/local/cvsroot/akima/src/idptli.f: Imported sources
 
-	* src/akima.new.f, src/tripack.subset.f, orig/526, man/interpp.Rd,
-	R/interp.old.R, R/interpp.R, R/interpp.old.R, R/interp.R:
-	Added new spline interpolation code from Akima 1996 interp()
-	chooses now between old an new version of code
+	* /usr/local/cvsroot/akima/src/idptli.f: New file.
 
-	* Attic/526: Added new spline interpolation code from Akima 1996
-
-	* src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c,
-	src-c/idpdrv.c, src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c,
-	src-c/idtang.c, src-c/idxchg.c, src-c/ttidbs.c, src/idptli.f:
+	* /usr/local/cvsroot/akima/data/akima.R, /usr/local/cvsroot/akima/src/idcldp.f, /usr/local/cvsroot/akima/src/idgrid.f, /usr/local/cvsroot/akima/src/idpdrv.f, /usr/local/cvsroot/akima/src/idptip.f, /usr/local/cvsroot/akima/src/idsfft.f, /usr/local/cvsroot/akima/src/idtang.f, /usr/local/cvsroot/akima/src/idxchg.f, /usr/local/cvsroot/akima/src/ttidbs.f:
 	Imported sources
 
-	* src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c,
-	src-c/idpdrv.c, src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c,
-	src-c/idtang.c, src-c/idxchg.c, src-c/ttidbs.c, src/idptli.f:
-	Initial revision
-
-	* INDEX, TITLE, data/akima.R, data/index.doc, man/akima.Rd,
-	src/idbvip.f, src/idcldp.f, src/idgrid.f, src/idpdrv.f,
-	src/idptip.f, src/idsfft.f, src/idtang.f, src/idxchg.f,
-	src/ttidbs.f:
-	Imported sources
-
-	* INDEX, TITLE, data/akima.R, data/index.doc, man/akima.Rd,
-	src/idbvip.f, src/idcldp.f, src/idgrid.f, src/idpdrv.f,
-	src/idptip.f, src/idsfft.f, src/idtang.f, src/idxchg.f,
-	src/ttidbs.f:
-	Initial revision
+	* /usr/local/cvsroot/akima/data/akima.R, /usr/local/cvsroot/akima/src/idcldp.f, /usr/local/cvsroot/akima/src/idgrid.f, /usr/local/cvsroot/akima/src/idpdrv.f, /usr/local/cvsroot/akima/src/idptip.f, /usr/local/cvsroot/akima/src/idsfft.f, /usr/local/cvsroot/akima/src/idtang.f, /usr/local/cvsroot/akima/src/idxchg.f, /usr/local/cvsroot/akima/src/ttidbs.f:
+	New file.
 

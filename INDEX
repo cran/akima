@@ -1,2 +1,6 @@
-interp		Gridded Bivariate Interpolation for Irregular Data
-interpp		Pointwise Bivariate Interpolation for Irregular Data
+akima                    Waveform Distortion Data for Bivariate
+                         Interpolation
+interp                   Gridded Bivariate Interpolation for Irregular
+                         Data
+interpp                  Pointwise Bivariate Interpolation for Irregular
+                         Data

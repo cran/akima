@@ -1,4 +1,5 @@
 \name{akima}
+\alias{akima}
 \title{
 Waveform Distortion Data for Bivariate Interpolation
 }
@@ -7,7 +8,7 @@ Waveform Distortion Data for Bivariate Interpolation
 represents a smooth surface of \code{z} values at selected points
 irregularly distributed in the \code{x-y} plane.
 }}
-\section{SOURCE}{
+\description{
 Hiroshi Akima, "A Method of Bivariate Interpolation and
 Smooth Surface Fitting for Irregularly Distributed Data
 Points", 
