@@ -1,6 +1,10 @@
+2005-03-31  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* DESCRIPTION, man/interp.Rd: man page cleanup for upcoming R 2.1.0
+
 2005-01-09  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* DESCRIPTION, R/aspline.R, man/aspline.Rd, src/akima433.f, src/akima697.f:
+	* R/aspline.R, man/aspline.Rd, src/akima433.f, src/akima697.f:
 	final changes before upload of akima 0.4
 
 2004-12-13  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
@@ -13,13 +17,11 @@
 
 	* data/00Index: indec update
 
-2002-05-06  alge  <alge@omega.home.algepop.dyndns.org>
+2002-05-06  alge  <alge@wpsi.home.algepop.dyndns.org>
 
 	* man/akima.Rd: last ? change for 1.5.0
 
-2002-05-05  alge  <alge@omega.home.algepop.dyndns.org>
-
-	* man/interp.Rd: last T/F changes
+2002-05-05  alge  <alge@wpsi.home.algepop.dyndns.org>
 
 	* man/interpp.Rd: T/F changes (1.5.0)
 
@@ -44,7 +46,10 @@
 
 	* R/zzz.R: dropped old sharedlib loading
 
-2000-06-03  khornik  <khornik@omega.home.algepop.dyndns.org>
+2000-06-03  khornik  <khornik@wpsi.home.algepop.dyndns.org>
+
+	* src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c, src-c/idtang.c, src-c/idxchg.c, src-c/tripack.subset.c, src-c/ttidbs.c, src-c/Makefile, src-c/akima.new.c, src-c/driver.c, src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c, src-c/idpdrv.c:
+	f2c parts removed
 
 	* src/Makefile, src/idbvip.f: New version is 0.2-4
 	COMMON/IDLC/N -> COMMON/IDLC/NIT, idummy in idbvip.f

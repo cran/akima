@@ -6,9 +6,9 @@
 \alias{interp.new}
 \alias{interp.old}
 \usage{
-interp(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
-interp.old(x, y, z, xo=<<see below>>, yo=<<see below>>, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
-interp.new(x, y, z, xo=<<see below>>, yo=<<see below>>, linear=FALSE, ncp=NULL, extrap=FALSE, duplicate = "error", dupfun = NULL)
+interp(x, y, z, xo=seq(min(x), max(x), length = 40), yo=seq(min(y), max(y), length = 40), ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
+interp.old(x, y, z, xo= seq(min(x), max(x), length = 40), yo=seq(min(y), max(y), length = 40), ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
+interp.new(x, y, z, xo= seq(min(x), max(x), length = 40), yo=seq(min(y), max(y), length = 40), linear=FALSE, ncp=NULL, extrap=FALSE, duplicate = "error", dupfun = NULL)
 }
 \arguments{
   \item{x}{
