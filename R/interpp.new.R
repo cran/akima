@@ -44,7 +44,7 @@
         n <- length(x)
       }
       else{
-        ord <- (hist(i,plot=F,freq=T,breaks=seq(0.5,max(i)+0.5,1))$counts==1)
+        ord <- (hist(i,plot=FALSE,freq=TRUE,breaks=seq(0.5,max(i)+0.5,1))$counts==1)
         x <- x[ord]
         y <- y[ord]
         z <- z[ord]
@@ -57,7 +57,7 @@
   zo <- rep(0, np)
   storage.mode(zo) <- "double"
   miss <- !extrap	#if not extrapolating use missing values
-  extrap <- seq(T, np)
+  extrap <- seq(TRUE, np)
   if(extrap & ncp == 0)
     warning("Cannot extrapolate with linear option")
   ans <- .Fortran("sdbi3p",

@@ -1,5 +1,5 @@
 "interp.new"<-function(x, y, z, xo = seq(min(x), max(x), length = 40),
-                       yo = seq(min(y), max(y), length = 40), linear=F,
+                       yo = seq(min(y), max(y), length = 40), linear=FALSE,
                        ncp = NULL, extrap = FALSE, duplicate = "error", 
                        dupfun = NULL)
 {
@@ -50,7 +50,7 @@
         n <- length(x)
       }
       else{
-        ord <- (hist(i,plot=F,freq=T,breaks=seq(0.5,max(i)+0.5,1))$counts==1)
+        ord <- (hist(i,plot=FALSE,freq=TRUE,breaks=seq(0.5,max(i)+0.5,1))$counts==1)
         x <- x[ord]
         y <- y[ord]
         z <- z[ord]
@@ -63,7 +63,7 @@
   zo <- matrix(0, nx, ny)
   storage.mode(zo) <- "double"
   miss <- !extrap	#if not extrapolating use missing values
-  extrap <- matrix(T, nx, ny)
+  extrap <- matrix(TRUE, nx, ny)
   if(!is.null(ncp)){
     if(extrap & ncp == 0)
       warning("Cannot extrapolate with linear option")
