@@ -1,13 +1,14 @@
 "interp.old"<-function(x, y, z, xo = seq(min(x), max(x), length = 40),
-                   yo = seq(min(y), max(y), length = 40), 
+                   yo = seq(min(y), max(y), length = 40),
                    ncp = 0, extrap = FALSE, duplicate = "error", dupfun = NULL)
 {
   if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
     stop("missing values and Infs not allowed")
-  if(ncp>25){
+  if(ncp > 25) {
     ncp <- 25
     cat("ncp too large, using ncp=25\n")
   }
+
   drx <- diff(range(x))
   dry <- diff(range(y))
   if(drx == 0 || dry == 0)
@@ -19,36 +20,34 @@
   ny <- length(yo)
   if(length(y) != n || length(z) != n)
     stop("Lengths of x, y, and z do not match")
-  xy <- paste(x, y, sep =",")
-  i <- match(xy, xy)
-  if(duplicate=="user" && !is.function(dupfun))
-    stop("duplicate=\"user\" requires dupfun to be set to a function")
-  if(duplicate!="error")
-    {
-      centre <- function(x) {
+
+  xy <- paste(x, y, sep = ",")# trick for 'duplicated' (x,y)-pairs
+  if(duplicate == "error") {
+    if(any(duplicated(xy)))
+      stop("duplicate data points: need to set 'duplicate = ..' ")
+  }
+  else { ## duplicate != "error"
+
+    i <- match(xy, xy)
+    if(duplicate == "user")
+      dupfun <- match.fun(dupfun)#> error if it fails
+
+    ord <- !duplicated(xy)
+    if(duplicate != "strip") {
+      centre <- function(x)
         switch(duplicate,
                mean = mean(x),
                median = median(x),
                user = dupfun(x))
-      }
-      if(duplicate!="strip"){
-        z <- unlist(lapply(split(z,i), centre))
-        ord <- !duplicated(xy)
-        x <- x[ord]
-        y <- y[ord]
-        n <- length(x)
-      }
-      else{
-        ord <- (hist(i,plot=FALSE,freq=TRUE,breaks=seq(0.5,max(i)+0.5,1))$counts==1)
-        x <- x[ord]
-        y <- y[ord]
-        z <- z[ord]
-        n <- length(x)
-      }
+      z <- unlist(lapply(split(z,i), centre))
+    } else {
+      z <- z[ord]
     }
-  else
-    if(any(duplicated(xy)))
-      stop("duplicate data points")
+    x <- x[ord]
+    y <- y[ord]
+    n <- length(x)
+  }
+
   zo <- matrix(0, nx, ny)
   storage.mode(zo) <- "double"
   miss <- !extrap	#if not extrapolating use missing values
@@ -70,8 +69,7 @@
                   integer((31 + ncp) * n + nx * ny),
                   double(5 * n),
                   misso = as.logical(misso),
-                  PACKAGE = "akima")
-  temp <- ans[c("x", "y", "z", "misso")]
-  temp$z[temp$misso]<-NA
-  temp[c("x", "y", "z")]
+                  PACKAGE = "akima")[c("x", "y", "z", "misso")]
+  ans$z[ans$misso] <- NA
+  ans[c("x", "y", "z")]
 }

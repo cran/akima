@@ -1,12 +1,13 @@
-"interp.new"<-function(x, y, z, xo = seq(min(x), max(x), length = 40),
-                       yo = seq(min(y), max(y), length = 40), linear=FALSE,
-                       ncp = NULL, extrap = FALSE, duplicate = "error", 
-                       dupfun = NULL)
+interp.new <-
+  function(x, y, z,
+           xo = seq(min(x), max(x), length = 40),
+           yo = seq(min(y), max(y), length = 40), linear = FALSE,
+           ncp = NULL, extrap = FALSE, duplicate = "error", dupfun = NULL)
 {
   if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
     stop("missing values and Infs not allowed")
-  if(!is.null(ncp)){
-    if(ncp!=0){
+  if(!is.null(ncp)) {
+    if(ncp != 0) {
       cat("ncp not supported, it is automatically choosen by Fortran code\n")
     }
     else {
@@ -14,15 +15,15 @@
       stop("use interp.old().")
     }
   }
-  if(linear){
-      cat("linear interpolation not yet implemented with interp.new().\n")
-      stop("use interp.old().")
+  if(linear) {
+    cat("linear interpolation not yet implemented with interp.new().\n")
+    stop("use interp.old().")
   }
 
   drx <- diff(range(x))
   dry <- diff(range(y))
   if(drx == 0 || dry == 0)
-    stop("all data collinear")	# other cases caught in Fortran code
+    stop("all data collinear")    # other cases caught in Fortran code
   if(drx/dry > 10000 || drx/dry < 0.0001)
     stop("scales of x and y are too dissimilar")
   n <- length(x)
@@ -30,48 +31,42 @@
   ny <- length(yo)
   if(length(y) != n || length(z) != n)
     stop("Lengths of x, y, and z do not match")
-  xy <- paste(x, y, sep =",")
-  i <- match(xy, xy)
-  if(duplicate=="user" && !is.function(dupfun))
-    stop("duplicate=\"user\" requires dupfun to be set to a function")
-  if(duplicate!="error")
-    {
-      centre <- function(x) {
+
+  xy <- paste(x, y, sep = ",")# trick for 'duplicated' (x,y)-pairs
+  if(duplicate == "error") {
+    if(any(duplicated(xy)))
+      stop("duplicate data points: need to set 'duplicate = ..' ")
+  }
+  else { ## duplicate != "error"
+
+    i <- match(xy, xy)
+    if(duplicate == "user")
+      dupfun <- match.fun(dupfun)#> error if it fails
+
+    ord <- !duplicated(xy)
+    if(duplicate != "strip") {
+      centre <- function(x)
         switch(duplicate,
                mean = mean(x),
                median = median(x),
                user = dupfun(x))
-      }
-      if(duplicate!="strip"){
-        z <- unlist(lapply(split(z,i), centre))
-        ord <- !duplicated(xy)
-        x <- x[ord]
-        y <- y[ord]
-        n <- length(x)
-      }
-      else{
-        ord <- (hist(i,plot=FALSE,freq=TRUE,breaks=seq(0.5,max(i)+0.5,1))$counts==1)
-        x <- x[ord]
-        y <- y[ord]
-        z <- z[ord]
-        n <- length(x)
-      }
+      z <- unlist(lapply(split(z,i), centre))
+    } else {
+      z <- z[ord]
     }
-  else
-    if(any(duplicated(xy)))
-      stop("duplicate data points")
+    x <- x[ord]
+    y <- y[ord]
+    n <- length(x)
+  }
+
   zo <- matrix(0, nx, ny)
   storage.mode(zo) <- "double"
-  miss <- !extrap	#if not extrapolating use missing values
-  extrap <- matrix(TRUE, nx, ny)
-  if(!is.null(ncp)){
-    if(extrap & ncp == 0)
+  miss <- !extrap             # if not extrapolating, set missing values
+  misso <- matrix(TRUE, nx, ny)# hmm, or rather 'miss' ??
+
+  if(extrap && if(is.null(ncp)) linear else (ncp == 0))
       warning("Cannot extrapolate with linear option")
-  }
-  else {
-    if(extrap & linear)
-      warning("Cannot extrapolate with linear option")
-  }
+
   ans <- .Fortran("sdsf3p",
                   as.integer(1),
                   as.integer(n),
@@ -86,13 +81,13 @@
                   ier = integer(1),
                   double(36 * n),
                   integer(25 * n),
-                  extrap = as.logical(extrap),
+                  extrap = as.logical(misso),
                   near = integer(n),
                   nxt = integer(n),
                   dist = double(n),
-                  PACKAGE = "akima")
-  temp <- ans[c("x", "y", "z", "extrap")]
+                  PACKAGE = "akima")[c("x", "y", "z", "extrap")]
   if(miss)
-    temp$z[temp$extrap]<-NA
-  temp[c("x", "y", "z")]
+    ans$z[ans$extrap] <- NA
+
+  ans[c("x", "y", "z")]
 }

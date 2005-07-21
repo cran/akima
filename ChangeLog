@@ -1,6 +1,32 @@
-2005-03-31  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+2005-07-21  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* DESCRIPTION, man/interp.Rd: man page cleanup for upcoming R 2.1.0
+	* DESCRIPTION, R/interp.R, R/interp.new.R, R/interp.old.R, man/interp.Rd, orig/akima.bib, src/idptip.f:
+	commit bugfixes/enhancements from Martin Maechler (thanks :-)
+
+2005-07-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.4-5
+
+2005-07-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/interp.new.R (interp.new): simplify logic for warning("Cannot ..")
+
+2005-06-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/interp.R (interp): call interp.new and .old with *named*
+	arguments -> fixing long standing bug
+
+	* R/interp.new.R (interp.new): several improvements:
+	  use match.fun(); don't misuse hist(); don't save too much from
+	  .Fortran; etc.
+	* R/interp.old.R: dito ...
+
+	* man/interp.Rd: Improve 'Description'.
+	Examples extended; interp() now does call interp.new() correctly.
+
+	* orig/akima.bib: corrected to proper bib
+
+
 
 2005-01-09  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
@@ -17,18 +43,17 @@
 
 	* data/00Index: indec update
 
-2002-05-06  alge  <alge@wpsi.home.algepop.dyndns.org>
+2002-05-06  alge  <alge@pc22-ub.ub.uni-klu.ac.at.>
 
 	* man/akima.Rd: last ? change for 1.5.0
 
-2002-05-05  alge  <alge@wpsi.home.algepop.dyndns.org>
+2002-05-05  alge  <alge@pc22-ub.ub.uni-klu.ac.at.>
 
 	* man/interpp.Rd: T/F changes (1.5.0)
 
 2002-01-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* R/interp.new.R, R/interp.old.R, R/interpp.new.R, R/interpp.old.R:
-	T/F changed to TRUE/FALSE
+	* R/interpp.new.R, R/interpp.old.R: T/F changed to TRUE/FALSE
 
 2001-01-10  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
@@ -46,7 +71,7 @@
 
 	* R/zzz.R: dropped old sharedlib loading
 
-2000-06-03  khornik  <khornik@wpsi.home.algepop.dyndns.org>
+2000-06-03  khornik  <khornik@pc22-ub.ub.uni-klu.ac.at.>
 
 	* src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c, src-c/idtang.c, src-c/idxchg.c, src-c/tripack.subset.c, src-c/ttidbs.c, src-c/Makefile, src-c/akima.new.c, src-c/driver.c, src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c, src-c/idpdrv.c:
 	f2c parts removed
@@ -65,20 +90,19 @@
 
 1998-03-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* orig/761, orig/akima.bib, PORTING:
-	src-c now works, f2c problem vanished
+	* orig/761, PORTING: src-c now works, f2c problem vanished
 
 1998-02-28  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* orig/526, R/interpp.R, R/interp.R:
+	* orig/526, R/interpp.R:
 	Added new spline interpolation code from Akima 1996
 	interp() chooses now between old an new version of code
 
 	* 526: Added new spline interpolation code from Akima 1996
 
-	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idptli.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
+	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptli.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
 	Imported sources
 
-	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptip.f, src/idptli.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
+	* data/akima.R, src/idcldp.f, src/idgrid.f, src/idpdrv.f, src/idptli.f, src/idsfft.f, src/idtang.f, src/idxchg.f, src/ttidbs.f:
 	New file.
 
