@@ -38,6 +38,12 @@ C DECLARATION STATEMENTS
      *  WK(8*NDP)
       DIMENSION NTSC(9), IDSC(9)
       COMMON /IDLC/ NIT, ITIPV
+C agebhard@uni-klu.ac.at:
+C Fix an error caused by uninitialized values on second call,
+C possibly I added too much variables to this common block by guessing
+C their names from beeing used between "GO TO 80" and line "80":
+      COMMON /IDLCT/ XMN,XMX,YMN,YMX,XI,YI,XS1,YS1,XS2,YS2,NTSC,IDSC,
+     *     IT0T3,JWK,I1,I2,I3
 C STATEMENT FUNCTIONS
       SIDE(U1,V1,U2,V2,U3,V3) = (U1-U3)*(V2-V3) - (V1-V3)*(U2-U3)
       SPDT(U1,V1,U2,V2,U3,V3) = (U1-U2)*(U3-U2) + (V1-V2)*(V3-V2)

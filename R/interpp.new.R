@@ -1,4 +1,4 @@
-"interpp.new"<-function(x, y, z, xo, yo, ncp = 0, extrap = FALSE,
+"interpp.new"<-function(x, y, z, xo, yo, extrap = FALSE,
                     duplicate = "error", dupfun = NULL)
 {
   if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
@@ -7,10 +7,9 @@
     stop("xo missing")
   if(is.null(yo))
     stop("yo missing")
-  if(ncp>25){
-    ncp <- 25
-    cat("ncp too large, using ncp=25\n")
-  }
+  
+  
+
   drx <- diff(range(x))
   dry <- diff(range(y))
   if(drx == 0 || dry == 0)
@@ -58,11 +57,9 @@
   storage.mode(zo) <- "double"
   miss <- !extrap	#if not extrapolating use missing values
   extrap <- seq(TRUE, np)
-  if(extrap & ncp == 0)
-    warning("Cannot extrapolate with linear option")
+
   ans <- .Fortran("sdbi3p",
                   as.integer(1),
-#                  as.integer(ncp),
                   as.integer(n),
                   as.double(x),
                   as.double(y),
@@ -71,11 +68,12 @@
                   x = as.double(xo),
                   y = as.double(yo),
                   z = zo,
-                  double(17 * n),
-                  integer(25 * n),
+                  ier = integer(1),
+                  wk = double(17 * n),
+                  iwk = integer(25 * n),
                   extrap = as.logical(extrap),
                   near = integer(n),
-                  net = integer(n),
+                  nxt = integer(n),
                   dist = double(n),
                   PACKAGE = "akima")
   temp <- ans[c("x", "y", "z", "extrap")]

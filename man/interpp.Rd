@@ -6,7 +6,8 @@
 \alias{interpp.old}
 \alias{interpp.new}
 \usage{
-interpp(x, y, z, xo, yo, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL)
+interpp(x, y, z, xo, yo, linear=TRUE, extrap=FALSE, duplicate = "error",
+dupfun = NULL, ncp)
 }
 \arguments{
   \item{x}{
@@ -33,18 +34,23 @@ interpp(x, y, z, xo, yo, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL
   \item{yo}{
     vector of y-coordinates of points at which to evaluate the interpolating
     function.}
-  
-\item{ncp}{
-  number of additional points to be used in computing partial
-  derivatives at each data point.  
-  \code{ncp} must be either \code{0} (partial derivatives are not used, =
-  linear interpolation), or at
-  least 2 but smaller than the number of data points (and smaller than 25).
-}
-\item{extrap}{
-  logical flag: should extrapolation be used outside of the
-  convex hull determined by the data points?}
-\item{duplicate}{
+  \item{linear}{logical -- indicating wether linear or spline
+    interpolation should be used. supersedes old \code{ncp} parameter}
+  \item{ncp}{
+    deprecated, use parameter \code{linear}. Now only used by 
+    \code{interpp.old()}.
+
+    meaning was:
+    number of additional points to be used in computing partial
+    derivatives at each data point.  
+    \code{ncp} must be either \code{0} (partial derivatives are not used, =
+    linear interpolation), or at
+    least 2 but smaller than the number of data points (and smaller than 25).
+  }
+  \item{extrap}{
+    logical flag: should extrapolation be used outside of the
+    convex hull determined by the data points?}
+  \item{duplicate}{
   indicates how to handle duplicate data points. Possible values are
   \code{"error"} - produces an error message, \code{"strip"} - remove
   duplicate z values, \code{"mean"},\code{"median"},\code{"user"}  -
@@ -74,10 +80,15 @@ interpp(x, y, z, xo, yo, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL
   Use \code{interp} if interpolation on a regular grid is wanted.
 
   The two versions  \code{interpp.old}  and \code{interpp.new} refer to
-  Akimas Fortran code from 1978 and 1996 resp. At the moment
-  \code{interpp.new}
-  does not work porperly (it results in a segmentation fault), so it is
-  not used from the call wrapper  \code{interp}.
+  Akimas Fortran code from 1978 and 1996 resp. The call wrapper  \code{interpp}
+  chooses  \code{interpp.old} for linear and  \code{interpp.new} for cubic 
+  spline interpolation.
+
+  Earlier versions (pre 0.5-1) of \code{interpp} used the parameter 
+  \code{ncp} to choose between linear and cubic interpolation, this is now done
+  by setting the logical parameter \code{linear}. Use of \code{ncp} is still 
+  possible, but is deprecated.
+
 }
 \description{
   If \code{ncp} is zero, linear
@@ -109,11 +120,19 @@ interpp(x, y, z, xo, yo, ncp=0, extrap=FALSE, duplicate = "error", dupfun = NULL
   \bold{22}, 362-371.
 }
 \seealso{
-  \code{\link[base]{contour}}, \code{\link[base]{image}}, \code{\link[base]{approx}}, \code{\link[base]{spline}}, \code{\link[base]{outer}}, \code{\link[base]{expand.grid}},\code{\link{interp}}.
+  \code{\link[base]{contour}}, \code{\link[base]{image}}, 
+  \code{\link[base]{approx}}, \code{\link[base]{spline}}, 
+  \code{\link[base]{outer}}, \code{\link[base]{expand.grid}},
+  \code{\link{interp}}, \code{\link{aspline}}.
 }
 \examples{
 data(akima)
 # linear interpolation at points (1,2), (5,6) and (10,12)
 akima.lip<-interpp(akima$x, akima$y, akima$z,c(1,5,10),c(2,6,12))
+akima.lip$z
+# spline interpolation
+akima.sip<-interpp(akima$x, akima$y, akima$z,c(1,5,10),c(2,6,12),
+  linear=FALSE)
+akima.sip$z
 }
 \keyword{dplot}

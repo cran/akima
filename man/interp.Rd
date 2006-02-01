@@ -12,7 +12,7 @@
 \usage{
 interp(x, y, z, xo=seq(min(x), max(x), length = 40),
        yo=seq(min(y), max(y), length = 40),
-       ncp = 0, extrap=FALSE, duplicate = "error", dupfun = NULL)
+       linear = TRUE, extrap=FALSE, duplicate = "error", dupfun = NULL, ncp = NULL)
 interp.old(x, y, z, xo= seq(min(x), max(x), length = 40),
            yo=seq(min(y), max(y), length = 40), ncp = 0,
            extrap=FALSE, duplicate = "error", dupfun = NULL)
@@ -53,13 +53,18 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
   }
   \item{yo}{vector of y-coordinates of output grid; analogous to
     \code{xo}, see above.}
-  \item{linear}{logical, switch to linear interpolation in \code{interp.new}.}
+  \item{linear}{logical -- indicating wether linear or spline
+    interpolation should be used. supersedes old \code{ncp} parameter}
   \item{ncp}{
+    deprecated, use parameter \code{linear}. Now only used by
+    \code{interp.old()}.
+
+    meaning was:
     number of additional points to be used in computing partial
     derivatives at each data point.
     \code{ncp} must be either \code{0} (partial derivatives are not used), or at
     least 2 but smaller than the number of data points (and smaller than
-    25). This option is only supported by \code{interp.old}.
+    25).
   }
   \item{extrap}{
     logical flag: should extrapolation be used outside of the
@@ -96,20 +101,23 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
   interpolation the old version is choosen, but spline interpolation is
   done by the new version.
 
-  At the moment \code{interp.new} ignores \code{ncp} and does only
-  bicubic spline interpolation.
+  Earlier versions (pre 0.5-1) of \code{interp} used the parameter
+  \code{ncp} to choose between linear and cubic interpolation, this is now done
+  by setting the logical parameter \code{linear}. Use of \code{ncp} is still
+  possible, but is deprecated.
 
   The resulting structure is suitable for input to the
-  functions \code{contour} and \code{image}.  Check the requirements of
-  these functions when choosing values  for \code{xo} and \code{yo}.
+  functions \code{\link{contour}} and \code{\link{image}}.  Check
+  the requirements of these functions when choosing values  for
+  \code{xo} and \code{yo}.
 }
 \details{
-  If \code{ncp} is zero, linear
+  If \code{linear} is \code{TRUE} (default), linear
   interpolation is used in the triangles bounded by data points.
-  Cubic interpolation is done if partial derivatives are used.
+  Cubic interpolation is done if \code{linear} is set to \code{FALSE}.
   If \code{extrap} is \code{FALSE}, z-values for points outside the
   convex hull are returned as \code{NA}.
-  No extrapolation can be performed if \code{ncp} is zero.
+  No extrapolation can be performed for the linear case.
 
   The \code{interp} function handles duplicate \code{(x,y)} points
   in different ways. As default it will stop with an error message. But
@@ -118,26 +126,23 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
   user defined function).
 
   The triangulation scheme used by \code{interp} works well if \code{x}
-  and \code{y} have
-  similar scales but will appear stretched if they have very different
-  scales.  The spreads of \code{x} and \code{y} must be within four
-  orders of magnitude of each other for \code{interp} to work.
+  and \code{y} have similar scales but will appear stretched if they have
+  very different scales.  The spreads of \code{x} and \code{y} must be
+  within four orders of magnitude of each other for \code{interp} to work.
 }
 \references{
   Akima, H. (1978). A Method of Bivariate Interpolation and
   Smooth Surface Fitting for Irregularly Distributed Data Points.
-  ACM Transactions on Mathematical Software,
-  \bold{4}, 148-164.
+  ACM Transactions on Mathematical Software \bold{4}, 148-164.
 
   Akima, H. (1996). Algorithm 761: scattered-data surface fitting that has
   the accuracy of a cubic polynomial.
-  ACM Transactions on Mathematical Software,
-  \bold{22}, 362--371
-
+  ACM Transactions on Mathematical Software \bold{22}, 362--371.
 }
 \seealso{
   \code{\link{contour}}, \code{\link{image}},
   \code{\link{approx}}, \code{\link{spline}},
+  \code{\link{aspline}},
   \code{\link{outer}}, \code{\link{expand.grid}}.
 }
 \examples{
@@ -155,8 +160,8 @@ points (akima, pch = 3)
 akima.smooth <-
  with(akima, interp(x, y, z, xo=seq(0,25, length=100),
                     yo=seq(0,20, length=100)))
-image  (akima.smooth)
-contour(akima.smooth, add=TRUE)
+image  (akima.smooth, main = "interp(<akima data>, *) on finer grid")
+contour(akima.smooth, add = TRUE, col = "thistle")
 points(akima, pch = 3, cex = 2, col = "blue")
 # use triangulation package to show underlying triangulation:
 if(library(tripack, logical.return=TRUE))
@@ -164,12 +169,13 @@ if(library(tripack, logical.return=TRUE))
 
 # use only 15 points (interpolation only within convex hull!)
 akima.part <- with(akima, interp(x[1:15], y[1:15], z[1:15]))
-image  (akima.part)
+image(akima.part)
+title("interp() on subset of only 15 points")
 contour(akima.part, add=TRUE)
-points(akima$x[1:15],akima$y[1:15])
+points(akima$x[1:15],akima$y[1:15], col = "blue")
 
-## spline interpolation
-## --------------------
+## spline interpolation, two variants (AMS 526 "Old", AMS 761 "New")
+## -----------------------------------------------------------------
 ## "Old": use 5 points to calculate derivatives -> many NAs
 akima.sO <- interp.old(akima$x, akima$y, akima$z,
            xo=seq(0,25, length=100),  yo=seq(0,20, length=100), ncp=5)
@@ -177,13 +183,19 @@ table(is.na(akima.sO$z)) ## 3990 NA's; = 40 \%
 akima.sO <- with(akima,
    interp.old(x,y,z, xo=seq(0,25, length=100), yo=seq(0,20, len=100), ncp = 4))
 sum(is.na(akima.sO$z)) ## still 3429
-image  (akima.sO) # almost useless
+image  (akima.sO, main = "interp.old(*, ncp = 4) [almost useless]")
 contour(akima.sO, add = TRUE)
 
 ## "New:"
 akima.spl <- with(akima, interp.new(x,y,z, xo=seq(0,25, length=100),
                                            yo=seq(0,20, length=100)))
-contour(akima.spl) ; points(akima)
+## equivalent call via setting linear=FALSE in interp():
+akima.spl <- with(akima, interp(x,y,z, xo=seq(0,25, length=100),
+                                       yo=seq(0,20, length=100),
+                                linear=FALSE))
+
+contour(akima.spl, main = "smooth  interp(*, linear = FALSE)")
+points(akima)
 
 full.pal <- function(n) hcl(h = seq(340, 20, length = n))
 cool.pal <- function(n) hcl(h = seq(120, 0, length = n) + 150)
@@ -191,6 +203,7 @@ warm.pal <- function(n) hcl(h = seq(120, 0, length = n) - 30)
 
 filled.contour(akima.spl, color.palette = full.pal,
         plot.axes = { axis(1); axis(2);
+                      title("smooth  interp(*, linear = FALSE)");
                       points(akima, pch = 3, col= hcl(c=100, l = 20))})
 # no extrapolation!
 
@@ -200,9 +213,10 @@ data(airquality)
 air <- subset(airquality,
               !is.na(Temp) & !is.na(Ozone) & !is.na(Solar.R))
 # gives an error {duplicate ..}:
-try( air.ip <- interp.new(air$Temp,air$Solar.R,air$Ozone) )
+try( air.ip <- interp(air$Temp,air$Solar.R,air$Ozone, linear=FALSE) )
 # use mean of duplicate points:
-air.ip <- with(air, interp.new(Temp, Solar.R, log(Ozone), duplicate = "mean"))
+air.ip <- with(air, interp(Temp, Solar.R, log(Ozone), duplicate = "mean",
+                           linear = FALSE))
 image(air.ip, main = "Airquality: Ozone vs. Temp and Solar.R")
 with(air, points(Temp, Solar.R))
 }

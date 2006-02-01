@@ -1,6 +1,6 @@
 Package: akima
-Version: 0.4-5
-Date: 2005-07-21
+Version: 0.5-1
+Date: 2006-02-01
 Title: Interpolation of irregularly spaced data
 Author: Fortran code by H. Akima
  R port by Albrecht Gebhardt <albrecht.gebhardt@uni-klu.ac.at>
@@ -9,4 +9,4 @@ Author: Fortran code by H. Akima
 Maintainer: Albrecht Gebhardt <albrecht.gebhardt@uni-klu.ac.at>
 Description: Linear or cubic spline interpolation for irregular gridded data
 License: Fortran code: ACM, free for non-commercial use, R functions GPL
-Packaged: Thu Jul 21 17:26:00 2005; agebhard
+Packaged: Thu Feb  2 21:59:40 2006; hornik

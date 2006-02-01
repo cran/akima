@@ -7,18 +7,14 @@ interp.new <-
   if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
     stop("missing values and Infs not allowed")
   if(!is.null(ncp)) {
-    if(ncp != 0) {
-      cat("ncp not supported, it is automatically choosen by Fortran code\n")
-    }
-    else {
-      cat("linear interpolation not yet implemented with interp.new().\n")
-      stop("use interp.old().")
-    }
+    if(ncp != 0)
+	warning("'ncp' not supported, it is automatically choosen by Fortran code\n")
+    else
+	linear <- TRUE
   }
-  if(linear) {
-    cat("linear interpolation not yet implemented with interp.new().\n")
-    stop("use interp.old().")
-  }
+  if(linear)
+    stop("linear interpolation not implemented in interp.new().\n",
+	 "use 'interp()' (or 'interp.old()').")
 
   drx <- diff(range(x))
   dry <- diff(range(y))

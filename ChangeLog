@@ -1,32 +1,31 @@
+2006-02-02  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* man/interp.Rd: last fixes (plot titles in examples)
+
+	* INDEX, R/interp.new.R, man/interpp.Rd:
+	add last changes from Martin Maechler
+	ready for release as 0.5-1
+
+2006-02-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* src/init.c: fix two missing LGLSXP declarations
+
+	* DESCRIPTION, man/akima.Rd: adopt man pages for ncp->linear change
+
+	* src/idlctn.f: hopefully fix nasty interpp.old wrong interpolation bug
+
+2006-01-31  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* src/akima.h:
+	add Fortran parameter defintions and library call initializations.
+
+	* R/interp.R, R/interpp.R, R/interpp.new.R: fix interpp.new
+	drop ncp parameter
+
 2005-07-21  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* DESCRIPTION, R/interp.R, R/interp.new.R, R/interp.old.R, man/interp.Rd, orig/akima.bib, src/idptip.f:
-	commit bugfixes/enhancements from Martin Maechler (thanks :-)
-
-2005-07-20  Martin Maechler  <maechler@stat.math.ethz.ch>
-
-	* DESCRIPTION (Version): 0.4-5
-
-2005-07-02  Martin Maechler  <maechler@stat.math.ethz.ch>
-
-	* R/interp.new.R (interp.new): simplify logic for warning("Cannot ..")
-
-2005-06-27  Martin Maechler  <maechler@stat.math.ethz.ch>
-
-	* R/interp.R (interp): call interp.new and .old with *named*
-	arguments -> fixing long standing bug
-
-	* R/interp.new.R (interp.new): several improvements:
-	  use match.fun(); don't misuse hist(); don't save too much from
-	  .Fortran; etc.
-	* R/interp.old.R: dito ...
-
-	* man/interp.Rd: Improve 'Description'.
-	Examples extended; interp() now does call interp.new() correctly.
-
-	* orig/akima.bib: corrected to proper bib
-
-
+	* R/interp.old.R, orig/akima.bib, src/idptip.f:
+	bugfixes/enhancements from Martin Maechler (thanks :-)
 
 2005-01-09  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
@@ -35,7 +34,7 @@
 
 2004-12-13  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* INDEX, README, orig/433, orig/697:
+	* README, orig/433, orig/697:
 	add aspline interface to Akimas univariate interpolation functions,
 	provided by Thomas Petzoldt <petzoldt@rcs.urz.tu-dresden.de>.
 
@@ -43,17 +42,9 @@
 
 	* data/00Index: indec update
 
-2002-05-06  alge  <alge@pc22-ub.ub.uni-klu.ac.at.>
-
-	* man/akima.Rd: last ? change for 1.5.0
-
-2002-05-05  alge  <alge@pc22-ub.ub.uni-klu.ac.at.>
-
-	* man/interpp.Rd: T/F changes (1.5.0)
-
 2002-01-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* R/interpp.new.R, R/interpp.old.R: T/F changed to TRUE/FALSE
+	* R/interpp.old.R: T/F changed to TRUE/FALSE
 
 2001-01-10  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
@@ -71,7 +62,7 @@
 
 	* R/zzz.R: dropped old sharedlib loading
 
-2000-06-03  khornik  <khornik@pc22-ub.ub.uni-klu.ac.at.>
+2000-06-03  khornik  <khornik@pc28-math.math.uni-klu.ac.at>
 
 	* src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c, src-c/idtang.c, src-c/idxchg.c, src-c/tripack.subset.c, src-c/ttidbs.c, src-c/Makefile, src-c/akima.new.c, src-c/driver.c, src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c, src-c/idpdrv.c:
 	f2c parts removed
@@ -79,10 +70,6 @@
 	* src/Makefile, src/idbvip.f: New version is 0.2-4
 	COMMON/IDLC/N -> COMMON/IDLC/NIT, idummy in idbvip.f
 	Fix problems with \example in interp.Rd
-
-1998-08-19  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
-
-	* src/idlctn.f: interpp.old works now (COMMON variable added)
 
 1998-05-24  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
@@ -94,8 +81,7 @@
 
 1998-02-28  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* orig/526, R/interpp.R:
-	Added new spline interpolation code from Akima 1996
+	* orig/526: Added new spline interpolation code from Akima 1996
 	interp() chooses now between old an new version of code
 
 	* 526: Added new spline interpolation code from Akima 1996
