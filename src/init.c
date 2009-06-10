@@ -1,4 +1,20 @@
 
+/*
+ * This file contains declarations to interface R with Akimas
+ * triangulation package from ACMs Collected Algorithms Archive.
+ *
+ * The ACM copyright of the original Fortran code is described at
+ *   http://www.acm.org/pubs/copyright_policy/softwareCRnotice.html
+ *
+ * This interface layer is copyright by 
+ * 
+ *   Albrecht Gebhardt <albrecht.gebhardt@uni-klu.ac.at>
+ * 
+ * and can be used under both GPL or ACM license to be conform
+ * with the restrictions in the above mentioned ACM license.
+ * 
+ */
+
 #include <R.h>
 #include <Rinternals.h>
 

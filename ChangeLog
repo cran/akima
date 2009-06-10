@@ -1,3 +1,7 @@
+2009-06-10  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* DESCRIPTION, LICENSE, src/init.c: License clarification
+
 2006-02-02  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
 	* man/interp.Rd: last fixes (plot titles in examples)
@@ -8,9 +12,7 @@
 
 2006-02-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
-	* src/init.c: fix two missing LGLSXP declarations
-
-	* DESCRIPTION, man/akima.Rd: adopt man pages for ncp->linear change
+	* man/akima.Rd: adopt man pages for ncp->linear change
 
 	* src/idlctn.f: hopefully fix nasty interpp.old wrong interpolation bug
 
@@ -62,7 +64,7 @@
 
 	* R/zzz.R: dropped old sharedlib loading
 
-2000-06-03  khornik  <khornik@pc28-math.math.uni-klu.ac.at>
+2000-06-03  khornik  <khornik@console1-math>
 
 	* src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c, src-c/idtang.c, src-c/idxchg.c, src-c/tripack.subset.c, src-c/ttidbs.c, src-c/Makefile, src-c/akima.new.c, src-c/driver.c, src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c, src-c/idpdrv.c:
 	f2c parts removed
