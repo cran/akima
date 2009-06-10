@@ -120,8 +120,8 @@ dupfun = NULL, ncp)
   \bold{22}, 362-371.
 }
 \seealso{
-  \code{\link[base]{contour}}, \code{\link[base]{image}}, 
-  \code{\link[base]{approx}}, \code{\link[base]{spline}}, 
+  \code{\link[graphics]{contour}}, \code{\link[graphics]{image}}, 
+  \code{\link[stats]{approxfun}}, \code{\link[stats]{splinefun}}, 
   \code{\link[base]{outer}}, \code{\link[base]{expand.grid}},
   \code{\link{interp}}, \code{\link{aspline}}.
 }
