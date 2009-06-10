@@ -1,8 +1,10 @@
+2009-11-04  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
+
+	* DESCRIPTION, man/akima.Rd: fix documentation
+
 2009-09-21  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
 
 	* man/interpp.Rd: fixes to pass R CMD check version 2.10
-
-	* DESCRIPTION: use getRversion()
 
 	* R/zzz.R: use getRversion() instaed of version
 
@@ -22,8 +24,6 @@
 	ready for release as 0.5-1
 
 2006-02-01  Albrecht Gebhardt  <albrecht.gebhardt@uni-klu.ac.at>
-
-	* man/akima.Rd: adopt man pages for ncp->linear change
 
 	* src/idlctn.f: hopefully fix nasty interpp.old wrong interpolation bug
 
