@@ -164,9 +164,10 @@ image  (akima.smooth, main = "interp(<akima data>, *) on finer grid")
 contour(akima.smooth, add = TRUE, col = "thistle")
 points(akima, pch = 3, cex = 2, col = "blue")
 # use triangulation package to show underlying triangulation:
+\dontrun{
 if(library(tripack, logical.return=TRUE))
    plot(tri.mesh(akima), add=TRUE, lty="dashed")
-
+}
 # use only 15 points (interpolation only within convex hull!)
 akima.part <- with(akima, interp(x[1:15], y[1:15], z[1:15]))
 image(akima.part)

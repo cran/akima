@@ -144,16 +144,20 @@
       IER = 0
       RETURN
 * Error exit
-   20 WRITE (*,FMT=9000) MD,NDP
+   20 CONTINUE                                                          
+C     WRITE (*,FMT=9000) MD,NDP
       IER = 1
       RETURN
-   30 WRITE (*,FMT=9010) MD,NDP,NDPPV
+   30 CONTINUE                                                          
+C     WRITE (*,FMT=9010) MD,NDP,NDPPV
       IER = 2
       RETURN
-   40 WRITE (*,FMT=9020) MD,NDP,NIP
+   40 CONTINUE                                                          
+C     WRITE (*,FMT=9020) MD,NDP,NIP
       IER = 3
       RETURN
-   50 WRITE (*,FMT=9030)
+   50 CONTINUE                                                          
+C     WRITE (*,FMT=9030)
       IER = 9
       RETURN
 * Format statement for error message
@@ -324,19 +328,24 @@
       IER = 0
       RETURN
 * Error exit
-   40 WRITE (*,FMT=9000) MD,NDP
+   40 CONTINUE                                                          
+C     WRITE (*,FMT=9000) MD,NDP
       IER = 1
       RETURN
-   50 WRITE (*,FMT=9010) MD,NDP,NDPPV
+   50 CONTINUE                                                          
+C     WRITE (*,FMT=9010) MD,NDP,NDPPV
       IER = 2
       RETURN
-   60 WRITE (*,FMT=9020) MD,NDP,NXI,NYI
+   60 CONTINUE                                                          
+C     WRITE (*,FMT=9020) MD,NDP,NXI,NYI
       IER = 3
       RETURN
-   70 WRITE (*,FMT=9030) MD,NDP,NXI,NYI
+   70 CONTINUE                                                          
+C     WRITE (*,FMT=9030) MD,NDP,NXI,NYI
       IER = 4
       RETURN
-   80 WRITE (*,FMT=9040)
+   80 CONTINUE                                                          
+C     WRITE (*,FMT=9040)
       IER = 9
       RETURN
 * Format statement for error message
@@ -445,22 +454,27 @@
 * Error exit
    10 IF (IERTM.EQ.-1) THEN
           IERT = 1
-          WRITE (*,FMT=9000) NDP
+          CONTINUE                                                      
+C     WRITE (*,FMT=9000) NDP
       ELSE IF (IERTM.EQ.-2) THEN
           IERT = 2
-          WRITE (*,FMT=9010)
+          CONTINUE                                                      
+C     WRITE (*,FMT=9010)
       ELSE
           IERT = 3
           IP1 = IERTM
-          WRITE (*,FMT=9020) NDP,IP1,XD(IP1),YD(IP1)
+          CONTINUE                                                      
+C     WRITE (*,FMT=9020) NDP,IP1,XD(IP1),YD(IP1)
       END IF
       RETURN
    20 IF (IERTL.EQ.1) THEN
           IERT = 4
-          WRITE (*,FMT=9030) NDP
+          CONTINUE                                                      
+C     WRITE (*,FMT=9030) NDP
       ELSE IF (IERTL.EQ.2) THEN
           IERT = 5
-          WRITE (*,FMT=9040)
+          CONTINUE                                                      
+C     WRITE (*,FMT=9040)
       END IF
       RETURN
 * Format statements

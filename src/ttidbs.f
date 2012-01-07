@@ -79,33 +79,33 @@ C CALCULATION                                                           ID000670
    16   CONTINUE                                                        ID000810
    17 CONTINUE                                                          ID000820
 C PRINTING OF INPUT DATA                                                ID000830
-   20 WRITE (LUN,2020)  NDP                                             ID000840
+C       WRITE (LUN,2020)  NDP                                             ID000840
       DO 23  IDP=1,NDP                                                  ID000850
-        IF(MOD(IDP,5).EQ.1)    WRITE (LUN,2021)                         ID000860
-        WRITE (LUN,2022)  IDP,XD(IDP),YD(IDP),ZD(IDP)                   ID000870
+C       WRITE (LUN,2021)                         ID000860
+C       WRITE (LUN,2022)  IDP,XD(IDP),YD(IDP),ZD(IDP)                   ID000870
    23 CONTINUE                                                          ID000880
 C PRINTING OF OUTPUT RESULTS                                            ID000890
-   30 WRITE (LUN,2030)                                                  ID000900
-      WRITE (LUN,2031)  YI                                              ID000910
+C       WRITE (LUN,2030)                                                  ID000900
+C       WRITE (LUN,2031)  YI                                              ID000910
       DO 33  IXI=1,NXI                                                  ID000920
-        WRITE (LUN,2032)  XI(IXI),(ZI1(IXI,IYI),IYI=1,NYI)              ID000930
+C       WRITE (LUN,2032)  XI(IXI),(ZI1(IXI,IYI),IYI=1,NYI)              ID000930
    33 CONTINUE                                                          ID000940
-   40 WRITE (LUN,2040)                                                  ID000950
-      WRITE (LUN,2031)  YI                                              ID000960
+C       WRITE (LUN,2040)                                                  ID000950
+C       WRITE (LUN,2031)  YI                                              ID000960
       DO 43  IXI=1,NXI                                                  ID000970
-        WRITE (LUN,2032)  XI(IXI),(DZI1(IXI,IYI),IYI=1,NYI)             ID000980
+C       WRITE (LUN,2032)  XI(IXI),(DZI1(IXI,IYI),IYI=1,NYI)             ID000980
    43 CONTINUE                                                          ID000990
-   50 WRITE (LUN,2050)                                                  ID001000
-      WRITE (LUN,2031)  YI                                              ID001010
+C       WRITE (LUN,2050)                                                  ID001000
+C       WRITE (LUN,2031)  YI                                              ID001010
       DO 53  IXI=1,NXI                                                  ID001020
-        WRITE (LUN,2032)  XI(IXI),(ZI2(IXI,IYI),IYI=1,NYI)              ID001030
+C       WRITE (LUN,2032)  XI(IXI),(ZI2(IXI,IYI),IYI=1,NYI)              ID001030
    53 CONTINUE                                                          ID001040
-   60 WRITE (LUN,2060)                                                  ID001050
-      WRITE (LUN,2031)  YI                                              ID001060
+C       WRITE (LUN,2060)                                                  ID001050
+C       WRITE (LUN,2031)  YI                                              ID001060
       DO 63  IXI=1,NXI                                                  ID001070
-        WRITE (LUN,2032)  XI(IXI),(DZI2(IXI,IYI),IYI=1,NYI)             ID001080
+C       WRITE (LUN,2032)  XI(IXI),(DZI2(IXI,IYI),IYI=1,NYI)             ID001080
    63 CONTINUE                                                          ID001090
-      STOP                                                              ID001100
+C      STOP                                                              ID001100
 C FORMAT STATEMENTS                                                     ID001110
  2020 FORMAT(1H1,6HTTIDBS/////3X,10HINPUT DATA,8X,5HNDP =,I3///         ID001120
      1   30H      I      XD     YD     ZD /)                            ID001130

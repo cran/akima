@@ -355,12 +355,16 @@ C ARE LISTED COUNTER-CLOCKWISE.
       NL=NL0
       RETURN
 C ERROR EXIT
-   90 WRITE (LUN,2090)  NDP0
+   90 CONTINUE                                                          
+C     WRITE (LUN,2090)  NDP0
       GO TO 93
-   91 WRITE (LUN,2091)  NDP0,IP1,IP2,X1,Y1
+   91 CONTINUE                                                          
+C     WRITE (LUN,2091)  NDP0,IP1,IP2,X1,Y1
       GO TO 93
-   92 WRITE (LUN,2092)  NDP0
-   93 WRITE (LUN,2093)
+   92 CONTINUE                                                          
+C     WRITE (LUN,2092)  NDP0
+   93 CONTINUE                                                          
+C     WRITE (LUN,2093)
       NT=0
       RETURN
 C FORMAT STATEMENTS

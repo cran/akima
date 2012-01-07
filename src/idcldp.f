@@ -101,10 +101,13 @@ C - REPLACES THE LOCAL ARRAY FOR THE OUTPUT ARRAY.
    59 CONTINUE
       RETURN
 C ERROR EXIT
-   90 WRITE (LUN,2090)
+   90 CONTINUE                                                          
+C     WRITE (LUN,2090)
       GO TO 92
-   91 WRITE (LUN,2091)
-   92 WRITE (LUN,2092)  NDP0,NCP0
+   91 CONTINUE                                                          
+C     WRITE (LUN,2091)
+   92 CONTINUE                                                          
+C     WRITE (LUN,2092)  NDP0,NCP0
       IPC(1)=0
       RETURN
 C FORMAT STATEMENTS FOR ERROR MESSAGES
