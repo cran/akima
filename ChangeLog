@@ -1,0 +1,122 @@
+2012-12-05  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* DESCRIPTION: license clarification
+
+2012-11-30  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* LICENSE: license clarifications
+
+2012-01-07  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src/akima.new.f, src/idbvip.f, src/idcldp.f, src/idsfft.f, src/idtang.f, src/tripack.f, src/ttidbs.f:
+	second fix for 2.14.x
+
+2012-01-06  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* NAMESPACE, R/zzz.R, data/00Index, data/akima.R, data/akima.rda, man/interp.Rd:
+	Changes for R 2.14.x
+
+2011-06-21  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* acinclude.m4, configure, configure.ac: ..
+
+2010-01-14  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src/Makevars.in:
+	add autoconf stuff to detect problematic compiler options on sun studio
+	compilers
+
+2009-11-04  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* man/akima.Rd: fix documentation
+
+2009-09-21  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* man/interpp.Rd: fixes to pass R CMD check version 2.10
+
+2009-06-11  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* INDEX: date updated
+
+2009-06-10  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src/init.c: License clarification
+
+2006-02-02  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* R/interp.new.R: add last changes from Martin Maechler
+	ready for release as 0.5-1
+
+2006-02-01  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src/idlctn.f: hopefully fix nasty interpp.old wrong interpolation bug
+
+2006-01-31  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src/akima.h:
+	add Fortran parameter defintions and library call initializations.
+
+	* R/interp.R, R/interpp.R, R/interpp.new.R: fix interpp.new
+	drop ncp parameter
+
+2005-07-21  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* R/interp.old.R, orig/akima.bib, src/idptip.f:
+	bugfixes/enhancements from Martin Maechler (thanks :-)
+
+2005-01-09  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* R/aspline.R, man/aspline.Rd, src/akima433.f, src/akima697.f:
+	final changes before upload of akima 0.4
+
+2004-12-13  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* README, orig/433, orig/697:
+	add aspline interface to Akimas univariate interpolation functions,
+	provided by Thomas Petzoldt <petzoldt@rcs.urz.tu-dresden.de>.
+
+2002-01-01  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* R/interpp.old.R: T/F changed to TRUE/FALSE
+
+2001-01-10  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src/tripack.subset.f:
+	updated to use the same TRIPACK functions as package tripack.
+	works also with crosslinking aklima against tripack (R-genlibs patch at
+	ftp://ftp-stat.uni.klu.ac.at/pub/R/contrib). In this case src/tripack.f
+	can be removed.
+
+2000-06-04  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* TITLE, data/index.doc: last changes to make "R CMD build" happy
+
+2000-06-03  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src-c/idptip.c, src-c/idptli.c, src-c/idsfft.c, src-c/idtang.c, src-c/idxchg.c, src-c/tripack.subset.c, src-c/ttidbs.c, src-c/Makefile, src-c/akima.new.c, src-c/driver.c, src-c/idbvip.c, src-c/idcldp.c, src-c/idgrid.c, src-c/idlctn.c, src-c/idpdrv.c:
+	f2c parts removed
+
+	* src/Makefile: New version is 0.2-4
+	COMMON/IDLC/N -> COMMON/IDLC/NIT, idummy in idbvip.f
+	Fix problems with \example in interp.Rd
+
+1998-05-24  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* ChangeLog: removed from CVS
+
+1998-03-01  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* orig/761, PORTING: src-c now works, f2c problem vanished
+
+	* orig/526: Added new spline interpolation code from Akima 1996
+	interp() chooses now between old an new version of code
+
+	* 526: Added new spline interpolation code from Akima 1996
+
+1998-02-28  Albrecht Gebhardt <agebhard@uni-klu.ac.at>
+
+	* src/idgrid.f, src/idpdrv.f, src/idptli.f, src/idxchg.f:
+	Imported sources
+
+	* src/idgrid.f, src/idpdrv.f, src/idptli.f, src/idxchg.f: New file.
+

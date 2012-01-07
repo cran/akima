@@ -1,2 +1,2 @@
-PKG_CFLAGS=-g -O2 
-PKG_FFLAGS=-g -O2
+PKG_CFLAGS=-O3 -pipe -g 
+PKG_FFLAGS=-O3 -pipe -g

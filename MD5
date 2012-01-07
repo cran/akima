@@ -1,6 +1,7 @@
-8e8b7f05e6c79772be19b01b6c5b46f3 *DESCRIPTION
+bbfcffd7c5a0e5bcfd0dcbaee5034dc7 *ChangeLog
+f2c1523f8492ab97f92f621957974cb6 *DESCRIPTION
 9aec0fb62ebdf300b42856bbf77c547b *INDEX
-d73616a574cd953e85cbdcb6e3d3f6ab *LICENSE
+56f0b6b83d59e4fa80b9da428bbf33ab *LICENSE
 115e547d86970e029c0c017943013bb5 *NAMESPACE
 5528656c72dae4d46daea3ab5750fa3e *PORTING
 1e49c05a50df3cc84d7d92b89a9d649b *R/aspline.R
@@ -11,7 +12,6 @@ abbdd06f7bc25e7f912a654b47fec7bf *R/interp.old.R
 a0da8d95fd011af70368c9351ff11302 *R/interpp.new.R
 da1a9f7caa2868b6b0b0431099b4ca6c *R/interpp.old.R
 d9d98a303d381277440bb35594a5a5f1 *README
-403e53dc92623300a696879e86ec5201 *acinclude.m4
 825ce2c3598af2a0916ac06c32b421a6 *configure
 7b0ca38cea4a5ccbb2c412025222bcb4 *configure.ac
 2e5024d6223e580b969c96af7d2e207e *data/akima.rda
@@ -24,7 +24,7 @@ e6704f6b46065fc831686f59949166a3 *orig/526
 72edf80d512cb934ab46725dff361aa9 *orig/697
 978a70f66b4b26c2ac1d3273e1f1b95b *orig/761
 2757520c6085caf6232bafef3f4c8fee *orig/akima.bib
-8f6becfe18485db5b5e8ebec549071e9 *src/Makevars
+3ef6801d292b9070663bc3b16903b2bd *src/Makevars
 b7b66926fbc5f6a890fe51c320c78cea *src/Makevars.in
 891e6f2c8d2bd318ca9e3b01c8186274 *src/akima.h
 72630c467aef080d3a4280cce39b41d7 *src/akima.new.f
