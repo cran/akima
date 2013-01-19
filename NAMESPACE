@@ -1,2 +1,2 @@
 useDynLib(akima)
-export(aspline,interp,interpp,interp.old,interp.new)
+export(aspline,interp,interpp,interp.old,interp.new,interp2xyz)
