@@ -1,3 +1,7 @@
+2013-09-16  Albrecht Gebhardt  <agebhard@uni-klu.ac.at>
+
+	* DESCRIPTION: fix license field
+
 2013-03-01  Albrecht Gebhardt  <agebhard@uni-klu.ac.at>
 
 	* configure, configure.ac: new version, regenerate
@@ -8,7 +12,7 @@
 
 	* src/init.c: fix call
 
-	* DESCRIPTION, LICENSE, NAMESPACE, R/bicubic.R, man/bicubic.Rd, man/bicubic.grid.Rd, src/akima.h, src/toms760.f:
+	* LICENSE, NAMESPACE, R/bicubic.R, man/bicubic.Rd, man/bicubic.grid.Rd, src/akima.h, src/toms760.f:
 	add bicubic interpolation for rectangular gridded data (TOMS 760)
 
 2013-01-20  Albrecht Gebhardt  <agebhard@uni-klu.ac.at>

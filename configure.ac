@@ -3,7 +3,7 @@ AC_PREREQ(2.50)
 AC_INIT([akima],[0.5-10])
 AC_CONFIG_SRCDIR(src/tripack.f)
 #if you want to use more macros
-#AC_CONFIG_MACRO_DIR([m4]) 
+m4_include([tools/acinclude.m4])
 
 if test -z "${R_HOME}" ; then
  R_HOME=`R RHOME`

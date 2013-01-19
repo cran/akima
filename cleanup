@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm -f src/Makevars
+rm -f src/*.o
+rm -f src/*.so
+rm -f src/*.dll
+

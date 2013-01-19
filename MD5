@@ -1,5 +1,5 @@
-7b0df00ca161cde60bed5e0c29f8100c *ChangeLog
-17c42c189e9aed614fbee3a05ce9db70 *DESCRIPTION
+3537c96dcf96ea3607c7e0d22898b117 *ChangeLog
+1c8b7323fdc3b77bd0b7857acf1a8700 *DESCRIPTION
 e52b0def768b04be9344337ae30f5207 *LICENSE
 6e23174e510c3243ff64115ad35a968a *NAMESPACE
 5528656c72dae4d46daea3ab5750fa3e *PORTING
@@ -13,9 +13,9 @@ fdf47f0a8ea325a0ff5814ec9207df92 *R/interp2xyz.R
 a0da8d95fd011af70368c9351ff11302 *R/interpp.new.R
 da1a9f7caa2868b6b0b0431099b4ca6c *R/interpp.old.R
 d9d98a303d381277440bb35594a5a5f1 *README
-403e53dc92623300a696879e86ec5201 *acinclude.m4
-07840340f6c13b7644e7f6152c03433c *configure
-79bb22fc9251f5e98768e9514d8b3bfa *configure.ac
+a12e6828368054fe3495f6a4e7e7bb92 *cleanup
+d5bc03332ba64a3bc848bbb577c9047f *configure
+d2d638adb6f8b52a733beef48f501518 *configure.ac
 2e5024d6223e580b969c96af7d2e207e *data/akima.rda
 e6f3cd08ae5b12e469cd241bfab552a5 *data/akima760.rda
 67acf70539da27768c8c1c93c03cda1e *man/akima.Rd
@@ -26,11 +26,6 @@ e6f3cd08ae5b12e469cd241bfab552a5 *data/akima760.rda
 b75be14f08d00a6b82cd6b4b7d2fcec0 *man/interp.Rd
 cbc19816fcb783867b0de8285b5a7202 *man/interp2xyz.Rd
 611df4134bcbe1d8a38b5b05d46ff742 *man/interpp.Rd
-fb012aabd794443eb974d049231cf806 *orig/433
-e6704f6b46065fc831686f59949166a3 *orig/526
-72edf80d512cb934ab46725dff361aa9 *orig/697
-978a70f66b4b26c2ac1d3273e1f1b95b *orig/761
-2757520c6085caf6232bafef3f4c8fee *orig/akima.bib
 b7b66926fbc5f6a890fe51c320c78cea *src/Makevars.in
 c3d40cad58d3d780a46e242663a8ca57 *src/akima.h
 72630c467aef080d3a4280cce39b41d7 *src/akima.new.f
@@ -50,3 +45,4 @@ c78ebb9bdc60ec69affe770e68867e27 *src/init.c
 fb419ca6c7f5fe908ac72940097d56a6 *src/toms760.f
 fa152b8dc18ad033af0a4f8540b8f348 *src/tripack.f
 dff6b036cc23034225713d46b4620eed *src/ttidbs.f
+72c171f05c1d02b345759529deed87aa *tools/acinclude.m4

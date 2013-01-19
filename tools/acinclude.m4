@@ -14,13 +14,8 @@ PKG_CFLAGS=`"${R_HOME}/bin/R" CMD config CFLAGS`
 PKG_FFLAGS=`"${R_HOME}/bin/R" CMD config FFLAGS`
 
 
-<<<<<<< acinclude.m4
-case "${host_cpu}-${host_os}" in
-  x86*-solaris*) 
-=======
 case "${host}" in
   x*-sun-solaris*) 
->>>>>>> 1.2
 dnl use a hard coded call to src/tripack.f through R
 dnl to determine wether it returns all NA. 
 dnl then retry with -xO5
