@@ -24,6 +24,21 @@
 
 /* Fortran interface descriptions: */
 
+static R_NativePrimitiveArgType rgbi3p_t[12] = {
+  INTSXP,  /* MD,     */
+  INTSXP,  /* NXP,    */
+  INTSXP,  /* NYP,    */
+  REALSXP, /* XD,     */
+  REALSXP, /* YD,     */
+  REALSXP, /* ZD,     */
+  INTSXP,  /* NIP,    */
+  REALSXP, /* XI,     */
+  REALSXP, /* YI,     */
+  REALSXP, /* ZI,     */
+  INTSXP,  /* IER,    */
+  REALSXP  /* WK,     */
+};
+
 static R_NativePrimitiveArgType idbvip_t[13] = {
   INTSXP,  /* MD,   */
   INTSXP,  /* NCP,  */
@@ -124,6 +139,7 @@ static R_FortranMethodDef fortranMethods[] = {
   {"sdsf3p", (DL_FUNC) &F77_SUB(sdsf3p), 17, sdsf3p_t}, /* interp.new  */
   {"uvip3p", (DL_FUNC) &F77_SUB(uvip3p), 8, uvip3p_t},  /* aspline     */
   {"intrpl", (DL_FUNC) &F77_SUB(intrpl), 7, intrpl_t},  /* aspline     */
+  {"rgbi3p", (DL_FUNC) &F77_SUB(rgbi3p), 12, rgbi3p_t}, /* bicubic     */
   {NULL, NULL, 0}
 };
 

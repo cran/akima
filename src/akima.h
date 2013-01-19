@@ -28,3 +28,5 @@ int F77_NAME(uvip3p) (int *np, int *nd, double *xd, double *yd,
 int F77_NAME(intrpl) (int *l,double *x, double *y, int *n,
 		      double *u, double *v, int *err);
 
+int F77_NAME(rgbi3p) (int *md, int *nxd, int *nyd, double *xd, double *yd, double *zd,
+		      int *nip, double *xi, double *yi, double *zi, int *err);

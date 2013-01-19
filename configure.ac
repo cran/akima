@@ -1,6 +1,6 @@
 # package/configure.in
 AC_PREREQ(2.50)
-AC_INIT([akima],[0.5-5])
+AC_INIT([akima],[0.5-10])
 AC_CONFIG_SRCDIR(src/tripack.f)
 #if you want to use more macros
 #AC_CONFIG_MACRO_DIR([m4]) 

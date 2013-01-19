@@ -9,7 +9,7 @@ Copyrighted and Licensed by ACM,
 see http://www.acm.org/publications/policies/softwarecrnotice
 
 
-2. R interface (src/init.c R/*.R man/*.Rd data/*): 
+2. R interface (src/init.c src/akima.h R/*.R man/*.Rd data/*): 
 
 The R interface code has been developed as work based on the 
 ACM licensed code, hence it is also ACM licensed, copyright 
