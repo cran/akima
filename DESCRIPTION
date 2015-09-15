@@ -1,17 +1,37 @@
 Package: akima
-Version: 0.5-11
-Date: 2013-01-19
-Title: Interpolation of irregularly spaced data
-Author: Fortran code by H. Akima
- R port by Albrecht Gebhardt <albrecht.gebhardt@uni-klu.ac.at>
- aspline function by Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>
- interp2xyz, enhancements and corrections by Martin Maechler <maechler@stat.math.ethz.ch>
-Maintainer: Albrecht Gebhardt <albrecht.gebhardt@uni-klu.ac.at>
-Description: Linear or cubic spline interpolation for irregular gridded data
+Version: 0.5-12
+Date: 2015-08-26
+Title: Interpolation of Irregularly and Regularly Spaced Data
+Authors@R: c(person("Hiroshi", "Akima", role = c("aut", "cph"),
+		     comment = "Fortran code (TOMS 526, 761, 697 and 433)"),
+	      person("Albrecht", "Gebhardt", role = c("aut", "cre", "cph"),
+                     email = "albrecht.gebhardt@aau.at",
+                     comment = "R port (interp* functions), bicubic* functions"),
+	      person("Thomas", "Petzold", role = c("ctb", "cph"),
+                     comment = "aspline function"),
+              person("Martin", "Maechler", email="maechler@stat.math.ethz.ch",
+                      role = c("ctb", "cph"), comment = "interp2xyz function + enhancements"),
+              person("YYYY Association for Computing Machinery, Inc.",
+                      role = c("cph"), comment = "covers code from TOMS 526, 761, 697 and 433")
+            )
+Description: Several cubic spline interpolation methods of H. Akima for irregular and
+  regular gridded data are available through this package, both for the bivariate case
+  (irregular data: ACM 526 and ACM 761, regular data: ACM 433) and univariate case (ACM 697).
+  Linear interpolation of irregular gridded data is also covered by reusing D. J. Renkas
+  triangulation code which is part of Akimas Fortran code.
 License: ACM | file LICENSE
 Depends: R (>= 2.0.0)
-Packaged: 2013-09-16 08:18:39 UTC; agebhard
+Imports: sp
 NeedsCompilation: yes
+Packaged: 2015-09-15 07:31:05 UTC; alge
+Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 526, 761, 697 and 433)),
+  Albrecht Gebhardt [aut, cre, cph] (R port (interp* functions), bicubic*
+    functions),
+  Thomas Petzold [ctb, cph] (aspline function),
+  Martin Maechler [ctb, cph] (interp2xyz function + enhancements),
+  YYYY Association for Computing Machinery, Inc. [cph] (covers code from
+    TOMS 526, 761, 697 and 433)
+Maintainer: Albrecht Gebhardt <albrecht.gebhardt@aau.at>
 License_restricts_use: yes
 Repository: CRAN
-Date/Publication: 2013-09-16 14:11:47
+Date/Publication: 2015-09-15 15:15:20

@@ -1,2 +1,11 @@
 useDynLib(akima)
+
 export(aspline,interp,interpp,interp.old,interp.new,interp2xyz,bicubic,bicubic.grid)
+
+importFrom("sp","coordinates")
+importFrom("sp","coordinates<-")
+importFrom("sp","gridded<-")
+
+importFrom("grDevices", "xy.coords")
+importFrom("graphics", "hist")
+importFrom("stats", "median")

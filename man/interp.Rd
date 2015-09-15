@@ -10,9 +10,10 @@
   Akima.
 }
 \usage{
-interp(x, y, z, xo=seq(min(x), max(x), length = 40),
-       yo=seq(min(y), max(y), length = 40),
-       linear = TRUE, extrap=FALSE, duplicate = "error", dupfun = NULL, ncp = NULL)
+interp(x, y=NULL, z, xo=seq(min(x), max(x), length = nx),
+       yo=seq(min(y), max(y), length = ny),
+       linear = TRUE, extrap=FALSE, duplicate = "error", dupfun = NULL,
+       ncp = NULL, nx = 40, ny = 40)
 interp.old(x, y, z, xo= seq(min(x), max(x), length = 40),
            yo=seq(min(y), max(y), length = 40), ncp = 0,
            extrap=FALSE, duplicate = "error", dupfun = NULL)
@@ -22,18 +23,27 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
 }
 \arguments{
   \item{x}{
-    vector of x-coordinates of data points.
+    vector of x-coordinates of data points or a
+    \code{SpatialPointsDataFrame} object.
     Missing values are not accepted.
   }
   \item{y}{
     vector of y-coordinates of data points.
     Missing values are not accepted.
+
+    If left as NULL indicates that \code{x} should be a
+  \code{SpatialPointsDataFrame} and \code{z} names the variable of
+  interest in this dataframe.
   }
   \item{z}{
-    vector of z-coordinates of data points.
+    vector of z-coordinates of data points or a character variable
+    naming the variable of interest in the
+    \code{SpatialPointsDataFrame} \code{x}.
+
     Missing values are not accepted.
 
-    \code{x}, \code{y}, and \code{z} must be the same length and may
+    \code{x}, \code{y}, and \code{z} must be the same length 
+    (execpt if \code{x} is a \code{SpatialPointsDataFrame}) and may
     contain no fewer than four points. The points of \code{x} and
     \code{y} cannot be collinear, i.e, they cannot fall on the same line
     (two vectors \code{x} and \code{y} such that \code{y = ax + b} for
@@ -59,7 +69,7 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
     deprecated, use parameter \code{linear}. Now only used by
     \code{interp.old()}.
 
-    meaning was:
+    old meaning was:
     number of additional points to be used in computing partial
     derivatives at each data point.
     \code{ncp} must be either \code{0} (partial derivatives are not used), or at
@@ -80,6 +90,8 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
   }}
   \item{dupfun}{a function, applied to duplicate points if
     \code{duplicate= "user"}.}
+  \item{nx}{dimension of output grid in x direction}
+  \item{ny}{dimension of output grid in y direction}
 }
 \value{
   list with 3 components:
@@ -92,6 +104,9 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
     matrix of fitted z-values.  The value \code{z[i,j]} is computed
     at the x,y point \code{xo[i], yo[j]}. \code{z} has
     dimensions \code{length(xo)} times \code{length(yo)}.}
+
+  If input is a \code{SpatialPointsDataFrame} a
+  \code{SpatialPixelssDataFrame} is returned.
 }
 \note{
   \code{interp} is a wrapper for the two versions \code{interp.old} (it
@@ -163,12 +178,12 @@ akima.smooth <-
 image  (akima.smooth, main = "interp(<akima data>, *) on finer grid")
 contour(akima.smooth, add = TRUE, col = "thistle")
 points(akima, pch = 3, cex = 2, col = "blue")
-# use triangulation package to show underlying triangulation:
+## use triangulation package to show underlying triangulation:
 \dontrun{
 if(library(tripack, logical.return=TRUE))
    plot(tri.mesh(akima), add=TRUE, lty="dashed")
 }
-# use only 15 points (interpolation only within convex hull!)
+## use only 15 points (interpolation only within convex hull!)
 akima.part <- with(akima, interp(x[1:15], y[1:15], z[1:15]))
 image(akima.part)
 title("interp() on subset of only 15 points")
@@ -206,20 +221,32 @@ filled.contour(akima.spl, color.palette = full.pal,
         plot.axes = { axis(1); axis(2);
                       title("smooth  interp(*, linear = FALSE)");
                       points(akima, pch = 3, col= hcl(c=100, l = 20))})
-# no extrapolation!
+## no extrapolation!
 
 ## example with duplicate points :
 
 data(airquality)
 air <- subset(airquality,
               !is.na(Temp) & !is.na(Ozone) & !is.na(Solar.R))
-# gives an error {duplicate ..}:
+## gives an error {duplicate ..}:
 try( air.ip <- interp(air$Temp,air$Solar.R,air$Ozone, linear=FALSE) )
-# use mean of duplicate points:
+## use mean of duplicate points:
 air.ip <- with(air, interp(Temp, Solar.R, log(Ozone), duplicate = "mean",
                            linear = FALSE))
 image(air.ip, main = "Airquality: Ozone vs. Temp and Solar.R")
 with(air, points(Temp, Solar.R))
+
+\dontrun{
+    ## interp can handle spatial point dataframes created by the sp package:
+    library(sp)
+    data(meuse)
+    coordinates(meuse) <- ~x+y
+    ## argument z has to be named, y has to be omitted!
+    z <- interp(meuse,z="zinc",nx=100,ny=150)
+    spplot(z,"zinc")
+    z <- interp(meuse,z="zinc",nx=100,ny=150,linear=FALSE)
+    spplot(z,"zinc")
+}
 }
 \keyword{dplot}
 
