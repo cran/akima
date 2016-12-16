@@ -1,8 +1,4 @@
-# R interface to Akimas regular grid spline interpolator
-# (TOMS 464) improved version: TOMS 760
-# http://www.netlib.org/toms/760
-
-bicubic <- function(x,y,z,x0,y0){
+bilinear <- function(x,y,z,x0,y0){
   nx <- length(x)
   ny <- length(y)
   if(dim(z)[1]!=nx)
@@ -13,25 +9,23 @@ bicubic <- function(x,y,z,x0,y0){
   if(length(y0)!=n0)
     stop("length of y0 and x0 differs!")
 
-  ret <- .Fortran("rgbi3p",
-                  md=as.integer(1),
-                  nxd=as.integer(nx),
-                  nyd=as.integer(ny),
-                  xd=as.double(x),
-                  yd=as.double(y),
-                  zd=as.double(z),                  
-                  nip=as.integer(n0),
-                  xi=as.double(x0),
-                  yi=as.double(y0),
-                  zi=double(n0),
-                  ier=integer(1),
-                  wk=double(3*nx*ny),
+  ret <- .Fortran("biliip",
+                  as.double(x0),
+                  as.double(y0),
+                  z0=double(n0),
+                  as.integer(n0),
+                  as.double(x),
+                  as.double(y),
+                  as.double(z),
+                  as.integer(nx),
+                  as.integer(ny),
                   PACKAGE="akima")
 
-    list(x=x0,y=y0,z=ret$zi) 
+    list(x=x0,y=y0,z=ret$z0)
 }
 
-bicubic.grid <- function(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
+
+bilinear.grid <- function(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
                          nx=40,ny=40,dx=NULL,dy=NULL){
   Nx <- length(x)
   Ny <- length(y)
@@ -59,8 +53,8 @@ bicubic.grid <- function(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
 
   n0 <- nx*ny
 
-  ret <- bicubic(x,y,z,xy[,1],xy[,2])
-  
+  ret <- bilinear(x,y,z,xy[,1],xy[,2])
+
  # return cell boundaries
   list(x=xi,y=yi,z=t(matrix(ret$z,nrow=ny,ncol=nx,byrow=F)))
 }

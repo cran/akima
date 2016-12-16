@@ -5,7 +5,7 @@
 }
 \description{
  The description in the Fortran code says:
-  
+
  This subroutine performs interpolation of a bivariate function,
  z(x,y), on a rectangular grid in the x-y plane.  It is based on
  the revised Akima method.
@@ -77,30 +77,6 @@ akima.bic <- bicubic(akima760$x,akima760$y,akima760$z,
                      seq(0,8,length=50), seq(0,10,length=50))
 plot(sqrt(akima.bic$x^2+akima.bic$y^2), akima.bic$z, type="l")
 
-
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (x, y, z, x0, y0) 
-{
-    nx <- length(x)
-    ny <- length(y)
-    if (dim(z)[1] != nx) 
-        stop("dim(z)[1] and length of x differs!")
-    if (dim(z)[2] != ny) 
-        stop("dim(z)[2] and length of y differs!")
-    n0 <- length(x0)
-    if (length(y0) != n0) 
-        stop("length of y0 and x0 differs!")
-    ret <- .Fortran("rgbi3p", md = as.integer(1), nxd = as.integer(nx), 
-        nyd = as.integer(ny), xd = as.double(x), yd = as.double(y), 
-        zd = as.double(z), nip = as.integer(n0), xi = as.double(x0), 
-        yi = as.double(y0), zi = double(n0), ier = integer(1), 
-        wk = double(3 * nx * ny), PACKAGE = "akima")
-    list(x = x0, y = y0, z = ret$zi)
-  }
 }
 
 \keyword{ dplot }

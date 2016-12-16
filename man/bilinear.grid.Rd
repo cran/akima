@@ -1,30 +1,29 @@
-\name{bicubic.grid}
-\alias{bicubic.grid}
+\name{bilinear.grid}
+\alias{bilinear.grid}
 \title{
-  Bicubic Interpolation for Data on a Rectangular grid
+  Bilinear Interpolation for Data on a Rectangular grid
 }
 \description{
- The description in the Fortran code says:
+  This is an implementation of a bilinear interpolating function.
 
- This subroutine performs interpolation of a bivariate function,
- z(x,y), on a rectangular grid in the x-y plane.  It is based on
- the revised Akima method.
+  For a point (x0,y0) contained in a rectangle (x1,y1),(x2,y1),
+  (x2,y2),(x1,y2) and x1<x2, y1<y2, the first step is to get z()
+  at locations (x0,y1) and (x0,y2) as convex linear combinations
+  z(x0,y*)=a*z(x1,y*)+(1-a)*z(x2,y*) where a=(x2-x1)/(x0-x1) for
+  y*=y1,y2. In a second step z(x0,y0) is calculated as convex linear
+  combination between z(x0,y1) and z(x0,y2) as
+  z(x0,y1)=b*z(x0,y1)+(1-b)*z(x0,y2)  where b=(y2-y1)/(y0-y1).
 
- In this subroutine, the interpolating function is a piecewise
- function composed of a set of bicubic (bivariate third-degree)
- polynomials, each applicable to a rectangle of the input grid
- in the x-y plane.  Each polynomial is determined locally.
+  Finally, z(x0,y0) is a convex linear combination of the z values at
+  the corners of the containing  rectangle with weights according to
+  the distance from (x0,y0) to these corners.
 
- This subroutine has the accuracy of a bicubic polynomial, i.e.,
- it interpolates accurately when all data points lie on a
- surface of a bicubic polynomial.
-
- The grid lines can be unevenly spaced.
+  The grid lines can be unevenly spaced.
 
 }
 \usage{
-bicubic.grid(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
-             nx=40,ny=40,dx=NULL,dy=NULL)
+bilinear.grid(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
+                         nx=40,ny=40,dx=NULL,dy=NULL)
 }
 
 \arguments{
@@ -60,11 +59,6 @@ bicubic.grid(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
     overrides \code{ny} if specified..
     }
 }
-\details{
-  This functiuon is a R interface to Akima's Rectangular-Grid-Data
-  Fitting algorithm (TOMS 760). The algorithm has the accuracy of a bicubic
-  (bivariate third-degree) polynomial.
-}
 \value{
   This function produces a grid of interpolated points, feasible to be
   used directly with \code{\link{image}} and \code{\link{contour}}:
@@ -73,10 +67,10 @@ bicubic.grid(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
   \item{z}{matrix of interpolated data for the output grid.}
 }
 \references{
-  Akima, H. (1996) Rectangular-Grid-Data
-  Surface Fitting that Has the Accuracy of a
-  Bicubic Polynomial,
-  J. ACM \bold{22}(3), 357-361
+  Pascal Getreuer,
+  Linear Methods for Image Interpolation,
+  Image Processing On Line, 2011,
+  http://www.ipol.im/pub/art/2011/g_lmii/article.pdf
 }
 \note{
   Use \code{\link{interp}} for the general case of irregular gridded data!
@@ -91,13 +85,13 @@ bicubic.grid(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
 \examples{
 data(akima760)
 # interpolate at a grid [0,8]x[0,10]
-akima.bic <- bicubic.grid(akima760$x,akima760$y,akima760$z)
-zmin <- min(akima.bic$z, na.rm=TRUE)
-zmax <- max(akima.bic$z, na.rm=TRUE)
+akima.bil <- bilinear.grid(akima760$x,akima760$y,akima760$z)
+zmin <- min(akima.bil$z, na.rm=TRUE)
+zmax <- max(akima.bil$z, na.rm=TRUE)
 breaks <- pretty(c(zmin,zmax),10)
 colors <- heat.colors(length(breaks)-1)
-image(akima.bic, breaks=breaks, col=colors)
-contour(akima.bic, levels=breaks,  add=TRUE)
+image(akima.bil, breaks=breaks, col=colors)
+contour(akima.bil, levels=breaks, add=TRUE)
 }
 \keyword{ dplot }
 

@@ -88,7 +88,7 @@ c http://gams.nist.gov/serve.cgi/ModuleComponent/13334/Fullsource/NETLIB/760
       INTEGER          IER,MD,NIP,NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL*8           WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
+      DOUBLE PRECISION WK(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
      +                 ZD(NXD,NYD),ZI(NIP)
 *     ..
 *     .. Local Scalars ..
@@ -265,14 +265,14 @@ C     WRITE (*,FMT=9050) NXD,NYD,NIP
       INTEGER          IER,MD,NXD,NXI,NYD,NYI
 *     ..
 *     .. Array Arguments ..
-      REAL*8           WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),
+      DOUBLE PRECISION WK(3,NXD,NYD),XD(NXD),XI(NXI),YD(NYD),YI(NYI),
      +                 ZD(NXD,NYD),ZI(NXI,NYI)
 *     ..
 *     .. Local Scalars ..
       INTEGER          IX,IXI,IY,IYI,NIPI
 *     ..
 *     .. Local Arrays ..
-      REAL*8           YII(NIPIMX)
+      DOUBLE PRECISION YII(NIPIMX)
       INTEGER          INXI(NIPIMX),INYI(NIPIMX)
 *     ..
 *     .. External Subroutines ..
@@ -405,10 +405,10 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       INTEGER          NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL*8           PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
+      DOUBLE PRECISION PDD(3,NXD,NYD),XD(NXD),YD(NYD),ZD(NXD,NYD)
 *     ..
 *     .. Local Scalars ..
-      REAL*8           B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
+      DOUBLE PRECISION B00,B00X,B00Y,B01,B10,B11,CX1,CX2,CX3,CY1,CY2,
      +                 CY3,DISF,DNM,DZ00,DZ01,DZ02,DZ03,DZ10,DZ11,DZ12,
      +                 DZ13,DZ20,DZ21,DZ22,DZ23,DZ30,DZ31,DZ32,DZ33,
      +                 DZX10,DZX20,DZX30,DZXY11,DZXY12,DZXY13,DZXY21,
@@ -422,7 +422,7 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
      +                 JXY,NX0,NY0
 *     ..
 *     .. Local Arrays ..
-      REAL*8           B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
+      DOUBLE PRECISION B00XA(4),B00YA(4),B01A(4),B10A(4),CXA(3,4),
      +                 CYA(3,4),SXA(4),SXXA(4),SYA(4),SYYA(4),XA(3,4),
      +                 YA(3,4),Z0IA(3,4),ZI0A(3,4)
       INTEGER          IDLT(3,4)
@@ -431,7 +431,7 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       INTRINSIC        MAX
 *     ..
 *     .. Statement Functions ..
-      REAL*8           Z2F,Z3F
+      DOUBLE PRECISION Z2F,Z3F
 *     ..
 * Data statements 
       DATA             ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,
@@ -898,11 +898,11 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       INTEGER          NIP,NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL*8           XD(NXD),XI(NIP),YD(NYD),YI(NIP)
+      DOUBLE PRECISION XD(NXD),XI(NIP),YD(NYD),YI(NIP)
       INTEGER          INXI(NIP),INYI(NIP)
 *     ..
 *     .. Local Scalars ..
-      REAL*8           XII,YII
+      DOUBLE PRECISION XII,YII
       INTEGER          IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
 *     ..
 * DO-loop with respect to IIP, which is the point number of the
@@ -1048,12 +1048,12 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       INTEGER          NIP,NXD,NYD
 *     ..
 *     .. Array Arguments ..
-      REAL*8           PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
+      DOUBLE PRECISION PDD(3,NXD,NYD),XD(NXD),XI(NIP),YD(NYD),YI(NIP),
      +                 ZD(NXD,NYD),ZI(NIP)
       INTEGER          INXI(NIP),INYI(NIP)
 *     ..
 *     .. Local Scalars ..
-      REAL*8           A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
+      DOUBLE PRECISION A,B,C,D,DX,DXSQ,DY,DYSQ,P00,P01,P02,P03,P10,P11,
      +                 P12,P13,P20,P21,P22,P23,P30,P31,P32,P33,Q0,Q1,Q2,
      +                 Q3,U,V,X0,XII,Y0,YII,Z00,Z01,Z0DX,Z0DY,Z10,Z11,
      +                 Z1DX,Z1DY,ZDXDY,ZII,ZX00,ZX01,ZX0DY,ZX10,ZX11,

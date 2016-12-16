@@ -1,8 +1,6 @@
 \name{interp}
 \title{Gridded Bivariate Interpolation for Irregular Data}
 \alias{interp}
-\alias{interp.new}
-\alias{interp.old}
 \description{
   These functions implement bivariate interpolation onto a grid
   for irregularly spaced input data.  Bilinear or bicubic spline
@@ -13,13 +11,8 @@
 interp(x, y=NULL, z, xo=seq(min(x), max(x), length = nx),
        yo=seq(min(y), max(y), length = ny),
        linear = TRUE, extrap=FALSE, duplicate = "error", dupfun = NULL,
-       ncp = NULL, nx = 40, ny = 40)
-interp.old(x, y, z, xo= seq(min(x), max(x), length = 40),
-           yo=seq(min(y), max(y), length = 40), ncp = 0,
-           extrap=FALSE, duplicate = "error", dupfun = NULL)
-interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
-           yo = seq(min(y), max(y), length = 40), linear = FALSE,
-            ncp = NULL, extrap=FALSE, duplicate = "error", dupfun = NULL)
+       nx = 40, ny = 40,
+       jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE)
 }
 \arguments{
   \item{x}{
@@ -42,12 +35,18 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
 
     Missing values are not accepted.
 
-    \code{x}, \code{y}, and \code{z} must be the same length 
+    \code{x}, \code{y}, and \code{z} must be the same length
     (execpt if \code{x} is a \code{SpatialPointsDataFrame}) and may
     contain no fewer than four points. The points of \code{x} and
-    \code{y} cannot be collinear, i.e, they cannot fall on the same line
+    \code{y} should not be collinear, i.e, they should not fall on the same line
     (two vectors \code{x} and \code{y} such that \code{y = ax + b} for
-    some \code{a}, \code{b} will not be accepted). \code{interp} is
+    some \code{a}, \code{b} will not produce menaningful results). Some
+    heuristics is built in to avoid this case by adding small jitter to
+    \code{x} and \code{y} when the number of \code{NA} values in the
+    result exceeds 10\%.
+
+
+    \code{interp} is
     meant for cases in which you have \code{x}, \code{y} values
     scattered over a plane and a \code{z} value for each.  If, instead,
     you are trying to evaluate a mathematical function, or get a
@@ -64,18 +63,7 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
   \item{yo}{vector of y-coordinates of output grid; analogous to
     \code{xo}, see above.}
   \item{linear}{logical -- indicating wether linear or spline
-    interpolation should be used. supersedes old \code{ncp} parameter}
-  \item{ncp}{
-    deprecated, use parameter \code{linear}. Now only used by
-    \code{interp.old()}.
-
-    old meaning was:
-    number of additional points to be used in computing partial
-    derivatives at each data point.
-    \code{ncp} must be either \code{0} (partial derivatives are not used), or at
-    least 2 but smaller than the number of data points (and smaller than
-    25).
-  }
+    interpolation should be used.}
   \item{extrap}{
     logical flag: should extrapolation be used outside of the
     convex hull determined by the data points?}
@@ -92,6 +80,22 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
     \code{duplicate= "user"}.}
   \item{nx}{dimension of output grid in x direction}
   \item{ny}{dimension of output grid in y direction}
+  \item{jitter}{Jitter of amount of \code{diff(range(XX))*jitter} (XX=x
+    or y) will be added to coordinates if collinear points are
+    detected. Afterwards interpolation will be tried once again.
+
+    Note that the jitter is not generated randomly unless
+    \code{jitter.random} is set to \code{TRUE}. This ensures
+    reproducable result. \code{\link[tripack]{tri.mesh}} of package
+    \code{tripack} uses the same jitter mechanism. That means you can
+    plot the triangulation on top of the interpolation and see the
+    same triangulation as used for interpolation, see examples below.
+  }
+  \item{jitter.iter}{number of iterations to retry with jitter, amount
+    will be multiplied in each iteration by \code{iter^1.5}}
+  \item{jitter.random}{logical, see \code{jitter}, defaults to
+    \code{FALSE}
+  }
 }
 \value{
   list with 3 components:
@@ -109,17 +113,12 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
   \code{SpatialPixelssDataFrame} is returned.
 }
 \note{
-  \code{interp} is a wrapper for the two versions \code{interp.old} (it
-  uses (almost) the same Fortran code from Akima 1978 as the S-Plus version) and
-  \code{interp.new}
-  (it is based on new Fortran code from Akima 1996). For linear
-  interpolation the old version is choosen, but spline interpolation is
-  done by the new version.
+  \code{interp} uses Akimas new Fortran code from 1996
+  for spline interpolation, the triangulation (based on Renkas tripack)
+  is reused for linear interpolation. In this newer version Akima
+  switched from his own triangulation to Renkas tripack (=TOMS 751).
 
-  Earlier versions (pre 0.5-1) of \code{interp} used the parameter
-  \code{ncp} to choose between linear and cubic interpolation, this is now done
-  by setting the logical parameter \code{linear}. Use of \code{ncp} is still
-  possible, but is deprecated.
+  Note that S-Plus uses (used?) the old Fortran code from Akima 1978.
 
   The resulting structure is suitable for input to the
   functions \code{\link{contour}} and \code{\link{image}}.  Check
@@ -153,12 +152,18 @@ interp.new(x, y, z, xo = seq(min(x), max(x), length = 40),
   Akima, H. (1996). Algorithm 761: scattered-data surface fitting that has
   the accuracy of a cubic polynomial.
   ACM Transactions on Mathematical Software \bold{22}, 362--371.
+
+  R. J. Renka (1996). Algorithm 751: TRIPACK: a constrained
+  two-dimensional Delaunay triangulation package.
+  ACM Transactions on Mathematical Software.
+  \bold{22}, 1-8.
 }
 \seealso{
   \code{\link{contour}}, \code{\link{image}},
   \code{\link{approx}}, \code{\link{spline}},
   \code{\link{aspline}},
-  \code{\link{outer}}, \code{\link{expand.grid}}.
+  \code{\link{outer}}, \code{\link{expand.grid}},
+  \code{link{franke.data}}.
 }
 \examples{
 data(akima)
@@ -167,17 +172,27 @@ with(akima, text(x, y, formatC(z,dig=2), adj = -0.1))
 
 ## linear interpolation
 akima.li <- interp(akima$x, akima$y, akima$z)
-image  (akima.li, add=TRUE)
-contour(akima.li, add=TRUE)
+li.zmin <- min(akima.li$z,na.rm=TRUE)
+li.zmax <- max(akima.li$z,na.rm=TRUE)
+breaks <- pretty(c(li.zmin,li.zmax),10)
+colors <- heat.colors(length(breaks)-1)
+with(akima.li, image  (x,y,z, breaks=breaks, col=colors))
+with(akima.li,contour(x,y,z, levels=breaks, add=TRUE))
 points (akima, pch = 3)
 
 ## increase smoothness (using finer grid):
 akima.smooth <-
- with(akima, interp(x, y, z, xo=seq(0,25, length=100),
-                    yo=seq(0,20, length=100)))
-image  (akima.smooth, main = "interp(<akima data>, *) on finer grid")
-contour(akima.smooth, add = TRUE, col = "thistle")
+    with(akima, interp(x, y, z, nx=100, ny=100))
+si.zmin <- min(akima.smooth$z,na.rm=TRUE)
+si.zmax <- max(akima.smooth$z,na.rm=TRUE)
+breaks <- pretty(c(si.zmin,si.zmax),10)
+colors <- heat.colors(length(breaks)-1)
+
+image  (akima.smooth, main = "interp(<akima data>, *) on finer grid",
+        breaks=breaks, col=colors)
+contour(akima.smooth, add = TRUE, levels=breaks, col = "thistle")
 points(akima, pch = 3, cex = 2, col = "blue")
+
 ## use triangulation package to show underlying triangulation:
 \dontrun{
 if(library(tripack, logical.return=TRUE))
@@ -185,30 +200,18 @@ if(library(tripack, logical.return=TRUE))
 }
 ## use only 15 points (interpolation only within convex hull!)
 akima.part <- with(akima, interp(x[1:15], y[1:15], z[1:15]))
-image(akima.part)
+p.zmin <- min(akima.part$z,na.rm=TRUE)
+p.zmax <- max(akima.part$z,na.rm=TRUE)
+breaks <- pretty(c(p.zmin,p.zmax),10)
+colors <- heat.colors(length(breaks)-1)
+
+image(akima.part, breaks=breaks, col=colors)
 title("interp() on subset of only 15 points")
-contour(akima.part, add=TRUE)
+contour(akima.part, levels=breaks, add=TRUE)
 points(akima$x[1:15],akima$y[1:15], col = "blue")
 
-## spline interpolation, two variants (AMS 526 "Old", AMS 761 "New")
-## -----------------------------------------------------------------
-## "Old": use 5 points to calculate derivatives -> many NAs
-akima.sO <- interp.old(akima$x, akima$y, akima$z,
-           xo=seq(0,25, length=100),  yo=seq(0,20, length=100), ncp=5)
-table(is.na(akima.sO$z)) ## 3990 NA's; = 40 \%
-akima.sO <- with(akima,
-   interp.old(x,y,z, xo=seq(0,25, length=100), yo=seq(0,20, len=100), ncp = 4))
-sum(is.na(akima.sO$z)) ## still 3429
-image  (akima.sO, main = "interp.old(*, ncp = 4) [almost useless]")
-contour(akima.sO, add = TRUE)
-
-## "New:"
-akima.spl <- with(akima, interp.new(x,y,z, xo=seq(0,25, length=100),
-                                           yo=seq(0,20, length=100)))
-## equivalent call via setting linear=FALSE in interp():
-akima.spl <- with(akima, interp(x,y,z, xo=seq(0,25, length=100),
-                                       yo=seq(0,20, length=100),
-                                linear=FALSE))
+## spline interpolation
+akima.spl <- with(akima, interp(x, y, z, nx=100, ny=100, linear=FALSE))
 
 contour(akima.spl, main = "smooth  interp(*, linear = FALSE)")
 points(akima)
@@ -223,19 +226,6 @@ filled.contour(akima.spl, color.palette = full.pal,
                       points(akima, pch = 3, col= hcl(c=100, l = 20))})
 ## no extrapolation!
 
-## example with duplicate points :
-
-data(airquality)
-air <- subset(airquality,
-              !is.na(Temp) & !is.na(Ozone) & !is.na(Solar.R))
-## gives an error {duplicate ..}:
-try( air.ip <- interp(air$Temp,air$Solar.R,air$Ozone, linear=FALSE) )
-## use mean of duplicate points:
-air.ip <- with(air, interp(Temp, Solar.R, log(Ozone), duplicate = "mean",
-                           linear = FALSE))
-image(air.ip, main = "Airquality: Ozone vs. Temp and Solar.R")
-with(air, points(Temp, Solar.R))
-
 \dontrun{
     ## interp can handle spatial point dataframes created by the sp package:
     library(sp)
@@ -247,6 +237,116 @@ with(air, points(Temp, Solar.R))
     z <- interp(meuse,z="zinc",nx=100,ny=150,linear=FALSE)
     spplot(z,"zinc")
 }
+
+\dontrun{
+### An example demonstrating the problems that occur for rectangular
+### gridded data.
+###
+require(tripack)
+### Create irregularly spaced sample data on even values of x and y
+### (the "14" makes it irregular spacing).
+x   <- c(seq(2,10,2),14)
+nx  <- length(x)
+y   <- c(seq(2,10,2),14)
+ny  <- length(y)
+nxy <- nx*ny
+xy  <- expand.grid(x,y)
+colnames(xy) <- c("x","y")
+### prepare a dataframe for interp
+df  <- cbind(xy,z=rnorm(nxy))
+### and a matrix for bicubic and bilinear
+z   <- matrix(df$z,nx,ny)
+
+old.par <- par(mfrow=c(2,2))
+### First: bicubic spline interpolation:
+### This is Akimas bicubic spline implementation for regular gridded
+### data:
+iRbic <- bicubic.grid(x,y,z,nx=250,ny=250)
+### Note that this interpolation tends to extreme values in large cells.
+### Therefore zmin and zmax are taken from here to generate the same
+### color scheme for the next plots.
+zmin <- min(iRbic$z, na.rm=TRUE)
+zmax <- max(iRbic$z, na.rm=TRUE)
+breaks <- pretty(c(zmin,zmax),10)
+colors <- heat.colors(length(breaks)-1)
+image(iRbic,breaks=breaks,col = colors)
+contour(iRbic,col="black",levels=breaks,add=TRUE)
+points(xy$x,xy$y)
+title(main="bicubic interpolation",
+      xlab="bcubic.grid(...)",
+      sub="Akimas regular grid version, ACM 760")
+
+### Now Akima splines with accurracy of bicubic polynomial
+### for irregular gridded data:
+iRspl <- with(df,interp(x,y,z,linear=FALSE,nx=250,ny=250))
+### Note that the triangulation is created by adding small amounts
+### of jitter to the coordinates, resulting in an unique triangulation.
+### This jitter is not randomly choosen to get reproducable results.
+### tri.mesh() from package tripack uses the same code and so produces the
+### same triangulation.
+image(iRspl,breaks=breaks,col = colors)
+contour(iRspl,col="black",levels=breaks,add=TRUE)
+plot(tri.mesh(xy$x,xy$y),col="white",add=TRUE)
+title(main="bicubic* interpolation",
+      xlab="interp(...,linear=FALSE)",
+      ylab="*: accuracy of bicubic polynomial"
+      sub="Akimas irregular grid version, ACM 761")
+
+### Just for comparison an implementation of bilinear interpolation,
+### only applicable to regular gridded data:
+iRbil <- bilinear.grid(x,y,z,nx=250,ny=250)
+### Note the lack of differentiability at grid cell borders.
+image(iRbil,breaks=breaks,col = colors)
+contour(iRbil,col="black",levels=breaks,add=TRUE)
+points(xy$x,xy$y)
+title(main="bilinear interpolation",
+      xlab="bilinear.grid(...)",
+      sub="only works for regular grid")
+
+### Linear interpolation using the same triangulation as
+### Akima bicubic splines for irregular gridded data.
+iRlin <- with(df,interp(x,y,z,linear=TRUE,nx=250,ny=250))
+### Note how the triangulation influences the interpolation.
+### For this rectangular gridded dataset the triangulation
+### in each rectangle is arbitraryly choosen from two possible
+### solutions, hence the interpolation would change drastically
+### when the triangulation changes. For this reason interp()
+### is not meant for regular (rectangular) gridded data!
+image(iRlin,breaks=breaks,col = colors)
+contour(iRlin,col="black",levels=breaks,add=TRUE)
+plot(tri.mesh(xy$x,xy$y),col="white",add=TRUE)
+title(main="linear interpolation",
+      xlab="interp(...,linear=TRUE)",
+      sub="same triangulation as Akima irregular grid")
+
+### And now four times Akima 761 with random jitter for
+### triangulation correction, note that now interp() and tri.mesh()
+### need the same random seed to produce identical triangulations!
+for(i in 1:4){
+    set.seed(42+i)
+    iRspl <- with(df,interp(x,y,z,linear=FALSE,nx=250,ny=250,jitter.random=TRUE))
+    image(iRspl,breaks=breaks,col = colors)
+    contour(iRspl,col="black",levels=breaks,add=TRUE)
+    set.seed(42+i)
+    plot(tri.mesh(xy$x,xy$y,jitter.random=TRUE),col="white",add=TRUE)
+    title(main="bicubic* interpolation",
+          xlab="interp(...,linear=FALSE)",
+          ylab="random jitter added",
+          sub="Akimas irregular grid version, ACM 761")
+}
+par(old.par)
+
+}
+### Use all datasets from Franke, 1979:
+data(franke)
+for(i in 1:5)
+    for(j in 1:3){
+        FR <- franke.data(i,j,franke)
+        IL <- with(FR, interp(x,y,z,linear=FALSE))
+        image(IL)
+        contour(IL,add=TRUE)
+        with(FR,points(x,y))
+    }
 }
 \keyword{dplot}
 

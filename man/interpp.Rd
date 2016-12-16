@@ -3,11 +3,10 @@
   Pointwise Bivariate Interpolation for Irregular Data
 }
 \alias{interpp}
-\alias{interpp.old}
-\alias{interpp.new}
 \usage{
 interpp(x, y=NULL, z, xo, yo=NULL, linear=TRUE, extrap=FALSE,
-duplicate = "error", dupfun = NULL, ncp)
+        duplicate = "error", dupfun = NULL,
+        jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE)
 }
 \arguments{
   \item{x}{
@@ -20,8 +19,8 @@ duplicate = "error", dupfun = NULL, ncp)
     Missing values are not accepted.
 
     If left as NULL indicates that \code{x} should be a
-  \code{SpatialPointsDataFrame} and \code{z} names the variable of
-  interest in this dataframe.
+    \code{SpatialPointsDataFrame} and \code{z} names the variable of
+    interest in this dataframe.
   }
   \item{z}{
     vector of z-coordinates of data points or a character variable
@@ -30,12 +29,12 @@ duplicate = "error", dupfun = NULL, ncp)
 
     Missing values are not accepted.
 
-    \code{x}, \code{y}, and \code{z} must be the same length  
-    (execpt if \code{x} is a \code{SpatialPointsDataFrame}) and may contain no fewer
-    than four points. The points of \code{x} and \code{y}
+    \code{x}, \code{y}, and \code{z} must be the same length
+    (execpt if \code{x} is a \code{SpatialPointsDataFrame}) and may
+    contain no fewer than four points. The points of \code{x} and \code{y}
     cannot be collinear, i.e, they cannot fall on the same line (two vectors
-    \code{x} and \code{y} such that \code{y = ax + b} for some \code{a}, \code{b} will not be
-    accepted).
+    \code{x} and \code{y} such that \code{y = ax + b} for some \code{a},
+    \code{b} will not be accepted).
   }
   \item{xo}{
     vector of x-coordinates of points at which to evaluate the interpolating
@@ -49,30 +48,38 @@ duplicate = "error", dupfun = NULL, ncp)
     If operating on \code{SpatialPointsDataFrame}s this is left as \code{NULL}
   }
   \item{linear}{logical -- indicating wether linear or spline
-    interpolation should be used. supersedes old \code{ncp} parameter}
-  \item{ncp}{
-    deprecated, use parameter \code{linear}. Now only used by
-    \code{interpp.old()}.
-
-    meaning was:
-    number of additional points to be used in computing partial
-    derivatives at each data point.
-    \code{ncp} must be either \code{0} (partial derivatives are not used, =
-    linear interpolation), or at
-    least 2 but smaller than the number of data points (and smaller than 25).
+    interpolation should be used.
   }
   \item{extrap}{
     logical flag: should extrapolation be used outside of the
-    convex hull determined by the data points?}
+    convex hull determined by the data points? Not possible for linear
+    interpolation.}
   \item{duplicate}{
-  indicates how to handle duplicate data points. Possible values are
-  \code{"error"} - produces an error message, \code{"strip"} - remove
-  duplicate z values, \code{"mean"},\code{"median"},\code{"user"}  -
-  calculate  mean , median or user defined function of duplicate z
-  values.
-}
-\item{dupfun}{this function is applied to duplicate points if \code{duplicate="user"}
-}
+    indicates how to handle duplicate data points. Possible values are
+    \code{"error"} - produces an error message, \code{"strip"} - remove
+    duplicate z values, \code{"mean"},\code{"median"},\code{"user"}  -
+    calculate  mean , median or user defined function of duplicate z
+    values.
+  }
+  \item{dupfun}{
+    this function is applied to duplicate points if \code{duplicate="user"}
+  }
+  \item{jitter}{Jitter of amount of \code{diff(range(XX))*jitter} (XX=x
+    or y) will be added to coordinates if collinear points are
+    detected. Afterwards interpolation will be tried once again.
+
+    Note that the jitter is not generated randomly unless
+    \code{jitter.random} is set to \code{TRUE}. This ensures
+    reproducable result. \code{\link[tripack]{tri.mesh}} of package
+    \code{tripack} uses the same jitter mechanism. That means you can
+    plot the triangulation on top of the interpolation and see the
+    same triangulation as used for interpolation, see examples below.
+  }
+  \item{jitter.iter}{number of iterations to retry with jitter, amount
+    will be increased in each iteration by \code{iter^1.5}}
+  \item{jitter.random}{logical, see \code{jitter}, defaults to
+    \code{FALSE}
+  }
 }
 \value{
   list with 3 components:
@@ -95,35 +102,30 @@ duplicate = "error", dupfun = NULL, ncp)
 \section{NOTE}{
   Use \code{interp} if interpolation on a regular grid is wanted.
 
-  The two versions  \code{interpp.old}  and \code{interpp.new} refer to
-  Akimas Fortran code from 1978 and 1996 resp. The call wrapper  \code{interpp}
-  chooses  \code{interpp.old} for linear and  \code{interpp.new} for cubic
-  spline interpolation.
-
-  Earlier versions (pre 0.5-1) of \code{interpp} used the parameter
-  \code{ncp} to choose between linear and cubic interpolation, this is now done
-  by setting the logical parameter \code{linear}. Use of \code{ncp} is still
-  possible, but is deprecated.
-
+  See \code{\link{interp}} for more details.
 }
 \description{
-  If \code{ncp} is zero, linear
-  interpolation is used in the triangles bounded by data points.
-  Cubic interpolation is done if partial derivatives are used.
-  If \code{extrap} is \code{FALSE}, z-values for points outside the convex hull are
-  returned as \code{NA}.
-  No extrapolation can be performed if \code{ncp} is zero.
+  If \code{linear} is \\code{TRUE}, linear
+  interpolation is used in the triangles bounded by data points, otherwise
+  cubic interpolation is done.
 
-   The \code{interpp} function handles duplicate \code{(x,y)} points                in different ways. As default it will stop with an error message. But
-  it can give duplicate points an unique \code{z} value according to the
-  parameter \code{duplicate} (\code{mean},\code{median} or any other user defined function).
+  If \code{extrap} is \code{FALSE}, z-values for points outside the
+  convex hull are returned as \code{NA}. No extrapolation can be
+  performed for linear interpolation.
 
+  The \code{interpp} function handles duplicate \code{(x,y)} points in
+  different ways. As default it will stop with an error message. But it
+  can give duplicate points an unique \code{z} value according to the
+  parameter \code{duplicate} (\code{mean},\code{median} or any other
+  user defined function).
 
-  The triangulation scheme used by \code{interp} works well if \code{x} and \code{y} have
-  similar scales but will appear stretched if they have very different
-  scales.  The spreads of \code{x} and \code{y} must be within four orders of magnitude
-  of each other for \code{interpp} to work.
+  The triangulation scheme used by \code{interp} works well if \code{x}
+  and \code{y} have similar scales but will appear stretched if they
+  have very different scales.  The spreads of \code{x} and \code{y} must
+  be within four orders of magnitude of each other for \code{interpp} to
+  work.
 }
+
 \references{
   Akima, H. (1978). A Method of Bivariate Interpolation and
   Smooth Surface Fitting for Irregularly Distributed Data Points.
@@ -134,6 +136,11 @@ duplicate = "error", dupfun = NULL, ncp)
   the accuracy of a cubic polynomial.
   ACM Transactions on Mathematical Software,
   \bold{22}, 362-371.
+
+  R. J. Renka (1996). Algorithm 751: TRIPACK: a constrained
+  two-dimensional Delaunay triangulation package.
+  ACM Transactions on Mathematical Software.
+  \bold{22}, 1-8.
 }
 \seealso{
   \code{\link[graphics]{contour}}, \code{\link[graphics]{image}},

@@ -1,5 +1,5 @@
       SUBROUTINE SDBI3P(MD,NDP,XD,YD,ZD,NIP,XI,YI, ZI,IER, WK,IWK,
-     +                  EXTRPI,NEAR,NEXT,DIST)
+     +                  EXTRPI,NEAR,NEXT,DIST,LINEAR)
 *
 * Scattered-data bivariate interpolation
 * (a master subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -40,7 +40,9 @@
 *       = 1 for NDP = 9 or less
 *       = 2 for NDP not equal to NDPPV
 *       = 3 for NIP = 0 or less
-*       = 9 for errors in SDTRAN called by this subroutine.
+*       = 9 for errors in SDTRAN called by this subroutine, except the next one
+*       =10 for error 2 in SDTRAN (first three points collinear), as this can
+*           be fixed by adding jitter to the locations in the calling routine.
 *
 * The other arguments are
 *   WK  = two-dimensional array of dimension NDP*17 used
@@ -82,6 +84,7 @@
 *     ..
 *     .. Scalar Arguments ..
       INTEGER          IER,MD,NDP,NIP,NEAR(NDP),NEXT(NDP)
+      LOGICAL          LINEAR
 
 *     ..
 *     .. Array Arguments ..
@@ -120,6 +123,7 @@
      +                NEAR,NEXT,DIST)
 *         CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
 *    +                LIST,LPTR,LEND,LTRI,ITL)
+          IF (IERT.EQ.2) GO TO 55
           IF (IERT.GT.0) GO TO 50
       END IF
 * Estimates partial derivatives at all data points.  (for MD=1,2)
@@ -144,21 +148,25 @@
       IER = 0
       RETURN
 * Error exit
-   20 CONTINUE                                                          
+   20 CONTINUE
 C     WRITE (*,FMT=9000) MD,NDP
       IER = 1
       RETURN
-   30 CONTINUE                                                          
+   30 CONTINUE
 C     WRITE (*,FMT=9010) MD,NDP,NDPPV
       IER = 2
       RETURN
-   40 CONTINUE                                                          
+   40 CONTINUE
 C     WRITE (*,FMT=9020) MD,NDP,NIP
       IER = 3
       RETURN
-   50 CONTINUE                                                          
+   50 CONTINUE
 C     WRITE (*,FMT=9030)
       IER = 9
+      RETURN
+ 55   CONTINUE
+C first three points collinear:
+      IER = 10
       RETURN
 * Format statement for error message
  9000 FORMAT (' ',/,'*** SDBI3P Error 1: NDP = 9 or less',/,'    MD =',
@@ -172,7 +180,7 @@ C     WRITE (*,FMT=9030)
 
 
       SUBROUTINE SDSF3P(MD,NDP,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK,IWK,
-     +                  EXTRPI,NEAR,NEXT,DIST)
+     +                  EXTRPI,NEAR,NEXT,DIST,LINEAR)
 *
 * Scattered-data smooth surface fitting
 * (a master subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -217,7 +225,9 @@ C     WRITE (*,FMT=9030)
 *       = 2 for NDP not equal to NDPPV
 *       = 3 for NXI = 0 or less
 *       = 4 for NYI = 0 or less
-*       = 9 for errors in SDTRAN called by this subroutine.
+*       = 9 for errors in SDTRAN called by this subroutine, except the next one
+*       =10 for error 2 in SDTRAN (first three points collinear), as this can
+*           be fixed by adding jitter to the locations in the calling routine.
 *
 * The other arguments are
 *   WK  = two-dimensional array of dimension NDP*36 used
@@ -259,6 +269,7 @@ C     WRITE (*,FMT=9030)
 *     ..
 *     .. Scalar Arguments ..
       INTEGER          IER,MD,NDP,NXI,NYI,NEAR(NDP),NEXT(NDP)
+      LOGICAL          LINEAR
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION             WK(NDP,17),XD(NDP),XI(NXI),YD(NDP),
@@ -298,10 +309,11 @@ C     WRITE (*,FMT=9030)
      +                NEAR,NEXT,DIST)
 *         CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
 *    +                LIST,LPTR,LEND,LTRI,ITL)
+          IF (IERT.EQ.2) GO TO 85
           IF (IERT.GT.0) GO TO 80
       END IF
 * Estimates partial derivatives at all data points.  (for MD=1,2)
-      IF (MD.NE.3) THEN
+      IF (MD.NE.3 .AND. (.NOT. LINEAR)) THEN
           CALL SDPD3P(NDP,XD,YD,ZD, WK(1,1), WK(1,6),WK(1,15),WK(1,17),
      +                IWK(1,9),IWK(1,10),IWK(1,19))
 *         CALL SDPD3P(NDP,XD,YD,ZD, PDD, CF3,CFL1,DSQ,IDSQ,IPC,NCP)
@@ -317,36 +329,46 @@ C     WRITE (*,FMT=9030)
               CALL SDLCTN(NDP,XD,YD,NT,IWK(1,1),NL,IWK(1,7),NIPI,
      +                    XI(IXI),YII, KTLI,ITLI)
 *             CALL SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,NIP,XI,YI, KTLI,ITLI)
+              IF (LINEAR) THEN
+              CALL SDLIPL(NDP,XD,YD,ZD,NT,IWK(1,1),NL,IWK(1,7),
+     +                    NIPI,XI(IXI),YII,KTLI,ITLI, ZI(IXI,IYI),
+     +                    EXTRPI(IXI,IYI))
+              ELSE
               CALL SDPLNL(NDP,XD,YD,ZD,NT,IWK(1,1),NL,IWK(1,7),WK(1,1),
      +                    NIPI,XI(IXI),YII,KTLI,ITLI, ZI(IXI,IYI),
      +                    EXTRPI(IXI,IYI))
 *             CALL SDPLNL(NDP,XD,YD,ZD,NT,ITP,NL,IPL,PDD,
 *    +                    NIP,XI,YI,KTLI,ITLI, ZI)
+              END IF
    20     CONTINUE
    30 CONTINUE
 * Normal return
       IER = 0
       RETURN
 * Error exit
-   40 CONTINUE                                                          
+   40 CONTINUE
 C     WRITE (*,FMT=9000) MD,NDP
       IER = 1
       RETURN
-   50 CONTINUE                                                          
+   50 CONTINUE
 C     WRITE (*,FMT=9010) MD,NDP,NDPPV
       IER = 2
       RETURN
-   60 CONTINUE                                                          
+   60 CONTINUE
 C     WRITE (*,FMT=9020) MD,NDP,NXI,NYI
       IER = 3
       RETURN
-   70 CONTINUE                                                          
+   70 CONTINUE
 C     WRITE (*,FMT=9030) MD,NDP,NXI,NYI
       IER = 4
       RETURN
-   80 CONTINUE                                                          
+   80 CONTINUE
 C     WRITE (*,FMT=9040)
       IER = 9
+      RETURN
+ 85   CONTINUE
+C first three points collinear:
+      IER = 10
       RETURN
 * Format statement for error message
  9000 FORMAT (' ',/,'*** SDSF3P Error 1: NDP = 9 or less',/,'    MD =',
@@ -408,8 +430,10 @@ C     WRITE (*,FMT=9040)
 *   IERT = error flag
 *        = 0 for no errors
 *        = 1 for NDP = 3 or less
-*        = 2 for identical data points
-*        = 3 for all collinear data points.
+*        = 2 for first three data points are collinear
+*        = 3 for identical data points
+*        = 4 for invalid NCC, NDP, or NROW value.
+*        = 5 for invalid data structure (LIST,LPTR,LEND).
 *
 * The other arguments are
 *   LIST = integer array of dimension 6*NDP USED internally
@@ -454,26 +478,26 @@ C     WRITE (*,FMT=9040)
 * Error exit
    10 IF (IERTM.EQ.-1) THEN
           IERT = 1
-          CONTINUE                                                      
+          CONTINUE
 C     WRITE (*,FMT=9000) NDP
       ELSE IF (IERTM.EQ.-2) THEN
           IERT = 2
-          CONTINUE                                                      
+          CONTINUE
 C     WRITE (*,FMT=9010)
       ELSE
           IERT = 3
           IP1 = IERTM
-          CONTINUE                                                      
+          CONTINUE
 C     WRITE (*,FMT=9020) NDP,IP1,XD(IP1),YD(IP1)
       END IF
       RETURN
    20 IF (IERTL.EQ.1) THEN
           IERT = 4
-          CONTINUE                                                      
+          CONTINUE
 C     WRITE (*,FMT=9030) NDP
       ELSE IF (IERTL.EQ.2) THEN
           IERT = 5
-          CONTINUE                                                      
+          CONTINUE
 C     WRITE (*,FMT=9040)
       END IF
       RETURN
@@ -697,7 +721,7 @@ C     WRITE (*,FMT=9040)
 *     .. Statement Functions ..
       DOUBLE PRECISION             DSQF,VPDT
 *     ..
-* Statement Function definitions 
+* Statement Function definitions
       DSQF(U1,V1,U2,V2) = (U2-U1)**2 + (V2-V1)**2
       VPDT(U1,V1,U2,V2,U3,V3) = (V3-V1)* (U2-U1) - (U3-U1)* (V2-V1)
 *     ..
@@ -1726,7 +1750,7 @@ C     WRITE (*,FMT=9040)
 *     .. Statement Functions ..
       DOUBLE PRECISION             SPDT,VPDT
 *     ..
-* Statement Function definitions 
+* Statement Function definitions
       SPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (U2-U3) + (V1-V3)* (V2-V3)
       VPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (V2-V3) - (V1-V3)* (U2-U3)
 *     ..
@@ -1894,7 +1918,7 @@ C     WRITE (*,FMT=9040)
 * The output argument is
 *   ZI   = array of dimension NIP, where the calculated z
 *          values are to be stored.
-*   EXTRPI = logical array of dimension NIP, indicating 
+*   EXTRPI = logical array of dimension NIP, indicating
 *            if a point resides outside the convex hull (and its Z value
 *            has been extrapolated)
 *
@@ -2253,4 +2277,152 @@ C     WRITE (*,FMT=9040)
           END IF
   120 CONTINUE
       END
+
+* agebhard: add a linear interpolator, along the lines of sdplnl
+
+      SUBROUTINE SDLIPL(NDP,XD,YD,ZD,NT,IPT,NL,IPL,NIP,XI,YI,KTLI,
+     +                  ITLI, ZI, EXTRPI)
+*
+* A. Gebhardt:
+* Linear interpolation, uses similar arguments to SDSLPL
+*
+* The input arguments are
+*   NDP  = number of data points,
+*   XD   = array of dimension NDP containing the x
+*          coordinates of the data points,
+*   YD   = array of dimension NDP containing the y
+*          coordinates of the data points,
+*   ZD   = array of dimension NDP containing the z
+*          values at the data points,
+*   NT   = number of triangles,
+*   IPT  = two-dimensional integer array of dimension 3*NT
+*          containing the point numbers of the vertexes of
+*          the triangles,
+*   NL   = number of border line segments,
+*   IPL  = two-dimensional integer array of dimension 2*NL
+*          containing the point numbers of the end points of
+*          the border line segments,
+*   NIP  = number of output points at which interpolation is
+*          to be performed,
+*   XI   = array of dimension NIP containing the x
+*          coordinates of the output points,
+*   YI   = array of dimension NIP containing the y
+*          coordinates of the output points,
+*   KTLI = integer array of dimension NIP, each element
+*          containing the code for the type of the piece of
+*          the plane in which each output point lies
+*        = 1 for a triangle inside the data area
+*        = 2 for a rectangle on the right-hand side of a
+*            border line segment
+*        = 3 for a triangle between two rectangles on the
+*            right-hand side of two consecutive border
+*            line segments
+*        = 4 for the triangle which is an overlap of two
+*            rectangles on the right-hand side of two
+*            consecutive border line segments,
+*   ITLI = integer array of dimension NIP containing the
+*          triangle numbers or the (second) border line
+*          segment numbers corresponding to the output
+*          points.
+*
+* The output argument is
+*   ZI   = array of dimension NIP, where the calculated z
+*          values are to be stored.
+*   EXTRPI = logical array of dimension NIP, indicating
+*            if a point resides outside the convex hull (and its Z value
+*            has been extrapolated)
+*
+* Specification statements
+*     .. Scalar Arguments ..
+      INTEGER          NDP,NIP,NL,NT
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION             XD(NDP),XI(NIP),YD(NDP),
+     +     YI(NIP),ZD(NDP),ZI(NIP)
+      INTEGER          IPT(3,NT),ITLI(NIP),KTLI(NIP)
+      LOGICAL          EXTRPI(NIP)
+*     ..
+*     .. Local Scalars ..
+      DOUBLE PRECISION             A,B,C,EA,EB,EC,DV
+      INTEGER          I,IDP,IIP,ITLII,ITLIPV,KTLII,KTLIPV
+*     ..
+*     .. Local Arrays ..
+      DOUBLE PRECISION             X(3),Y(3),Z(3),
+     +     ZUV(3),ZV(3),ZVV(3)
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC        MOD
+*     ..
+*     Outermost DO-loop with respect to the output point
+      DO 121 IIP = 1,NIP
+         KTLII = KTLI(IIP)
+         ITLII = ITLI(IIP)
+         IF (IIP.EQ.1) THEN
+            KTLIPV = 0
+            ITLIPV = 0
+         ELSE
+            KTLIPV = KTLI(IIP-1)
+            ITLIPV = ITLI(IIP-1)
+         END IF
+*     Part 1.  Calculation of ZII by interpolation
+         IF (KTLII.EQ.1) THEN
+*     Calculates the coefficients when necessary.
+            IF (KTLII.NE.KTLIPV .OR. ITLII.NE.ITLIPV) THEN
+*     Loads coordinate values at the vertexes.
+               DO 21 I = 1,3
+                  IDP = IPT(I,ITLII)
+                  X(I) = XD(IDP)
+                  Y(I) = YD(IDP)
+                  Z(I) = ZD(IDP)
+ 21            CONTINUE
+*     Solve the equations for the plane throuh (x1,y1,z1),
+*     (x2,y2,z2), (x3,y3,z3):
+*     Maxima:
+*     (%i1) eq1:a*x1+b*y1+c=z1;
+*     (%o1)                        b y1 + a x1 + c = z1
+*     (%i2) eq2:a*x2+b*y2+c=z2;
+*     (%o2)                        b y2 + a x2 + c = z2
+*     (%i3) eq3:a*x3+b*y3+c=z3;
+*     (%o3)                        b y3 + a x3 + c = z3
+*     solve([eq1,eq2,eq3],[a,b,c]);
+*     gives:
+
+             DV =  X(1)*(Y(3)-Y(2))-X(2)*Y(3)+X(3)*Y(2)+(X(2)-X(3))*Y(1)
+             EA =  Y(1)*(Z(3)-Z(2))-Y(2)*Z(3)+Y(3)*Z(2)+(Y(2)-Y(3))*Z(1)
+             EB =  X(1)*(Z(3)-Z(2))-X(2)*Z(3)+X(3)*Z(2)+(X(2)-X(3))*Z(1)
+             EC =  X(1)*(Y(3)*Z(2)-Y(2)*Z(3))+
+     .             Y(1)*(X(2)*Z(3)-X(3)*Z(2))+
+     .             Z(1)*(X(3)*Y(2)-X(2)*Y(3))
+               IF (DABS(DV) .GT. 1.0D-10) THEN
+                  A = -EA/DV
+                  B =  EB/DV
+                  C =  EC/DV
+                  ZI(IIP) = A*XI(IIP)+B*YI(IIP)+C
+                  EXTRPI(IIP) = .FALSE.
+               ELSE
+*     Use the extrapolation marker as error message, as no extrapolation
+*     is possible:
+                  ZI(IIP) = 0.0D0
+                  EXTRPI(IIP) = .TRUE.
+               END IF
+            ELSE
+*     reuse A,B,C from last (same) triangle:
+               IF (DABS(DV) .GT. 1.0D-10) THEN
+                  ZI(IIP) = A*XI(IIP)+B*YI(IIP)+C
+                  EXTRPI(IIP) = .FALSE.
+               ELSE
+*     Use the extrapolation marker as error message, as no extrapolation
+*     is possible:
+                  ZI(IIP) = 0.0D0
+                  EXTRPI(IIP) = .TRUE.
+               END IF
+            END IF
+         ELSE
+*     outside of triangles:
+            ZI(IIP) = 0.0D0
+            EXTRPI(IIP) = .TRUE.
+         END IF
+ 121  CONTINUE
+      END
+
 

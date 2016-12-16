@@ -35,6 +35,18 @@ http://www.netlib.org/toms/526
 http://www.netlib.org/toms/697
 http://www.netlib.org/toms/761
 
+UPDATE: (28.02.2013)
+
+Add bicubic interpolation for regular grid (TOMS 760).
+
+UPDATE: (09.12.2016)
+
+Only Akimas new implementation of bicubic interpolation for regular grid (TOMS 761) 
+remains in the package, the old one is no longer needed. Linear interpolation is now
+calcaluted based on Renkas trmesh function.
+
+A simple bilinear interpolation has been added (no Akima code).
+
 ------------------------------------------------------------------------------
 Albrecht Gebhardt          email: albrecht.gebhardt@aau.at
 Institut fuer Mathematik   Tel. : (++43 463) 2700/3118

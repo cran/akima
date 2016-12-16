@@ -1,12 +1,12 @@
 This package is distributed under the ACM license at
-http://www.acm.org/publications/policies/softwarecrnotice.
+http://www.acm.org/publications/policies/software-copyright-notice
 
 In detail:
 
 1. Fortran code (src/*.f): 
 
 Copyrighted and Licensed by ACM, 
-see http://www.acm.org/publications/policies/softwarecrnotice
+see http://www.acm.org/publications/policies/software-copyright-notice
 
 
 2. R interface (src/init.c src/akima.h R/*.R man/*.Rd data/*): 
