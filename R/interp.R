@@ -25,6 +25,11 @@ interp <-
         } else
             stop("either x,y,z are numerical or x is SpatialPointsDataFrame and z a name of a data column in x")
     }
+    ## FIXME: drop old akima code
+    if(linear)
+    ret <- interp.old(x,y,z,xo,yo,ncp=0,extrap=FALSE,
+                      duplicate=duplicate,dupfun=dupfun)
+    else {
 
     if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
         stop("missing values and Infs not allowed")
@@ -68,8 +73,8 @@ interp <-
         n <- length(x)
     }
 
-    zo <- matrix(0, nx, ny)
-    storage.mode(zo) <- "double"
+    ## zo <- matrix(0, nx, ny)
+    ## storage.mode(zo) <- "double"
     miss <- !extrap             # if not extrapolating, set missing values
 
     ans <- .Fortran("sdsf3p",
@@ -82,7 +87,7 @@ interp <-
                     x = as.double(xo),
                     ny=as.integer(ny),
                     y = as.double(yo),
-                    z = zo,
+                    z = as.double(matrix(0,nx,ny)),
                     ier = integer(1),
                     wk = double(36 * n),
                     iwk = integer(25 * n),
@@ -143,7 +148,7 @@ interp <-
                             x = as.double(xo),
                             as.integer(ny),
                             y = as.double(yo),
-                            z = zo,
+                            z = as.double(matrix(0,nx,ny)),
                             ier = integer(1),
                             double(36 * n),
                             integer(25 * n),
@@ -177,7 +182,8 @@ interp <-
         ret@proj4string <- sp.proj4string
         gridded(ret) <- TRUE
     } else {
-        ret <- list(x=ans$x,y=ans$y,z=ans$z)
+        ret <- list(x=ans$x,y=ans$y,z=matrix(ans$z,nx,ny))
     }
+    } ## END FIXME
     ret
 }

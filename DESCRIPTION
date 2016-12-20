@@ -1,9 +1,9 @@
 Package: akima
-Version: 0.6-1
+Version: 0.6-2
 Date: 2016-12-16
 Title: Interpolation of Irregularly and Regularly Spaced Data
 Authors@R: c(person("Hiroshi", "Akima", role = c("aut", "cph"),
-		     comment = "Fortran code (TOMS 526, 761, 697 and 433)"),
+		     comment = "Fortran code (TOMS 760, 761, 697 and 433)"),
 	      person("Albrecht", "Gebhardt", role = c("aut", "cre", "cph"),
                      email = "albrecht.gebhardt@aau.at",
                      comment = "R port (interp* functions), bicubic* functions"),
@@ -12,7 +12,7 @@ Authors@R: c(person("Hiroshi", "Akima", role = c("aut", "cph"),
               person("Martin", "Maechler", email="maechler@stat.math.ethz.ch",
                       role = c("ctb", "cph"), comment = "interp2xyz function + enhancements"),
               person("YYYY Association for Computing Machinery, Inc.",
-                      role = c("cph"), comment = "covers code from TOMS 526, 761, 697 and 433")
+                      role = c("cph"), comment = "covers code from TOMS 760, 761, 697 and 433")
             )
 Maintainer: Albrecht Gebhardt <albrecht.gebhardt@aau.at>
 Description: Several cubic spline interpolation methods of H. Akima for irregular and
@@ -26,14 +26,14 @@ License: ACM | file LICENSE
 Depends: R (>= 2.0.0)
 Imports: sp
 NeedsCompilation: yes
-Packaged: 2016-12-16 17:44:33 UTC; alge
-Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 526, 761, 697 and 433)),
+Packaged: 2016-12-20 00:14:46 UTC; alge
+Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 760, 761, 697 and 433)),
   Albrecht Gebhardt [aut, cre, cph] (R port (interp* functions), bicubic*
     functions),
   Thomas Petzold [ctb, cph] (aspline function),
   Martin Maechler [ctb, cph] (interp2xyz function + enhancements),
   YYYY Association for Computing Machinery, Inc. [cph] (covers code from
-    TOMS 526, 761, 697 and 433)
+    TOMS 760, 761, 697 and 433)
 License_restricts_use: yes
 Repository: CRAN
-Date/Publication: 2016-12-16 19:50:04
+Date/Publication: 2016-12-20 01:40:25

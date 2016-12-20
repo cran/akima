@@ -1,6 +1,8 @@
 2016-12-16  Albrecht Gebhardt  <agebhard@aau.at>
 
-	* .Rbuildignore, DESCRIPTION, NAMESPACE, R/franke.R, R/interp.R, R/interpp.R, data/franke.rda, man/franke.data.Rd, man/interp.Rd, man/interpp.Rd, src/akima433.f, src/akima697.f, src/akima761.f:
+	* DESCRIPTION: fix ACM numbers
+
+	* .Rbuildignore, NAMESPACE, R/franke.R, R/interp.R, R/interpp.R, data/franke.rda, man/franke.data.Rd, man/interp.Rd, man/interpp.Rd, src/akima433.f, src/akima697.f, src/akima761.f:
 	* Fix ACM license URL
 	* remove old Akima code and interface, everything is now handled by
 	  Akima new code

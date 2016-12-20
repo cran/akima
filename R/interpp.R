@@ -29,6 +29,12 @@
                        "or both x and xo have to be SpatialPointsDataFrames",
                        "and z a name of a data column in x"))
     }
+    ## FIXME: drop old akima code
+    if(linear)
+    ret <- interpp.old(x,y,z,xo,yo,ncp=0,extrap=FALSE,
+                      duplicate=duplicate,dupfun=dupfun)
+    else {
+
     if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
         stop("missing values and Infs not allowed")
     if(is.null(xo))
@@ -164,5 +170,6 @@
     } else {
         ret <- list(x=ans$x,y=ans$y,z=ans$z)
     }
+    } ## END FIXME
     ret
 }

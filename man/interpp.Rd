@@ -105,6 +105,10 @@ interpp(x, y=NULL, z, xo, yo=NULL, linear=TRUE, extrap=FALSE,
   See \code{\link{interp}} for more details.
 }
 \description{
+  These functions implement bivariate interpolation onto a set of points
+  for irregularly spaced input data. These functions are only for
+  backward compatibility, use \code{\link{interpp}} instead.
+
   If \code{linear} is \\code{TRUE}, linear
   interpolation is used in the triangles bounded by data points, otherwise
   cubic interpolation is done.

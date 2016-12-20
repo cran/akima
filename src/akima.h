@@ -1,6 +1,17 @@
 
 #include <R.h>
 
+/* ACM 526, soon to be removed: */
+int F77_NAME(idbvip) (int *md, int *ncp, int *ndp,
+                      double *xd, double *yd, double *zd,
+                      int *nip, double *xi, double *yi, double *zi,
+                      int *iwk, double *wk, int *missi);
+
+int F77_NAME(idsfft) (int *md, int *ncp, int *ndp,
+                      double *xd, double *yd,double *zd,
+                      int *nxi, int *nyi,
+                      double *xi, double *yi, double *zi,
+                      int *iwk, double *wk, int *missi);
 
 /* ACM 679: */
 int F77_NAME(uvip3p) (int *np, int *nd, double *xd, double *yd,
@@ -25,6 +36,6 @@ int F77_NAME(sdbi3p) (int *md, int *ndp, double *xd, double *yd, double *zd,
 		      int *extrpi, int *near, int *next, double *dist);
 
 /* bilinear, A. Gebhardt: */
-int F77_NAME(biliip) (double *x0, double *y0, double *z0, 
+int F77_NAME(biliip) (double *x0, double *y0, double *z0,
                       double *x, double *y, double *z,
                       int *nx, int *ny);
