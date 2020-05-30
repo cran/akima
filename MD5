@@ -1,5 +1,5 @@
 c2ac0e90e95b01efb0c02317714f618a *ChangeLog
-855191c727b02548d10fbb9f7cf0fd4e *DESCRIPTION
+41b90afa7330f97115f67831f32d606c *DESCRIPTION
 cb967e2857173bc1737f16c0607351a8 *LICENSE
 09ed5edd41e822a32d295dec50890666 *NAMESPACE
 1e49c05a50df3cc84d7d92b89a9d649b *R/aspline.R
@@ -34,7 +34,8 @@ cbc19816fcb783867b0de8285b5a7202 *man/interp2xyz.Rd
 00c757483e27e32ddb27d88b83dd9a44 *man/interpp.Rd
 8e55535ecf137cf2d0df4ad3f3e77493 *man/interpp.old.Rd
 b7b66926fbc5f6a890fe51c320c78cea *src/Makevars.in
-4dfb3ee907f9f18b038baf6d9e9d8f90 *src/akima.h
+3a0879cadb4d5b62fa049a416bfc3f7c *src/akima.h
+7d6826928c974408adf59b5892465a22 *src/akima.h.keep
 e50edcf3ad36861a2631e44fc95c38fe *src/akima433.f
 e698d132c01aa12deb10ad3297aad898 *src/akima697.f
 0ed9d6e97beff9602c07c0b5a31af131 *src/akima760.f
@@ -50,6 +51,6 @@ bd3e4d17ef6958a15601e4ff24585640 *src/idptip.f
 4677234abb4664e8f9b75ef74c5eb941 *src/idsfft.f
 91e10bb4d6825e496b118fd5fdcf708d *src/idtang.f
 4967c8396bab7747b114f6ae6c8d95a2 *src/idxchg.f
-99f8ccf93747a6cf2f75195f71623b24 *src/init.c
+17111c6dce6136a2a522dda73cc33554 *src/init.c
 fa152b8dc18ad033af0a4f8540b8f348 *src/tripack.f
 72c171f05c1d02b345759529deed87aa *tools/acinclude.m4

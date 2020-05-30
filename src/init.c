@@ -171,4 +171,5 @@ R_init_akima(DllInfo *info)
   R_registerRoutines(info,
 		     NULL /*cMethods*/, NULL /*callMethods*/,
 		     fortranMethods, NULL/*externalMethods*/);
+  R_useDynamicSymbols(info, FALSE);
 }
