@@ -15,10 +15,10 @@ if test -z "${R_HOME}" ; then
 fi
 
 CC=`"${R_HOME}/bin/R" CMD config CC`
-F77=`"${R_HOME}/bin/R" CMD config F77`
+FC=`"${R_HOME}/bin/R" CMD config FC`
 
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_FC
 
 
 CHECK_SUN_COMPILER_OPTIMIZATION

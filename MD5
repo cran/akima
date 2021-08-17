@@ -1,5 +1,4 @@
-c2ac0e90e95b01efb0c02317714f618a *ChangeLog
-41b90afa7330f97115f67831f32d606c *DESCRIPTION
+b2c69185f80b8f7c04c2ac5362ddb528 *DESCRIPTION
 cb967e2857173bc1737f16c0607351a8 *LICENSE
 09ed5edd41e822a32d295dec50890666 *NAMESPACE
 1e49c05a50df3cc84d7d92b89a9d649b *R/aspline.R
@@ -15,8 +14,8 @@ eec617d0b2003675e736580d6dca41b6 *R/interpp.new.R
 549e7384ca16406577596db4a0d02b2f *R/interpp.old.R
 3b30b932500484ccdacae6d5fda0e0bf *README
 06c1bd10b34d285fab9c82100e12abbe *cleanup
-d5bc03332ba64a3bc848bbb577c9047f *configure
-d2d638adb6f8b52a733beef48f501518 *configure.ac
+837cb6e7e08851a508b8110dca7fa56a *configure
+796a0ba1c735c2a5f36aee3c5ed7c428 *configure.ac
 2e5024d6223e580b969c96af7d2e207e *data/akima.rda
 e6f3cd08ae5b12e469cd241bfab552a5 *data/akima760.rda
 91bf0772cf7358446293ab6445fe6b72 *data/franke.rda
@@ -35,7 +34,6 @@ cbc19816fcb783867b0de8285b5a7202 *man/interp2xyz.Rd
 8e55535ecf137cf2d0df4ad3f3e77493 *man/interpp.old.Rd
 b7b66926fbc5f6a890fe51c320c78cea *src/Makevars.in
 3a0879cadb4d5b62fa049a416bfc3f7c *src/akima.h
-7d6826928c974408adf59b5892465a22 *src/akima.h.keep
 e50edcf3ad36861a2631e44fc95c38fe *src/akima433.f
 e698d132c01aa12deb10ad3297aad898 *src/akima697.f
 0ed9d6e97beff9602c07c0b5a31af131 *src/akima760.f

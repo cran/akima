@@ -1,6 +1,6 @@
 Package: akima
-Version: 0.6-2.1
-Date: 2016-12-16
+Version: 0.6-2.2
+Date: 2021-08-17
 Title: Interpolation of Irregularly and Regularly Spaced Data
 Authors@R: c(person("Hiroshi", "Akima", role = c("aut", "cph"),
 		     comment = "Fortran code (TOMS 760, 761, 697 and 433)"),
@@ -26,7 +26,7 @@ License: ACM | file LICENSE
 Depends: R (>= 2.0.0)
 Imports: sp
 NeedsCompilation: yes
-Packaged: 2020-05-30 09:17:28 UTC; ripley
+Packaged: 2021-08-17 12:34:44 UTC; alge
 Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 760, 761, 697 and 433)),
   Albrecht Gebhardt [aut, cre, cph] (R port (interp* functions), bicubic*
     functions),
@@ -36,4 +36,4 @@ Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 760, 761, 697 and 433)),
     TOMS 760, 761, 697 and 433)
 License_restricts_use: yes
 Repository: CRAN
-Date/Publication: 2020-05-30 09:50:55 UTC
+Date/Publication: 2021-08-17 16:10:21 UTC
