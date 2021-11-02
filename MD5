@@ -1,4 +1,4 @@
-b2c69185f80b8f7c04c2ac5362ddb528 *DESCRIPTION
+108346b4acbea368edc5dfeb1b301848 *DESCRIPTION
 cb967e2857173bc1737f16c0607351a8 *LICENSE
 09ed5edd41e822a32d295dec50890666 *NAMESPACE
 1e49c05a50df3cc84d7d92b89a9d649b *R/aspline.R
@@ -14,11 +14,11 @@ eec617d0b2003675e736580d6dca41b6 *R/interpp.new.R
 549e7384ca16406577596db4a0d02b2f *R/interpp.old.R
 3b30b932500484ccdacae6d5fda0e0bf *README
 06c1bd10b34d285fab9c82100e12abbe *cleanup
-837cb6e7e08851a508b8110dca7fa56a *configure
-796a0ba1c735c2a5f36aee3c5ed7c428 *configure.ac
-2e5024d6223e580b969c96af7d2e207e *data/akima.rda
-e6f3cd08ae5b12e469cd241bfab552a5 *data/akima760.rda
-91bf0772cf7358446293ab6445fe6b72 *data/franke.rda
+d809a6de6d13924927bb2d49a1fe83b7 *configure
+ca5d32635572fdab5f297770ebcdc299 *configure.ac
+4bdd17668a604ae4f37d6ed61204e17d *data/akima.rda
+2b7ad6b240642e70ddccf4c3cf505a55 *data/akima760.rda
+23c56756a78c5c664b5cea472b03ab8c *data/franke.rda
 67acf70539da27768c8c1c93c03cda1e *man/akima.Rd
 84c95a59a05b5484198fb8c6b8c1586d *man/akima760.Rd
 33d8c1b6313590920bbc83cc13942645 *man/aspline.Rd
