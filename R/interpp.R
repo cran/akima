@@ -1,6 +1,7 @@
 "interpp"<-function(x, y=NULL, z, xo, yo=NULL, linear = TRUE, extrap = FALSE,
                     duplicate = "error", dupfun = NULL,
-                    jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE)
+                    jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE,
+                    remove = !linear)
 {
 
     ## handle sp data, save coordinate and value names
@@ -9,14 +10,14 @@
     sp.z <- NULL
     sp.proj4string <- NULL
     if(is.null(y)&&is.character(z)){
-        if(class(xo)=="SpatialPointsDataFrame"){
+        if(inherits(xo,"SpatialPointsDataFrame")){
             yo <- coordinates(xo)[,2]
             xo <- coordinates(xo)[,1]
         } else
             stop(paste("either x,y,z,xo,yo have to be numeric vectors",
                        "or both x and xo have to be SpatialPointsDataFrames",
                        "and z a name of a data column in x"))
-        if(class(x)=="SpatialPointsDataFrame"){
+        if(inherits(x,"SpatialPointsDataFrame")){
             sp.coord <- dimnames(coordinates(x))[[2]]
             sp.z <- z
             sp.proj4string <- x@proj4string
@@ -29,12 +30,6 @@
                        "or both x and xo have to be SpatialPointsDataFrames",
                        "and z a name of a data column in x"))
     }
-    ## FIXME: drop old akima code
-    if(linear)
-    ret <- interpp.old(x,y,z,xo,yo,ncp=0,extrap=FALSE,
-                      duplicate=duplicate,dupfun=dupfun)
-    else {
-
     if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
         stop("missing values and Infs not allowed")
     if(is.null(xo))
@@ -91,6 +86,11 @@
     zo <- rep(0, np)
     miss <- !extrap	#if not extrapolating use missing values
     extrap <- rep(extrap, np)
+    ## Defaults from Fortran code for triangle removal moved to R code,
+    ## see SDTRTT:
+    hbrmn <- 0.1 # height to base ratio for thin triangles
+    nrrtt <- 5   # recursion depth for triangle removal, 0 disables
+    if(!remove) nrrtt <- 0
 
     ans <- .Fortran("sdbi3p",
                     md = as.integer(1),
@@ -103,23 +103,29 @@
                     y = as.double(yo),
                     z = as.double(zo),
                     ier = integer(1),
-                    wk = double(17 * n),
-                    iwk = integer(25 * n),
+                    wk = double(17 * 5 * n),
+                    iwk = integer(39 * n),
                     extrap = as.logical(extrap),
-                    near = integer(n),
-                    nxt = integer(n),
-                    dist = double(n),
                     linear = as.logical(linear),
+                    hbrmn = as.double(hbrmn),
+                    nrrtt = as.integer(nrrtt),
                     PACKAGE = "akima")
     if(miss)
         ans$z[ans$extrap]<-NA
-    ## Error code 10 from sdsf3p indicates error code -2 from trmesh:
+
+    ## Error code 11 from sdbi3p indicates failure of thin triangle removal.
+    if(ans$ier==11){
+        stop("removal of thin triangles from border failed. try to re-run with remove=FALSE")
+    }
+
+
+    ## Error code 10 from sdbi3p indicates error code -2 from trmesh:
     ## first three points collinear.
     ## Try to add jitter to data locations to avoid collinearities,
     ## start with diff(range(x))*jitter*jitter.trials^1.5 and repeat for
     ## jitter.trials steps until success (ier=0)
 
-    if(ans$ier==10)
+    if(ans$ier==10){
         warning("collinear points, trying to add some jitter to avoid collinearities!")
     jitter.trials <- 1
     success <- FALSE
@@ -143,13 +149,12 @@
                         y = as.double(yo),
                         z = as.double(zo),
                         ier = integer(1),
-                        wk = double(17 * n),
-                        iwk = integer(25 * n),
+                        wk = double(17 * 5 * n),
+                        iwk = integer(39 * n),
                         extrap = as.logical(extrap),
-                        near = integer(n),
-                        nxt = integer(n),
-                        dist = double(n),
                         linear = as.logical(linear),
+                        hbrmn = as.double(hbrmn),
+                        nrrtt = as.integer(nrrtt),
                         PACKAGE = "akima")
         if(miss)
             ans$z[ans$extrap] <- NA
@@ -160,6 +165,7 @@
         if(success)
             warning("success: collinearities reduced through jitter")
         jitter.trials <- jitter.trials+1
+        }
     }
     if(is.sp){
         nona <- !is.na(ans$z)
@@ -170,6 +176,5 @@
     } else {
         ret <- list(x=ans$x,y=ans$y,z=ans$z)
     }
-    } ## END FIXME
     ret
 }

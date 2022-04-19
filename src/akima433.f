@@ -36,7 +36,7 @@ C DECLARATION STATEMENTS
       EQUIVALENCE  (UK,DX),(IMN,X2,A1,M1),(IMX,X5,A5,M5),
      1             (J,SW,SA),(Y2,W2,W4,Q2),(Y5,W3,Q3)
 C PRELIMINARY PROCESSING
-    10 L0=L
+      L0=L
       LM1=L0-1
       LM2=LM1-1
       LP1=L0+1
@@ -56,14 +56,14 @@ C MAIN DO-LOOP
       DO 80  K=1,N0
         UK=U(K)
 C ROUTINE TO LOCATE THE DESIRED POINT
-   20   IF(LM2.EQ.0)      GO TO 27
+        IF(LM2.EQ.0)      GO TO 27
         IF(UK.GE.X(L0))   GO TO 26
         IF(UK.LT.X(1))    GO TO 25
         IMN=2
         IMX=L0
    21   I=(IMN+IMX)/2
         IF(UK.GE.X(I))    GO TO 23
-   22   IMX=I
+        IMX=I
         GO TO 24
    23   IMN=I+1
    24   IF(IMX.GT.IMN)    GO TO 21
@@ -79,7 +79,7 @@ C CHECK IF I = IPV
         IPV=I
 C ROUTINES TO PICK UP NECESSARY X AND Y VALUES AND
 C          TO ESTIMATE THEM IF NECESSARY
-   40   J=I
+        J=I
         IF(J.EQ.1)        J=2
         IF(J.EQ.LP1)      J=L0
         X3=X(J-1)
@@ -166,7 +166,5 @@ C ERROR EXIT
    95 ERR = 6
       RETURN
    96 ERR = 7
-      RETURN
-   99 ERR = 10
       RETURN
       END

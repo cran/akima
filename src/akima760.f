@@ -158,17 +158,7 @@ C     WRITE (*,FMT=9040)
    90 CONTINUE
 C     WRITE (*,FMT=9050) NXD,NYD,NIP
       RETURN
-* Format statements for error messages
- 9000 FORMAT (1X,/,'*** RGBI3P Error 1: NXD = 1 or less')
- 9010 FORMAT (1X,/,'*** RGBI3P Error 2: NYD = 1 or less')
- 9020 FORMAT (1X,/,'*** RGBI3P Error 3: Identical XD values or',
-     +       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',
-     +       E11.3)
- 9030 FORMAT (1X,/,'*** RGBI3P Error 4: Identical YD values or',
-     +       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',
-     +       E11.3)
- 9040 FORMAT (1X,/,'*** RGBI3P Error 5: NIP = 0 or less')
- 9050 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NIP =',I5,/)
+      
       END
 
 
@@ -349,19 +339,6 @@ C     WRITE (*,FMT=9050)
   120 CONTINUE
 C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       RETURN
-* Format statements for error messages
- 9000 FORMAT (1X,/,'*** RGSF3P Error 1: NXD = 1 or less')
- 9010 FORMAT (1X,/,'*** RGSF3P Error 2: NYD = 1 or less')
- 9020 FORMAT (1X,/,'*** RGSF3P Error 3: Identical XD values or',
-     +       ' XD values out of sequence',/,'    IX =',I6,',  XD(IX) =',
-     +       E11.3)
- 9030 FORMAT (1X,/,'*** RGSF3P Error 4: Identical YD values or',
-     +       ' YD values out of sequence',/,'    IY =',I6,',  YD(IY) =',
-     +       E11.3)
- 9040 FORMAT (1X,/,'*** RGSF3P Error 5: NXI = 0 or less')
- 9050 FORMAT (1X,/,'*** RGSF3P Error 6: NYI = 0 or less')
- 9060 FORMAT ('    NXD =',I5,',  NYD =',I5,',  NXI =',I5,',  NYI =',I5,
-     +       /)
       END
 
 
@@ -443,6 +420,27 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
      +                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
      +                               (XX3/ (XX2-XX1)) + ZZ0
 *     ..
+* initialize some variables to silence compiler warnings      
+      Z00=0.0D0
+      Z01=0.0D0
+      Z02=0.0D0
+      Z03=0.0D0
+      Z10=0.0D0
+      Z11=0.0D0
+      Z12=0.0D0
+      Z13=0.0D0
+      Z20=0.0D0
+      Z21=0.0D0
+      Z22=0.0D0
+      Z23=0.0D0
+      Z30=0.0D0
+      Z31=0.0D0
+      Z32=0.0D0
+      Z33=0.0D0
+      X2=0.0D0
+      X3=0.0D0
+      Y2=0.0D0
+      Y3=0.0D0
 * Calculation
 * Initial setting of some local variables
       NX0 = MAX(4,NXD)
@@ -905,6 +903,9 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       DOUBLE PRECISION XII,YII
       INTEGER          IIP,IMD,IMN,IMX,IXD,IYD,NINTX,NINTY
 *     ..
+* initialize some variables to silence compiler warnings      
+      IXD=0
+      IYD=0
 * DO-loop with respect to IIP, which is the point number of the
 * output point
       DO 30 IIP = 1,NIP
@@ -1064,6 +1065,33 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
 *     .. Intrinsic Functions ..
       INTRINSIC        MAX
 *     ..
+* initialize some variables to silence compiler warnings      
+      X0=0.0D0
+      Y0=0.0D0
+      Z00=0.0D0
+      Z11=0.0D0
+      ZII=0.0D0
+      ZX00=0.0D0
+      ZY00=0.0D0
+      ZXY00=0.0D0
+      P00=0.0D0
+      P01=0.0D0
+      P02=0.0D0
+      P03=0.0D0
+      P10=0.0D0
+      P11=0.0D0
+      P12=0.0D0
+      P13=0.0D0
+      P20=0.0D0
+      P21=0.0D0
+      P22=0.0D0
+      P23=0.0D0
+      P30=0.0D0
+      P31=0.0D0
+      P32=0.0D0
+      P33=0.0D0
+      IYD0=0
+      IXD0=0
 * Calculation
 * Outermost DO-loop with respect to the output point
       DO 10 IIP = 1,NIP

@@ -1,16 +1,8 @@
-C      ALGORITHM 751, COLLECTED ALGORITHMS FROM ACM.
-C      THIS WORK PUBLISHED IN TRANSACTIONS ON MATHEMATICAL SOFTWARE,
-C      VOL. 22, NO. 1, March, 1996, P.  1--8.
-C      ####### With remark from renka (to appear) 4/dec/1998
-C
-C      modifications for R:
-C        REAL -> DOUBLE PRECISION  albrecht.gebhardt@uni-klu.ac.at
-C
       SUBROUTINE ADDCST (NCC,LCC,N,X,Y, LWK,IWK,LIST,LPTR,
      .                   LEND, IER)
       INTEGER NCC, LCC(*), N, LWK, IWK(LWK), LIST(*),
      .        LPTR(*), LEND(N), IER
-      DOUBLE PRECISION X(N), Y(N)
+      DOUBLE PRECISION    X(N), Y(N)
 C
 C***********************************************************
 C
@@ -18,7 +10,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   11/12/94
 C
 C   This subroutine provides for creation of a constrained
@@ -58,7 +50,7 @@ C
 C   The algorithm is as follows:  given a triangulation
 C which includes one or more sets of constraint nodes, the
 C corresponding adjacencies (constraint arcs) are forced to
-C be present (Subroutine EDGE).  Any additional new arcs
+C be present (subroutine EDGE).  Any additional new arcs
 C required are chosen to be locally optimal (satisfy the
 C modified circumcircle property).
 C
@@ -96,10 +88,10 @@ C             intersect a constraint arc to be added.  NI
 C             is bounded by N-3.
 C
 C       IWK = Integer work array of length LWK (used by
-C             Subroutine EDGE to add constraint arcs).
+C             subroutine EDGE to add constraint arcs).
 C
 C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
+C                        gulation.  Refer to subroutine
 C                        TRMESH.
 C
 C On output:
@@ -110,7 +102,7 @@ C             from its input value.
 C
 C       IWK = Array containing the endpoint indexes of the
 C             new arcs which were swapped in by the last
-C             call to Subroutine EDGE.
+C             call to subroutine EDGE.
 C
 C       LIST,LPTR,LEND = Triangulation data structure with
 C                        all constraint arcs present unless
@@ -251,7 +243,7 @@ C
      .                   LPTR,LEND,LNEW, IER)
       INTEGER K, IST, NCC, LCC(*), N, LIST(*), LPTR(*),
      .        LEND(*), LNEW, IER
-      DOUBLE PRECISION XK, YK, X(*), Y(*)
+      DOUBLE PRECISION    XK, YK, X(*), Y(*)
 C
 C***********************************************************
 C
@@ -259,11 +251,11 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/27/98
+C                                             (817) 565-2767
+C                                                   08/25/91
 C
 C   Given a triangulation of N nodes in the plane created by
-C Subroutine TRMESH or TRMSHR, this subroutine updates the
+C subroutine TRMESH or TRMSHR, this subroutine updates the
 C data structure with the addition of a new node in position
 C K.  If node K is inserted into X and Y (K .LE. N) rather
 C than appended (K = N+1), then a corresponding insertion
@@ -274,7 +266,7 @@ C value:  set Z(I+1) to Z(I) for I = N,N-1,...,K.  For
 C optimal efficiency, new nodes should be appended whenever
 C possible.  Insertion is necessary, however, to add a non-
 C constraint node when constraints are present (refer to
-C Subroutine ADDCST).
+C subroutine ADDCST).
 C
 C   Note that a constraint node cannot be added by this
 C routine.  In order to insert a constraint node, it is
@@ -315,7 +307,7 @@ C The above parameters are not altered by this routine.
 C
 C       LCC = List of constraint curve starting indexes (or
 C             dummy array of length 1 if NCC = 0).  Refer to
-C             Subroutine ADDCST.
+C             subroutine ADDCST.
 C
 C       N = Number of nodes in the triangulation before K is
 C           added.  N .GE. 3.  Note that N will be incre-
@@ -336,21 +328,20 @@ C On output:
 C
 C       LCC = List of constraint curve starting indexes in-
 C             cremented by 1 to reflect the insertion of K
-C             unless NCC = 0 or (IER .NE. 0 and IER .NE.
-C             -4).
+C             unless NCC = 0 or IER .NE. 0.
 C
 C       N = Number of nodes in the triangulation including K
-C           unless IER .NE. 0 and IER .NE. -4.  Note that
-C           all comments refer to the input value of N.
+C           unless IER .NE. 0.  Note that all comments refer
+C           to the input value of N.
 C
 C       X,Y = Arrays updated with the insertion of XK and YK
 C             in the K-th positions (node I+1 was node I be-
 C             fore the insertion for I = K to N if K .LE. N)
-C             unless IER .NE. 0 and IER .NE. -4.
+C             unless IER .NE. 0.
 C
 C       LIST,LPTR,LEND,LNEW = Data structure updated with
 C                             the addition of node K unless
-C                             IER .NE. 0 and IER .NE. -4.
+C                             IER .NE. 0.
 C
 C       IER = Error indicator:
 C             IER =  0 if no errors were encountered.
@@ -360,17 +351,14 @@ C             IER = -2 if all nodes (including K) are col-
 C                      linear.
 C             IER =  L if nodes L and K coincide for some L.
 C             IER = -3 if K lies in a constraint region.
-C             IER = -4 if an error flag is returned by SWAP
-C                      implying that the triangulation
-C                      (geometry) was bad on input.
 C
 C             The errors conditions are tested in the order
 C             specified.
 C
 C Modules required by ADDNOD:  BDYADD, CRTRI, INDXCC,
-C                                INSERT, INTADD, JRAND,
-C                                LEFT, LSTPTR, SWAP,
-C                                SWPTST, TRFIND
+C                                INSERT, INTADD, LEFT,
+C                                LSTPTR, SWAP, SWPTST,
+C                                TRFIND
 C
 C Intrinsic function called by ADDNOD:  ABS
 C
@@ -397,7 +385,7 @@ C Find a triangle (I1,I2,I3) containing K or the rightmost
 C   (I1) and leftmost (I2) visible boundary nodes as viewed
 C   from node K.
 C
-      CALL TRFIND (IST,XK,YK,N,X,Y,LIST,LPTR,LEND, I1,I2,I3)
+      CALL TRFIND (IST,XK,YK,X,Y,LIST,LPTR,LEND, I1,I2,I3)
 C
 C Test for collinear nodes, duplicate nodes, and K lying in
 C   a constraint region.
@@ -475,28 +463,27 @@ C
 C Begin loop:  find the node opposite K.
 C
     5 LP = LSTPTR(LEND(IO1),IO2,LIST,LPTR)
-        IF (LIST(LP) .LT. 0) GO TO 6
-        LP = LPTR(LP)
-        IN1 = ABS(LIST(LP))
-        IF ( CRTRI(NCC,LCC,IO1,IO2,IN1) ) GO TO 6
+      IF (LIST(LP) .LT. 0) GO TO 6
+      LP = LPTR(LP)
+      IN1 = ABS(LIST(LP))
+      IF ( CRTRI(NCC,LCC,IO1,IO2,IN1) ) GO TO 6
 C
 C Swap test:  if a swap occurs, two new arcs are
 C             opposite K and must be tested.
 C
-        IF ( .NOT. SWPTST(IN1,KK,IO1,IO2,X,Y) ) GO TO 6
-        CALL SWAP (IN1,KK,IO1,IO2, LIST,LPTR,LEND, LPO1)
-        IF (LPO1 .EQ. 0) GO TO 11
-        IO1 = IN1
-        GO TO 5
+      IF ( .NOT. SWPTST(IN1,KK,IO1,IO2,X,Y) ) GO TO 6
+      CALL SWAP (IN1,KK,IO1,IO2, LIST,LPTR,LEND, LPO1)
+      IO1 = IN1
+      GO TO 5
 C
 C No swap occurred.  Test for termination and reset
 C   IO2 and IO1.
 C
-    6   IF (LPO1 .EQ. LPF  .OR.  LIST(LPO1) .LT. 0) RETURN
-        IO2 = IO1
-        LPO1 = LPTR(LPO1)
-        IO1 = ABS(LIST(LPO1))
-        GO TO 5
+    6 IF (LPO1 .EQ. LPF  .OR.  LIST(LPO1) .LT. 0) RETURN
+      IO2 = IO1
+      LPO1 = LPTR(LPO1)
+      IO1 = ABS(LIST(LPO1))
+      GO TO 5
 C
 C A parameter is outside its valid range on input.
 C
@@ -517,15 +504,10 @@ C Node K lies in a constraint region.
 C
    10 IER = -3
       RETURN
-C
-C Zero pointer returned by SWAP.
-C
-   11 IER = -4
-      RETURN
       END
       DOUBLE PRECISION FUNCTION AREAP (X,Y,NB,NODES)
       INTEGER NB, NODES(NB)
-      DOUBLE PRECISION X(*), Y(*)
+      DOUBLE PRECISION    X(*), Y(*)
 C
 C***********************************************************
 C
@@ -533,7 +515,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/21/90
 C
 C   Given a sequence of NB points in the plane, this func-
@@ -546,7 +528,7 @@ C of the curve is taken to be the first point specified, and
 C this point should therefore not be specified twice.
 C
 C   The area of a triangulation may be computed by calling
-C AREAP with values of NB and NODES determined by Subroutine
+C AREAP with values of NB and NODES determined by subroutine
 C BNODES.
 C
 C
@@ -574,7 +556,7 @@ C
 C***********************************************************
 C
       INTEGER I, ND1, ND2, NNB
-      DOUBLE PRECISION A
+      DOUBLE PRECISION    A
 C
 C Local parameters:
 C
@@ -613,7 +595,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   02/22/91
 C
 C   This subroutine adds a boundary node to a triangulation
@@ -635,7 +617,7 @@ C            arcs.
 C
 C       I2 = Last (leftmost) boundary node which is visible
 C            from node KK.  I1 and I2 may be determined by
-C            Subroutine TRFIND.
+C            subroutine TRFIND.
 C
 C The above parameters are not altered by this routine.
 C
@@ -716,7 +698,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/01/88
 C
 C   Given a triangulation of N points in the plane, this
@@ -730,7 +712,7 @@ C
 C       N = Number of nodes in the triangulation.  N .GE. 3.
 C
 C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
+C                        gulation.  Refer to subroutine
 C                        TRMESH.
 C
 C The above parameters are not altered by this routine.
@@ -788,8 +770,7 @@ C
       SUBROUTINE CIRCUM (X1,Y1,X2,Y2,X3,Y3,RATIO, XC,YC,CR,
      .                   SA,AR)
       LOGICAL RATIO
-      DOUBLE PRECISION X1, Y1, X2, Y2, X3, Y3, XC, YC, CR, 
-     .           SA, AR
+      DOUBLE PRECISION    X1, Y1, X2, Y2, X3, Y3, XC, YC, CR, SA, AR
 C
 C***********************************************************
 C
@@ -797,7 +778,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   12/10/96
 C
 C   Given three vertices defining a triangle, this subrou-
@@ -846,7 +827,7 @@ C
 C***********************************************************
 C
       INTEGER I
-      DOUBLE PRECISION DS(3), FX, FY, U(3), V(3)
+      DOUBLE PRECISION    DS(3), FX, FY, U(3), V(3)
 C
 C Set U(K) and V(K) to the x and y components, respectively,
 C   of the directed edge opposite vertex K.
@@ -904,7 +885,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   08/14/91
 C
 C   This function returns TRUE if and only if triangle (I1,
@@ -913,7 +894,7 @@ C
 C
 C On input:
 C
-C       NCC,LCC = Constraint data structure.  Refer to Sub-
+C       NCC,LCC = Constraint data structure.  Refer to sub-
 C                 routine ADDCST.
 C
 C       I1,I2,I3 = Nodal indexes of the counterclockwise-
@@ -969,14 +950,14 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   11/12/94
 C
 C   This subroutine deletes a boundary arc from a triangula-
 C tion.  It may be used to remove a null triangle from the
 C convex hull boundary.  Note, however, that if the union of
-C triangles is rendered nonconvex, Subroutines DELNOD, EDGE,
-C and TRFIND may fail.  Thus, Subroutines ADDCST, ADDNOD,
+C triangles is rendered nonconvex, subroutines DELNOD, EDGE,
+C and TRFIND may fail.  Thus, subroutines ADDCST, ADDNOD,
 C DELNOD, EDGE, and NEARND should not be called following
 C an arc deletion.
 C
@@ -1099,8 +1080,8 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   07/30/98
+C                                             (817) 565-2767
+C                                                   08/16/91
 C
 C   This subroutine deletes a neighbor NB from the adjacency
 C list of node N0 (but N0 is not deleted from the adjacency
@@ -1131,7 +1112,7 @@ C
 C       LIST,LPTR,LEND,LNEW = Data structure updated with
 C                             the removal of NB from the ad-
 C                             jacency list of N0 unless
-C                             LPH < 0.
+C                             IER = 1 or IER = 2.
 C
 C       LPH = List pointer to the hole (NB as a neighbor of
 C             N0) filled in by the values at LNEW-1 or error
@@ -1148,17 +1129,6 @@ C
 C***********************************************************
 C
       INTEGER I, LNW, LP, LPB, LPL, LPP, NN
-C
-C Local parameters:
-C
-C I =   DO-loop index
-C LNW = LNEW-1 (output value of LNEW)
-C LP =  LIST pointer of the last neighbor of NB
-C LPB = Pointer to NB as a neighbor of N0
-C LPL = Pointer to the last neighbor of N0
-C LPP = Pointer to the neighbor of N0 that precedes NB
-C NN =  Local copy of N
-C
       NN = N
 C
 C Test for error 1.
@@ -1223,15 +1193,16 @@ C
         ENDIF
     4   CONTINUE
 C
-    5 DO 6 I = 1,LNW-1
+    5 DO 6 I = LNW-1,1,-1
         IF (LPTR(I) .EQ. LNW) THEN
           LPTR(I) = LPB
+          GO TO 7
         ENDIF
     6   CONTINUE
 C
 C No errors encountered.
 C
-      LNEW = LNW
+    7 LNEW = LNW
       LPH = LPB
       RETURN
       END
@@ -1239,7 +1210,7 @@ C
      .                   LNEW,LWK,IWK, IER)
       INTEGER K, NCC, LCC(*), N, LIST(*), LPTR(*),
      .        LEND(*), LNEW, LWK, IWK(2,*), IER
-      DOUBLE PRECISION X(*), Y(*)
+      DOUBLE PRECISION    X(*), Y(*)
 C
 C***********************************************************
 C
@@ -1247,22 +1218,22 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/28/98
+C                                             (817) 565-2767
+C                                                   08/22/91
 C
 C   This subroutine deletes node K (along with all arcs
 C incident on node K) from a triangulation of N nodes in the
 C plane, and inserts arcs as necessary to produce a triangu-
 C lation of the remaining N-1 nodes.  If a Delaunay triangu-
 C lation is input, a Delaunay triangulation will result, and
-C thus, DELNOD reverses the effect of a call to Subroutine
+C thus, DELNOD reverses the effect of a call to subroutine
 C ADDNOD.
 C
 C   Note that a constraint node cannot be deleted by this
 C routine.  In order to delete a constraint node, it is
 C necessary to call this routine with NCC = 0, decrement the
 C appropriate LCC entries (LCC(I) such that LCC(I) > K), and
-C then create (or restore) the constraints by a call to Sub-
+C then create (or restore) the constraints by a call to sub-
 C routine ADDCST.
 C
 C
@@ -1277,7 +1248,7 @@ C The above parameters are not altered by this routine.
 C
 C       LCC = List of constraint curve starting indexes (or
 C             dummy array of length 1 if NCC = 0).  Refer to
-C             Subroutine ADDCST.
+C             subroutine ADDCST.
 C
 C       N = Number of nodes in the triangulation on input.
 C           N .GE. 4.  Note that N will be decremented
@@ -1288,7 +1259,7 @@ C             of the nodes with non-constraint nodes in the
 C             first LCC(1)-1 locations if NCC > 0.
 C
 C       LIST,LPTR,LEND,LNEW = Data structure defining the
-C                             triangulation.  Refer to Sub-
+C                             triangulation.  Refer to sub-
 C                             routine TRMESH.
 C
 C       LWK = Number of columns reserved for IWK.  LWK must
@@ -1347,8 +1318,7 @@ C                     floating point errors with collinear
 C                     nodes or by an invalid data structure.
 C             IER = 5 if an error flag was returned by
 C                     OPTIM.  An error message is written
-C                     to the standard output unit in this
-C                     event.
+C                     to logical unit 6 in this event.
 C
 C   Note that the deletion may result in all remaining nodes
 C being collinear.  This situation is not flagged.
@@ -1366,7 +1336,7 @@ C
      .        LPH, LPL, LPL2, LPN, LWKL, N1, N2, NFRST, NIT,
      .        NL, NN, NNB, NR
       LOGICAL BDRY
-      DOUBLE PRECISION X1, X2, XL, XR, Y1, Y2, YL, YR
+      DOUBLE PRECISION    X1, X2, XL, XR, Y1, Y2, YL, YR
 C
 C Set N1 to K and NNB to the number of neighbors of N1 (plus
 C   one if N1 is a boundary node), and test for errors.  LPF
@@ -1557,7 +1527,10 @@ C
    10     CONTINUE
 C
    11   DO 12 I = LNW-1,1,-1
-          IF (LPTR(I) .EQ. LNW) LPTR(I) = LP
+          IF (LPTR(I) .EQ. LNW) THEN
+            LPTR(I) = LP
+            GO TO 13
+          ENDIF
    12     CONTINUE
    13   CONTINUE
 C
@@ -1574,7 +1547,7 @@ C
       N = NN
       LNEW = LNW
       IF (IWL .GT. 0) THEN
-        NIT = 4*IWL
+        NIT = 3*IWL
         CALL OPTIM (X,Y,IWL, LIST,LPTR,LEND,NIT,IWK, IERR)
         IF (IERR .NE. 0) GO TO 25
       ENDIF
@@ -1609,16 +1582,13 @@ C
 C Error flag returned by OPTIM.
 C
    25 IER = 5
-C       WRITE (*,100) NIT, IERR
       RETURN
-  100 FORMAT (//5X,'*** Error in OPTIM:  NIT = ',I4,
-     .        ', IER = ',I1,' ***'/)
       END
       SUBROUTINE EDGE (IN1,IN2,X,Y, LWK,IWK,LIST,LPTR,
      .                 LEND, IER)
       INTEGER IN1, IN2, LWK, IWK(2,*), LIST(*), LPTR(*),
      .        LEND(*), IER
-      DOUBLE PRECISION X(*), Y(*)
+      DOUBLE PRECISION    X(*), Y(*)
 C
 C***********************************************************
 C
@@ -1626,8 +1596,8 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/23/98
+C                                             (817) 565-2767
+C                                                   08/01/90
 C
 C   Given a triangulation of N nodes and a pair of nodal
 C indexes IN1 and IN2, this routine swaps arcs as necessary
@@ -1639,9 +1609,9 @@ C all arcs other than IN1-IN2 are locally optimal.
 C
 C   A sequence of calls to EDGE may be used to force the
 C presence of a set of edges defining the boundary of a non-
-C convex and/or multiply connected region (refer to Subrou-
+C convex and/or multiply connected region (refer to subrou-
 C tine ADDCST), or to introduce barriers into the triangula-
-C tion.  Note that Subroutine GETNP will not necessarily
+C tion.  Note that subroutine GETNP will not necessarily
 C return closest nodes if the triangulation has been con-
 C strained by a call to EDGE.  However, this is appropriate
 C in some applications, such as triangle-based interpolation
@@ -1666,7 +1636,7 @@ C
 C       IWK = Integer work array of length at least 2*LWK.
 C
 C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
+C                        gulation.  Refer to subroutine
 C                        TRMESH.
 C
 C On output:
@@ -1703,8 +1673,8 @@ C                     point error).
 C             IER = 4 if an error flag was returned by
 C                     OPTIM.
 C
-C   An error message is written to the standard output unit
-C in the case of IER = 3 or IER = 4.
+C   An error message is written to logical unit 6 in the
+C case of IER = 3 or IER = 4.
 C
 C Modules required by EDGE:  LEFT, LSTPTR, OPTIM, SWAP,
 C                              SWPTST
@@ -1717,13 +1687,13 @@ C
       INTEGER I, IERR, IWC, IWCP1, IWEND, IWF, IWL, LFT, LP,
      .        LPL, LP21, NEXT, NIT, NL, NR, N0, N1, N2,
      .        N1FRST, N1LST
-      DOUBLE PRECISION DX, DY, X0, Y0, X1, Y1, X2, Y2
+      DOUBLE PRECISION    DX, DY, X0, Y0, X1, Y1, X2, Y2
 C
 C Local parameters:
 C
 C DX,DY =   Components of arc N1-N2
 C I =       DO-loop index and column index for IWK
-C IERR =    Error flag returned by Subroutine OPTIM
+C IERR =    Error flag returned by subroutine OPTIM
 C IWC =     IWK index between IWF and IWL -- NL->NR is
 C             stored in IWK(1,IWC)->IWK(2,IWC)
 C IWCP1 =   IWC + 1
@@ -2105,25 +2075,18 @@ C Invalid triangulation data structure or collinear nodes
 C   on convex hull boundary.
 C
    33 IER = 3
-C       WRITE (*,130) IN1, IN2
-  130 FORMAT (//5X,'*** Error in EDGE:  Invalid triangula',
-     .        'tion or null triangles on boundary'/
-     .        9X,'IN1 =',I4,', IN2=',I4/)
       RETURN
 C
 C Error flag returned by OPTIM.
 C
    34 IER = 4
-C       WRITE (*,140) NIT, IERR
-  140 FORMAT (//5X,'*** Error in OPTIM:  NIT = ',I4,
-     .        ', IER = ',I1,' ***'/)
       RETURN
       END
       SUBROUTINE GETNP (NCC,LCC,N,X,Y,LIST,LPTR,LEND,
      .                  L, NPTS,DS, IER)
       INTEGER NCC, LCC(*), N, LIST(*), LPTR(*), LEND(N),
      .        L, NPTS(L), IER
-      DOUBLE PRECISION X(N), Y(N), DS(L)
+      DOUBLE PRECISION    X(N), Y(N), DS(L)
 C
 C***********************************************************
 C
@@ -2131,7 +2094,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   11/12/94
 C
 C   Given a triangulation of N nodes and an array NPTS con-
@@ -2174,7 +2137,7 @@ C       NCC = Number of constraints.  NCC .GE. 0.
 C
 C       LCC = List of constraint curve starting indexes (or
 C             dummy array of length 1 if NCC = 0).  Refer to
-C             Subroutine ADDCST.
+C             subroutine ADDCST.
 C
 C       N = Number of nodes in the triangulation.  N .GE. 3.
 C
@@ -2183,7 +2146,7 @@ C             of the nodes with non-constraint nodes in the
 C             first LCC(1)-1 locations if NCC > 0.
 C
 C       LIST,LPTR,LEND = Triangulation data structure.  Re-
-C                        fer to Subroutine TRMESH.
+C                        fer to subroutine TRMESH.
 C
 C       L = Number of nodes in the sequence on output.  2
 C           .LE. L .LE. N.
@@ -2228,9 +2191,12 @@ C
      .        NKBAK, NKFOR, NL, NN
       LOGICAL ISW, VIS, NCF, NJF, SKIP, SKSAV, LFT1, LFT2,
      .        LFT12
-      DOUBLE PRECISION DC, DL, X1, XC, XJ, XK, Y1, YC, YJ, 
-     .        YK
-C
+      DOUBLE PRECISION    DC, DL, X1, XC, XJ, XK, Y1, YC, YJ, YK
+C initialize some vars
+      NL=0
+      ILAST=0
+
+
 C Store parameters in local variables and test for errors.
 C   LCC1 indexes the first constraint node.
 C
@@ -2496,7 +2462,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   08/25/91
 C
 C   Given a constrained Delaunay triangulation, this func-
@@ -2516,12 +2482,12 @@ C       NCC = Number of constraints.  NCC .GE. 0.
 C
 C       LCC = List of constraint curve starting indexes (or
 C             dummy array of length 1 if NCC = 0).  Refer to
-C             Subroutine ADDCST.
+C             subroutine ADDCST.
 C
 C       N = Number of nodes in the triangulation.  N .GE. 3.
 C
 C       LIST,LEND = Data structure defining the triangula-
-C                   tion.  Refer to Subroutine TRMESH.
+C                   tion.  Refer to subroutine TRMESH.
 C
 C   Input parameters are not altered by this function.  Note
 C that the parameters are not tested for validity.
@@ -2588,7 +2554,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/01/88
 C
 C   This subroutine inserts K as a neighbor of N1 following
@@ -2606,7 +2572,7 @@ C
 C The above parameters are not altered by this routine.
 C
 C       LIST,LPTR,LNEW = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
+C                        gulation.  Refer to subroutine
 C                        TRMESH.
 C
 C On output:
@@ -2637,7 +2603,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   02/22/91
 C
 C   This subroutine adds an interior node to a triangulation
@@ -2659,7 +2625,7 @@ C
 C The above parameters are not altered by this routine.
 C
 C       LIST,LPTR,LEND,LNEW = Data structure defining the
-C                             triangulation.  Refer to Sub-
+C                             triangulation.  Refer to sub-
 C                             routine TRMESH.  Triangle
 C                             (I1,I2,I3) must be included
 C                             in the triangulation.
@@ -2715,7 +2681,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/01/88
 C
 C   Given a pair of line segments P1-P2 and P3-P4, this
@@ -2749,8 +2715,7 @@ C Modules required by INTSEC:  None
 C
 C***********************************************************
 C
-      DOUBLE PRECISION A, B, D, DX12, DX31, DX34, DY12,
-     .        DY31, DY34
+      DOUBLE PRECISION A, B, D, DX12, DX31, DX34, DY12, DY31, DY34
 C
 C Test for overlap between the smallest rectangles that
 C   contain the line segments and have sides parallel to
@@ -2796,72 +2761,8 @@ C
     1 INTSEC = A .EQ. 0.  .AND.  B .EQ. 0.
       RETURN
       END
-      INTEGER FUNCTION JRAND (N, IX,IY,IZ )
-      INTEGER N, IX, IY, IZ
-C
-C***********************************************************
-C
-C                                              From STRIPACK
-C                                            Robert J. Renka
-C                                  Dept. of Computer Science
-C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   07/28/98
-C
-C   This function returns a uniformly distributed pseudo-
-C random integer in the range 1 to N.
-C
-C
-C On input:
-C
-C       N = Maximum value to be returned.
-C
-C N is not altered by this function.
-C
-C       IX,IY,IZ = Integer seeds initialized to values in
-C                  the range 1 to 30,000 before the first
-C                  call to JRAND, and not altered between
-C                  subsequent calls (unless a sequence of
-C                  random numbers is to be repeated by
-C                  reinitializing the seeds).
-C
-C On output:
-C
-C       IX,IY,IZ = Updated integer seeds.
-C
-C       JRAND = Random integer in the range 1 to N.
-C
-C Reference:  B. A. Wichmann and I. D. Hill, "An Efficient
-C             and Portable Pseudo-random Number Generator",
-C             Applied Statistics, Vol. 31, No. 2, 1982,
-C             pp. 188-190.
-C
-C Modules required by JRAND:  None
-C
-C Intrinsic functions called by JRAND:  INT, MOD, DBLE
-C
-C***********************************************************
-C
-      DOUBLE PRECISION U, X
-C
-C Local parameters:
-C
-C U = Pseudo-random number uniformly distributed in the
-C     interval (0,1).
-C X = Pseudo-random number in the range 0 to 3 whose frac-
-C       tional part is U.
-C
-      IX = MOD(171*IX,30269)
-      IY = MOD(172*IY,30307)
-      IZ = MOD(170*IZ,30323)
-      X = (DBLE(IX)/30269.) + (DBLE(IY)/30307.) +
-     .    (DBLE(IZ)/30323.)
-      U = X - INT(X)
-      JRAND = DBLE(N)*U + 1.
-      RETURN
-      END
       LOGICAL FUNCTION LEFT (X1,Y1,X2,Y2,X0,Y0)
-      DOUBLE PRECISION X1, Y1, X2, Y2, X0, Y0
+      DOUBLE PRECISION    X1, Y1, X2, Y2, X0, Y0
 C
 C***********************************************************
 C
@@ -2869,7 +2770,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/01/88
 C
 C   This function determines whether node N0 is to the left
@@ -2925,7 +2826,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/01/88
 C
 C   This function returns the index (LIST pointer) of NB in
@@ -2940,7 +2841,7 @@ C       NB = Index of the node whose pointer is to be re-
 C            turned.  NB must be connected to N0.
 C
 C       LIST,LPTR = Data structure defining the triangula-
-C                   tion.  Refer to Subroutine TRMESH.
+C                   tion.  Refer to subroutine TRMESH.
 C
 C Input parameters are not altered by this function.
 C
@@ -2974,11 +2875,11 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/01/88
 C
 C   This function returns the number of neighbors of a node
-C N0 in a triangulation created by Subroutine TRMESH (or
+C N0 in a triangulation created by subroutine TRMESH (or
 C TRMSHR).
 C
 C
@@ -3015,7 +2916,7 @@ C
       INTEGER FUNCTION NEARND (XP,YP,IST,N,X,Y,LIST,LPTR,
      .                         LEND, DSQ)
       INTEGER IST, N, LIST(*), LPTR(*), LEND(N)
-      DOUBLE PRECISION XP, YP, X(N), Y(N), DSQ
+      DOUBLE PRECISION    XP, YP, X(N), Y(N), DSQ
 C
 C***********************************************************
 C
@@ -3023,11 +2924,11 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/27/98
+C                                             (817) 565-2767
+C                                                   10/31/90
 C
 C   Given a point P in the plane and a Delaunay triangula-
-C tion created by Subroutine TRMESH or TRMSHR, this function
+C tion created by subroutine TRMESH or TRMSHR, this function
 C returns the index of the nearest triangulation node to P.
 C
 C   The algorithm consists of implicitly adding P to the
@@ -3069,7 +2970,7 @@ C       Note that the number of candidates for NEARND
 C       (neighbors of P) is limited to LMAX defined in
 C       the PARAMETER statement below.
 C
-C Modules required by NEARND:  JRAND, LEFT, LSTPTR, TRFIND
+C Modules required by NEARND:  LEFT, LSTPTR, TRFIND
 C
 C Intrinsic function called by NEARND:  ABS
 C
@@ -3079,22 +2980,22 @@ C
       INTEGER   LMAX
       PARAMETER (LMAX=25)
       INTEGER   I1, I2, I3, L, LISTP(LMAX), LP, LP1, LP2,
-     .          LPL, LPTRP(LMAX), N1, N2, N3, NR, NST
-      DOUBLE PRECISION   COS1, COS2, DS1, DSR, DX11, DX12, 
-     .          DX21, DX22, DY11, DY12, DY21, DY22, SIN1, 
-     .          SIN2
+     .          LPL, LPTRP(LMAX), N1, N2, N3, NN, NR, NST
+      DOUBLE PRECISION      COS1, COS2, DS1, DSR, DX11, DX12, DX21,
+     .          DX22, DY11, DY12, DY21, DY22, SIN1, SIN2
 C
 C Store local parameters and test for N invalid.
 C
-      IF (N .LT. 3) GO TO 7
+      NN = N
+      IF (NN .LT. 3) GO TO 7
       NST = IST
-      IF (NST .LT. 1  .OR.  NST .GT. N) NST = 1
+      IF (NST .LT. 1  .OR.  NST .GT. NN) NST = 1
 C
 C Find a triangle (I1,I2,I3) containing P, or the rightmost
 C   (I1) and leftmost (I2) visible boundary nodes as viewed
 C   from P.
 C
-      CALL TRFIND (NST,XP,YP,N,X,Y,LIST,LPTR,LEND, I1,I2,I3)
+      CALL TRFIND (NST,XP,YP,X,Y,LIST,LPTR,LEND, I1,I2,I3)
 C
 C Test for collinear nodes.
 C
@@ -3223,7 +3124,7 @@ C
       SUBROUTINE OPTIM (X,Y,NA, LIST,LPTR,LEND,NIT,IWK, IER)
       INTEGER NA, LIST(*), LPTR(*), LEND(*), NIT, IWK(2,NA),
      .        IER
-      DOUBLE PRECISION X(*), Y(*)
+      DOUBLE PRECISION    X(*), Y(*)
 C
 C***********************************************************
 C
@@ -3231,8 +3132,8 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/27/98
+C                                             (817) 565-2767
+C                                                   06/14/90
 C
 C   Given a set of NA triangulation arcs, this subroutine
 C optimizes the portion of the triangulation consisting of
@@ -3259,7 +3160,7 @@ C
 C The above parameters are not altered by this routine.
 C
 C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
+C                        gulation.  Refer to subroutine
 C                        TRMESH.
 C
 C       NIT = Maximum number of iterations to be performed.
@@ -3291,8 +3192,6 @@ C             IER = 3 if IWK(2,I) is not a neighbor of
 C                     IWK(1,I) for some I in the range 1
 C                     to NA.  A swap may have occurred in
 C                     this case.
-C             IER = 4 if a zero pointer was returned by
-C                     Subroutine SWAP.
 C
 C Modules required by OPTIM:  LSTPTR, SWAP, SWPTST
 C
@@ -3304,23 +3203,6 @@ C
       INTEGER I, IO1, IO2, ITER, LP, LP21, LPL, LPP, MAXIT,
      .        N1, N2, NNA
       LOGICAL SWP
-C
-C Local parameters:
-C
-C I =       Column index for IWK
-C IO1,IO2 = Nodal indexes of the endpoints of an arc in IWK
-C ITER =    Iteration count
-C LP =      LIST pointer
-C LP21 =    Parameter returned by SWAP (not used)
-C LPL =     Pointer to the last neighbor of IO1
-C LPP =     Pointer to the node preceding IO2 as a neighbor
-C             of IO1
-C MAXIT =   Input value of NIT
-C N1,N2 =   Nodes opposite IO1->IO2 and IO2->IO1,
-C             respectively
-C NNA =     Local copy of NA
-C SWP =     Flag set to TRUE iff a swap occurs in the
-C             optimization loop
 C
       NNA = NA
       MAXIT = NIT
@@ -3346,10 +3228,9 @@ C
 C
 C   Set N1 and N2 to the nodes opposite IO1->IO2 and
 C     IO2->IO1, respectively.  Determine the following:
-C
-C     LPL = pointer to the last neighbor of IO1,
-C     LP = pointer to IO2 as a neighbor of IO1, and
-C     LPP = pointer to the node N2 preceding IO2.
+C         LPL = pointer to the last neighbor of IO1,
+C         LP = pointer to IO2 as a neighbor of IO1, and
+C         LPP = pointer to the node N2 preceding IO2.
 C
         LPL = LEND(IO1)
         LPP = LPL
@@ -3377,9 +3258,8 @@ C
 C   Test IO1-IO2 for a swap, and update IWK if necessary.
 C
         IF ( .NOT. SWPTST(N1,N2,IO1,IO2,X,Y) ) GO TO 4
-        CALL SWAP (N1,N2,IO1,IO2, LIST,LPTR,LEND, LP21)
-        IF (LP21 .EQ. 0) GO TO 9
         SWP = .TRUE.
+        CALL SWAP (N1,N2,IO1,IO2, LIST,LPTR,LEND, LP21)
         IWK(1,I) = N1
         IWK(2,I) = N2
     4   CONTINUE
@@ -3408,11 +3288,391 @@ C
     8 NIT = ITER
       IER = 3
       RETURN
+      END
+      SUBROUTINE PERMUT (N,IP, A )
+      INTEGER N, IP(N)
+      DOUBLE PRECISION    A(N)
 C
-C Zero pointer returned by SWAP.
+C***********************************************************
 C
-    9 NIT = ITER
-      IER = 4
+C                                               From TRIPACK
+C                                            Robert J. Renka
+C                                  Dept. of Computer Science
+C                                       Univ. of North Texas
+C                                             (817) 565-2767
+C                                                   09/01/88
+C
+C   This subroutine performs an in-place permutation of a
+C vector.
+C
+C
+C On input:
+C
+C       N = Vector length.
+C
+C       IP = Array of length N containing a permutation of
+C            the integers 1,...,N.
+C
+C The above parameters are not altered by this routine.
+C
+C       A = Array of length N containing the vector to be
+C           permuted.
+C
+C On output:
+C
+C       A = Reordered vector reflecting the permutation
+C           defined by IP.
+C
+C Modules required by PERMUT:  None
+C
+C***********************************************************
+C
+      INTEGER NN, K, J, IPJ
+      DOUBLE PRECISION    TEMP
+C
+C Local parameters:
+C
+C NN =   Local copy of N
+C K =    Index for IP and for the first element of A in a
+C          permutation
+C J =    Index for IP and A -- J .GE. K
+C IPJ =  IP(J)
+C TEMP = Temporary storage for A(K)
+C
+      NN = N
+      IF (NN .LT. 2) RETURN
+      K = 1
+C
+C Loop on permutations.
+C
+    1 J = K
+      TEMP = A(K)
+C
+C Apply permutation to A.  IP(J) is marked (made negative)
+C   as being included in the permutation.
+C
+    2 IPJ = IP(J)
+        IP(J) = -IPJ
+        IF (IPJ .EQ. K) GO TO 3
+        A(J) = A(IPJ)
+        J = IPJ
+        GO TO 2
+    3 A(J) = TEMP
+C
+C Search for an unmarked element of IP.
+C
+    4 K = K + 1
+        IF (K .GT. NN) GO TO 5
+        IF (IP(K) .GT. 0) GO TO 1
+        GO TO 4
+C
+C All permutations have been applied.  Unmark IP.
+C
+    5 DO 6 K = 1,NN
+        IP(K) = -IP(K)
+    6   CONTINUE
+      RETURN
+      END
+      SUBROUTINE QSORT (N,X, IND)
+      INTEGER N, IND(N)
+      DOUBLE PRECISION    X(N)
+C
+C***********************************************************
+C
+C                                               From TRIPACK
+C                                            Robert J. Renka
+C                                  Dept. of Computer Science
+C                                       Univ. of North Texas
+C                                             (817) 565-2767
+C                                                   09/01/88
+C
+C   This subroutine uses an order N*LOG(N) quick sort to
+C sort the real array X into increasing order.  The algor-
+C ithm is as follows.  IND is initialized to the ordered
+C sequence of indexes 1,...,N, and all interchanges are
+C applied to IND.  X is divided into two portions by picking
+C a central element T.  The first and last elements are com-
+C pared with T, and interchanges are applied as necessary so
+C that the three values are in ascending order.  Inter-
+C changes are then applied so that all elements greater than
+C T are in the upper portion of the array and all elements
+C less than T are in the lower portion.  The upper and lower
+C indices of one of the portions are saved in local arrays,
+C and the process is repeated recursively on the other
+C portion.  When a portion is completely sorted, the process
+C begins again by retrieving the indexes bounding another
+C unsorted portion.
+C
+C
+C On input:
+C
+C       N = Number of elements to be sorted.
+C
+C       X = Array of length N to be sorted.
+C
+C The above parameters are not altered by this routine.
+C
+C       IND = Array of length at least N.
+C
+C On output:
+C
+C       IND = Sequence of integers 1,...,N permuted in the
+C             the same fashion that X would be.  Thus, the
+C             sorted array may be stored in an array Y with
+C             the assignment statements:  Y(I) = X(IND(I))
+C             for I = 1 to N.  Alternatively, X may be over-
+C             written with the sorted array by a call to
+C             subroutine PERMUT.
+C
+C Modules required by QSORT:  None
+C
+C Intrinsic functions called by QSORT:  DBLE, INT
+C
+C***********************************************************
+C
+C NOTE -- IU and IL must be dimensioned .GE. log(N), where
+C         the log has base 2.
+C
+C***********************************************************
+C
+      INTEGER IU(21), IL(21)
+      INTEGER M, I, J, K, L, IJ, IT, ITT, INDX
+      DOUBLE PRECISION    R, T
+C
+C Local parameters:
+C
+C IU,IL =  Temporary storage for the upper and lower
+C            indexes of portions of the array X
+C M =      Index for IU and IL
+C I,J =    Lower and upper indexes of a portion of X
+C K,L =    Indexes in the range I,...,J
+C IJ =     Randomly chosen index between I and J
+C IT,ITT = Temporary storage for interchanges in IND
+C INDX =   Temporary index for X
+C R =      Pseudo random number for generating IJ
+C T =      Central element of X
+C
+      IF (N .LE. 0) RETURN
+C
+C Initialize IND, M, I, J, and R.
+C
+      DO 1 I = 1,N
+        IND(I) = I
+    1   CONTINUE
+      M = 1
+      I = 1
+      J = N
+      R = .375
+C
+C Top of loop --
+C
+    2 IF (I .GE. J) GO TO 7
+      IF (R .GT. .5898437) THEN
+        R = R - .21875
+      ELSE
+        R = R + .0390625
+      ENDIF
+C
+C Initialize K.
+C
+    3 K = I
+C
+C Select a central element of X and save it in T.
+C
+      IJ = I + INT(R*DBLE(J-I))
+      IT = IND(IJ)
+      T = X(IT)
+C
+C If the first element of the array is greater than T,
+C   interchange it with T.
+C
+      INDX = IND(I)
+      IF (X(INDX) .GT. T) THEN
+        IND(IJ) = INDX
+        IND(I) = IT
+        IT = INDX
+        T = X(IT)
+      ENDIF
+C
+C Initialize L.
+C
+      L = J
+C
+C If the last element of the array is less than T,
+C   interchange it with T.
+C
+      INDX = IND(J)
+      IF (X(INDX) .GE. T) GO TO 5
+      IND(IJ) = INDX
+      IND(J) = IT
+      IT = INDX
+      T = X(IT)
+C
+C If the first element of the array is greater than T,
+C   interchange it with T.
+C
+      INDX = IND(I)
+      IF (X(INDX) .LE. T) GO TO 5
+      IND(IJ) = INDX
+      IND(I) = IT
+      IT = INDX
+      T = X(IT)
+      GO TO 5
+C
+C Interchange elements K and L.
+C
+    4 ITT = IND(L)
+      IND(L) = IND(K)
+      IND(K) = ITT
+C
+C Find an element in the upper part of the array which is
+C   not larger than T.
+C
+    5 L = L - 1
+        INDX = IND(L)
+        IF (X(INDX) .GT. T) GO TO 5
+C
+C Find an element in the lower part of the array which is
+C   not smaller than T.
+C
+    6 K = K + 1
+        INDX = IND(K)
+        IF (X(INDX) .LT. T) GO TO 6
+C
+C If K .LE. L, interchange elements K and L.
+C
+      IF (K .LE. L) GO TO 4
+C
+C Save the upper and lower subscripts of the portion of the
+C   array yet to be sorted.
+C
+      IF (L-I .GT. J-K) THEN
+        IL(M) = I
+        IU(M) = L
+        I = K
+        M = M + 1
+      ELSE
+        IL(M) = K
+        IU(M) = J
+        J = L
+        M = M + 1
+      ENDIF
+      GO TO 8
+C
+C Begin again on another unsorted portion of the array.
+C
+    7 M = M - 1
+      IF (M .EQ. 0) RETURN
+      I = IL(M)
+      J = IU(M)
+C
+    8 IF (J-I .GE. 11) GO TO 3
+      IF (I .EQ. 1) GO TO 2
+      I = I - 1
+C
+C Sort elements I+1,...,J.  Note that 1 .LE. I .LT. J and
+C   J-I .LT. 11.
+C
+    9 I = I + 1
+      IF (I .EQ. J) GO TO 7
+      INDX = IND(I+1)
+      T = X(INDX)
+      IT = INDX
+      INDX = IND(I)
+      IF (X(INDX) .LE. T) GO TO 9
+      K = I
+C
+   10 IND(K+1) = IND(K)
+        K = K - 1
+        INDX = IND(K)
+        IF (T .LT. X(INDX)) GO TO 10
+      IND(K+1) = IT
+      GO TO 9
+      END
+      SUBROUTINE REORDR (N,IFLAG, A,B,C, IND)
+      INTEGER N, IFLAG, IND(N)
+      DOUBLE PRECISION    A(N), B(N), C(N)
+C
+C***********************************************************
+C
+C                                               From TRIPACK
+C                                            Robert J. Renka
+C                                  Dept. of Computer Science
+C                                       Univ. of North Texas
+C                                             (817) 565-2767
+C                                                   09/01/88
+C
+C   This subroutine uses an order N*LOG(N) quick sort to
+C reorder the real array A into increasing order.  A record
+C of the permutations applied to A is stored in IND, and
+C these permutations may be applied to one or two additional
+C vectors by this routine.  Any other vector V may be per-
+C muted in the same fashion by calling subroutine PERMUT
+C with N, IND, and V as parameters.
+C
+C   A set of nodes (X(I),Y(I)) (along with data values Z(I))
+C may be presorted by REORDR for increases efficiency in the
+C triangulation routine TRMESH.  Either X or Y may be used
+C as the sort key (associated with A).  Note, however, that
+C constraint nodes must not be reordered -- only the first
+C LCC(1)-1 nodes should be sorted.
+C
+C
+C On input:
+C
+C       N = Number of elements in the arrays to be sorted.
+C
+C       IFLAG = Number of arrays to be sorted:
+C               IFLAG .LE. 0 if A, B, and C are to remain
+C                            unaltered.
+C               IFLAG .EQ. 1 if only A is to be reordered.
+C               IFLAG .EQ. 2 if A and B are to be reordered.
+C               IFLAG .GE. 3 if A, B, and C are to be re-
+C                            ordered.
+C
+C       A,B,C = Arrays of length N to be reordered, or dummy
+C               arrays of length 1, depending on IFLAG.
+C               Unless IFLAG .LE. 0, A is sorted into nonde-
+C               creasing order, and the same permutations
+C               are applied to any other arrays to be
+C               reordered.
+C
+C       IND = Integer array of length at least N.
+C
+C N, IFLAG, and any dummy arrays are not altered by this
+C   routine.
+C
+C On output:
+C
+C       A,B,C = Sorted or unaltered arrays.
+C
+C       IND = Sequence of integers 1,...,N permuted in the
+C             the same fashion as A.  Thus, the ordering
+C             may be applied to a vector V and stored in W
+C             by setting W(I) = V(IND(I)) for I = 1 to N,
+C             or V may be reordered in place by a call to
+C             subroutine PERMUT.
+C
+C Modules required by REORDR:  PERMUT, QSORT
+C
+C***********************************************************
+C
+      INTEGER NN, NV
+C
+C Local parameters:
+C
+C NN = Local copy of N
+C NV = Local copy of IFLAG
+C
+      NN = N
+      NV = IFLAG
+      CALL QSORT (NN,A, IND)
+      IF (NV .LE. 0) RETURN
+      CALL PERMUT (NN,IND, A )
+      IF (NV .EQ. 1) RETURN
+      CALL PERMUT (NN,IND, B )
+      IF (NV .EQ. 2) RETURN
+      CALL PERMUT (NN,IND, C )
       RETURN
       END
       DOUBLE PRECISION FUNCTION STORE (X)
@@ -3424,7 +3684,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   03/18/90
 C
 C   This function forces its argument X to be stored in a
@@ -3468,15 +3728,13 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/22/98
+C                                             (817) 565-2767
+C                                                   09/01/88
 C
-C   Given a triangulation of a set of points on the unit
-C sphere, this subroutine replaces a diagonal arc in a
-C strictly convex quadrilateral (defined by a pair of adja-
-C cent triangles) with the other diagonal.  Equivalently, a
-C pair of adjacent triangles is replaced by another pair
-C having the same union.
+C   Given a triangulation of a set of points in the plane,
+C this subroutine replaces a diagonal arc in a strictly
+C convex quadrilateral (defined by a pair of adjacent tri-
+C angles) with the other diagonal.
 C
 C
 C On input:
@@ -3490,7 +3748,7 @@ C
 C The above parameters are not altered by this routine.
 C
 C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
+C                        gulation.  Refer to subroutine
 C                        TRMESH.
 C
 C On output:
@@ -3498,34 +3756,17 @@ C
 C       LIST,LPTR,LEND = Data structure updated with the
 C                        swap -- triangles (IO1,IO2,IN1) and
 C                        (IO2,IO1,IN2) are replaced by
-C                        (IN1,IN2,IO2) and (IN2,IN1,IO1)
-C                        unless LP21 = 0.
+C                        (IN1,IN2,IO2) and (IN2,IN1,IO1).
 C
 C       LP21 = Index of IN1 as a neighbor of IN2 after the
-C              swap is performed unless IN1 and IN2 are
-C              adjacent on input, in which case LP21 = 0.
+C              swap is performed.
 C
 C Module required by SWAP:  LSTPTR
-C
-C Intrinsic function called by SWAP:  ABS
 C
 C***********************************************************
 C
       INTEGER LSTPTR
       INTEGER LP, LPH, LPSAV
-C
-C Local parameters:
-C
-C LP,LPH,LPSAV = LIST pointers
-C
-C
-C Test for IN1 and IN2 adjacent.
-C
-      LP = LSTPTR(LEND(IN1),IN2,LIST,LPTR)
-      IF (ABS(LIST(LP)) .EQ. IN2) THEN
-        LP21 = 0
-        RETURN
-      ENDIF
 C
 C Delete IO2 as a neighbor of IO1.
 C
@@ -3570,7 +3811,7 @@ C
       END
       LOGICAL FUNCTION SWPTST (IN1,IN2,IO1,IO2,X,Y)
       INTEGER IN1, IN2, IO1, IO2
-      DOUBLE PRECISION X(*), Y(*)
+      DOUBLE PRECISION    X(*), Y(*)
 C
 C***********************************************************
 C
@@ -3578,7 +3819,7 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
+C                                             (817) 565-2767
 C                                                   09/01/88
 C
 C   This function applies the circumcircle test to a quadri-
@@ -3595,7 +3836,7 @@ C
 C   When the four vertices are nearly cocircular (the
 C neutral case), the preferred decision is no swap -- in
 C order to avoid unnecessary swaps and, more important, to
-C avoid cycling in Subroutine OPTIM which is called by
+C avoid cycling in subroutine OPTIM which is called by
 C DELNOD and EDGE.  Thus, a tolerance SWTOL (stored in
 C SWPCOM by TRMESH or TRMSHR) is used to define 'nearness'
 C to the neutral case.
@@ -3696,10 +3937,10 @@ C
     2 SWPTST = .FALSE.
       RETURN
       END
-      SUBROUTINE TRFIND (NST,PX,PY,N,X,Y,LIST,LPTR,LEND, I1,
+      SUBROUTINE TRFIND (NST,PX,PY,X,Y,LIST,LPTR,LEND, I1,
      .                   I2,I3)
-      INTEGER NST, N, LIST(*), LPTR(*), LEND(N), I1, I2, I3
-      DOUBLE PRECISION PX, PY, X(N), Y(N)
+      INTEGER NST, LIST(*), LPTR(*), LEND(*), I1, I2, I3
+      DOUBLE PRECISION    PX, PY, X(*), Y(*)
 C
 C***********************************************************
 C
@@ -3707,11 +3948,11 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   07/28/98
+C                                             (817) 565-2767
+C                                                   06/14/90
 C
 C   This subroutine locates a point P relative to a triangu-
-C lation created by Subroutine TRMESH or TRMSHR.  If P is
+C lation created by subroutine TRMESH or TRMSHR.  If P is
 C contained in a triangle, the three vertex indexes are
 C returned.  Otherwise, the indexes of the rightmost and
 C leftmost visible boundary nodes are returned.
@@ -3723,16 +3964,14 @@ C       NST = Index of a node at which TRFIND begins the
 C             search.  Search time depends on the proximity
 C             of this node to P.
 C
-C       PX,PY = X and y coordinates of the point P to be
+C       PX,PY = X and Y coordinates of the point P to be
 C               located.
 C
-C       N = Number of nodes in the triangulation.  N .GE. 3.
-C
-C       X,Y = Arrays of length N containing the coordinates
-C             of the nodes in the triangulation.
+C       X,Y = Arrays containing the coordinates of the nodes
+C             in the triangulation.
 C
 C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
+C                        gulation.  Refer to subroutine
 C                        TRMESH.
 C
 C Input parameters are not altered by this routine.
@@ -3741,61 +3980,30 @@ C On output:
 C
 C       I1,I2,I3 = Nodal indexes, in counterclockwise order,
 C                  of the vertices of a triangle containing
-C                  P if P is contained in a triangle.  If P
-C                  is not in the convex hull of the nodes,
-C                  I1 indexes the rightmost visible boundary
-C                  node, I2 indexes the leftmost visible
-C                  boundary node, and I3 = 0.  Rightmost and
-C                  leftmost are defined from the perspective
-C                  of P, and a pair of points are visible
-C                  from each other if and only if the line
-C                  segment joining them intersects no trian-
-C                  gulation arc.  If P and all of the nodes
-C                  lie on a common line, then I1 = I2 = I3 =
-C                  0 on output.
+C                  P, or, if P is not contained in the con-
+C                  vex hull of the nodes, I1 indexes the
+C                  rightmost visible boundary node, I2 in-
+C                  dexes the leftmost visible boundary node,
+C                  and I3 = 0.  Rightmost and leftmost are
+C                  defined from the perspective of P, and a
+C                  pair of points are visible from each
+C                  other if and only if the line segment
+C                  joining them intersects no triangulation
+C                  arc.  If P and all of the nodes lie on a
+C                  common line, then I1 = I2 = I3 = 0 on
+C                  output.
 C
-C Modules required by TRFIND:  JRAND, LEFT, LSTPTR, STORE
+C Modules required by TRFIND:  LEFT, LSTPTR
 C
-C Intrinsic function called by TRFIND:  ABS
+C Intrinsic functions called by TRFIND:  ABS, MAX
 C
 C***********************************************************
 C
-      INTEGER JRAND, LSTPTR
+      INTEGER LSTPTR
       LOGICAL LEFT
-      DOUBLE PRECISION STORE
-      INTEGER IX, IY, IZ, LP, N0, N1, N1S, N2, N2S, N3, N4,
-     .        NB, NF, NL, NP, NPP
+      INTEGER LP, N0, N1, N2, N3, N4, NB, NF, NL, NP, NPP
       LOGICAL FRWRD
-      DOUBLE PRECISION B1, B2, XA, XB, XC, XP, YA, YB, YC, 
-     .        YP
-C
-      SAVE    IX, IY, IZ
-      DATA    IX/1/, IY/2/, IZ/3/
-C
-C Local parameters:
-C
-C B1,B2 =    Unnormalized barycentric coordinates of P with
-C              respect to (N1,N2,N3)
-C IX,IY,IZ = Integer seeds for JRAND
-C LP =       LIST pointer
-C N0,N1,N2 = Nodes in counterclockwise order defining a
-C              cone (with vertex N0) containing P
-C N1S,N2S =  Saved values of N1 and N2
-C N3,N4 =    Nodes opposite N1->N2 and N2->N1, respectively
-C NB =       Index of a boundary node -- first neighbor of
-C              NF or last neighbor of NL in the boundary
-C              traversal loops
-C NF,NL =    First and last neighbors of N0, or first
-C              (rightmost) and last (leftmost) nodes
-C              visible from P when P is exterior to the
-C              triangulation
-C NP,NPP =   Indexes of boundary nodes used in the boundary
-C              traversal loops
-C XA,XB,XC = Dummy arguments for FRWRD
-C YA,YB,YC = Dummy arguments for FRWRD
-C XP,YP =    Local variables containing the components of P
-C
-C Statement function:
+      DOUBLE PRECISION    XA, XB, XC, XP, YA, YB, YC, YP
 C
 C FRWRD = TRUE iff C is forward of A->B
 C              iff <A->B,A->C> .GE. 0.
@@ -3803,16 +4011,11 @@ C
       FRWRD(XA,YA,XB,YB,XC,YC) = (XB-XA)*(XC-XA) +
      .                           (YB-YA)*(YC-YA) .GE. 0.
 C
-C Initialize variables.
-C
+      N0 = MAX(NST,1)
       XP = PX
       YP = PY
-      N0 = NST
-      IF (N0 .LT. 1  .OR.  N0 .GT. N)
-     .  N0 = JRAND(N, IX,IY,IZ )
 C
-C Set NF and NL to the first and last neighbors of N0, and
-C   initialize N1 = NF.
+C Set N1 = NF and NL to the first and last neighbors of N0.
 C
     1 LP = LEND(N0)
       NL = LIST(LP)
@@ -3820,7 +4023,7 @@ C
       NF = LIST(LP)
       N1 = NF
 C
-C Find a pair of adjacent neighbors N1,N2 of N0 that define
+C Find a pair of adjacent neighbors N1,N2 of N0 which define
 C   a wedge containing P:  P LEFT N0->N1 and P RIGHT N0->N2.
 C
       IF (NL .GT. 0) GO TO 2
@@ -3887,12 +4090,9 @@ C
 C
 C P is contained in the wedge defined by line segments
 C   N0->N1 and N0->N2, where N1 is adjacent to N2.  Set
-C   N3 to the node opposite N1->N2, and save N1 and N2 to
-C   test for cycling.
+C   N3 to the node opposite N1->N2.
 C
     7 N3 = N0
-      N1S = N1
-      N2S = N2
 C
 C Top of edge hopping loop.  Test for termination.
 C
@@ -3900,20 +4100,10 @@ C
 C
 C   P LEFT N1->N2 and hence P is in (N1,N2,N3) unless an
 C     error resulted from floating point inaccuracy and
-C     collinearity.  Compute the unnormalized barycentric
-C     coordinates of P with respect to (N1,N2,N3).
+C     collinearity.
 C
-        B1 = (X(N3)-X(N2))*(YP-Y(N2)) -
-     .       (XP-X(N2))*(Y(N3)-Y(N2))
-        B2 = (X(N1)-X(N3))*(YP-Y(N3)) -
-     .       (XP-X(N3))*(Y(N1)-Y(N3))
-        IF (STORE(B1+1.) .GE. 1.  .AND.
-     .      STORE(B2+1.) .GE. 1.) GO TO 16
-C
-C   Restart with N0 randomly selected.
-C
-        N0 = JRAND(N, IX,IY,IZ )
-        GO TO 1
+        IF ( LEFT(X(N2),Y(N2),X(N3),Y(N3),XP,YP)  .AND.
+     .       LEFT(X(N3),Y(N3),X(N1),Y(N1),XP,YP) ) GO TO 16
       ENDIF
 C
 C   Set N4 to the neighbor of N2 which follows N1 (node
@@ -3934,21 +4124,11 @@ C
       IF ( LEFT(X(N0),Y(N0),X(N4),Y(N4),XP,YP) ) THEN
         N3 = N1
         N1 = N4
-        N2S = N2
-        IF (N1 .NE. N1S  .AND.  N1 .NE. N0) GO TO 8
       ELSE
         N3 = N2
         N2 = N4
-        N1S = N1
-        IF (N2 .NE. N2S  .AND.  N2 .NE. N0) GO TO 8
       ENDIF
-C
-C   The starting node N0 or edge N1-N2 was encountered
-C     again, implying a cycle (infinite loop).  Restart
-C     with N0 randomly selected.
-C
-      N0 = JRAND(N, IX,IY,IZ )
-      GO TO 1
+      GO TO 8
 C
 C Boundary traversal loops.  NL->NF is a boundary edge and
 C   P RIGHT NL->NF.  Save NL and NF.
@@ -4036,11 +4216,11 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   03/22/97
+C                                             (817) 565-2767
+C                                                   11/12/94
 C
 C   This subroutine converts a triangulation data structure
-C from the linked list created by Subroutine TRMESH or
+C from the linked list created by subroutine TRMESH or
 C TRMSHR to a triangle list.
 C
 C On input:
@@ -4049,13 +4229,13 @@ C       NCC = Number of constraints.  NCC .GE. 0.
 C
 C       LCC = List of constraint curve starting indexes (or
 C             dummy array of length 1 if NCC = 0).  Refer to
-C             Subroutine ADDCST.
+C             subroutine ADDCST.
 C
 C       N = Number of nodes in the triangulation.  N .GE. 3.
 C
 C       LIST,LPTR,LEND = Linked list data structure defin-
 C                        ing the triangulation.  Refer to
-C                        Subroutine TRMESH.
+C                        subroutine TRMESH.
 C
 C       NROW = Number of rows (entries per triangle) re-
 C              served for the triangle list LTRI.  The value
@@ -4333,186 +4513,9 @@ C
       IER = 2
       RETURN
       END
-      SUBROUTINE TRLPRT (NCC,LCT,N,X,Y,NROW,NT,LTRI,LOUT,
-     .                   PRNTX)
-      INTEGER NCC, LCT(*), N, NROW, NT, LTRI(NROW,NT),
-     .        LOUT
-      LOGICAL PRNTX
-      DOUBLE PRECISION X(N), Y(N)
-C
-C***********************************************************
-C
-C                                               From TRLPACK
-C                                            Robert J. Renka
-C                                  Dept. of Computer Science
-C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   07/02/98
-C
-C   Given a triangulation of a set of points in the plane,
-C this subroutine prints the triangle list created by
-C Subroutine TRLIST and, optionally, the nodal coordinates
-C on logical unit LOUT.  The numbers of boundary nodes,
-C triangles, and arcs, and the constraint region triangle
-C indexes, if any, are also printed.
-C
-C   All parameters other than LOUT and PRNTX should be
-C unaltered from their values on output from TRLIST.
-C
-C
-C On input:
-C
-C       NCC = Number of constraints.
-C
-C       LCT = List of constraint triangle starting indexes
-C             (or dummy array of length 1 if NCC = 0).
-C
-C       N = Number of nodes in the triangulation.
-C           3 .LE. N .LE. 9999.
-C
-C       X,Y = Arrays of length N containing the coordinates
-C             of the nodes in the triangulation -- not used
-C             unless PRNTX = TRUE.
-C
-C       NROW = Number of rows (entries per triangle) re-
-C              served for the triangle list LTRI.  The value
-C              must be 6 if only the vertex indexes and
-C              neighboring triangle indexes are stored, or 9
-C              if arc indexes are also stored.
-C
-C       NT = Number of triangles in the triangulation.
-C            1 .LE. NT .LE. 9999.
-C
-C       LTRI = NROW by NT array whose J-th column contains
-C              the vertex nodal indexes (first three rows),
-C              neighboring triangle indexes (second three
-C              rows), and, if NROW = 9, arc indexes (last
-C              three rows) associated with triangle J for
-C              J = 1,...,NT.
-C
-C       LOUT = Logical unit number for output.  0 .LE. LOUT
-C              .LE. 99.  Output is printed on unit 6 if LOUT
-C              is outside its valid range on input.
-C
-C       PRNTX = Logical variable with value TRUE if and only
-C               if X and Y are to be printed (to 6 decimal
-C               places).
-C
-C None of the parameters are altered by this routine.
-C
-C Modules required by TRLPRT:  None
-C
-C***********************************************************
-C
-      INTEGER I, K, LUN, NA, NB, NL, NLMAX, NMAX
-      DATA    NMAX/9999/,  NLMAX/60/
-C
-C Local parameters:
-C
-C   I = DO-loop, nodal index, and row index for LTRI
-C   K = DO-loop and triangle index
-C   LUN = Logical unit number for output
-C   NA = Number of triangulation arcs
-C   NB = Number of boundary nodes
-C   NL = Number of lines printed on the current page
-C   NLMAX = Maximum number of print lines per page
-C   NMAX = Maximum value of N and NT (4-digit format)
-C
-      LUN = LOUT
-      IF (LUN .LT. 0  .OR.  LUN .GT. 99) LUN = 6
-C
-C Print a heading and test for invalid input.
-C
-C       WRITE (LUN,100)
-      NL = 1
-      IF (N .LT. 3  .OR.  N .GT. NMAX  .OR.
-     .    (NROW .NE. 6  .AND.  NROW .NE. 9)  .OR.
-     .    NT .LT. 1  .OR.  NT .GT. NMAX) THEN
-C
-C Print an error message and bypass the loops.
-C
-C       WRITE (LUN,110) N, NROW, NT
-        GO TO 3
-      ENDIF
-      IF (PRNTX) THEN
-C
-C Print X and Y.
-C
-C       WRITE (LUN,101)
-        NL = 6
-        DO 1 I = 1,N
-          IF (NL .GE. NLMAX) THEN
-C       WRITE (LUN,106)
-            NL = 0
-          ENDIF
-C       WRITE (LUN,102) I, X(I), Y(I)
-          NL = NL + 1
-    1     CONTINUE
-      ENDIF
-C
-C Print the triangulation LTRI.
-C
-      IF (NL .GT. NLMAX/2) THEN
-C       WRITE (LUN,106)
-        NL = 0
-      ENDIF
-      IF (NROW .EQ. 6) THEN
-C       WRITE (LUN,103)
-      ELSE
-C       WRITE (LUN,104)
-      ENDIF
-      NL = NL + 5
-      DO 2 K = 1,NT
-        IF (NL .GE. NLMAX) THEN
-C       WRITE (LUN,106)
-          NL = 0
-        ENDIF
-C       WRITE (LUN,105) K, (LTRI(I,K), I = 1,NROW)
-        NL = NL + 1
-    2   CONTINUE
-C
-C Print NB, NA, and NT (boundary nodes, arcs, and
-C   triangles).
-C
-      NB = 2*N - NT - 2
-      NA = NT + N - 1
-C      IF (NL .GT. NLMAX-6) WRITE (LUN,106)
-C       WRITE (LUN,107) NB, NA, NT
-C
-C Print NCC and LCT.
-C
-    3 CONTINUE
-C    3 WRITE (LUN,108) NCC
-C      IF (NCC .GT. 0) WRITE (LUN,109) (LCT(I), I = 1,NCC)
-      RETURN
-C
-C Print formats:
-C
-  100 FORMAT (///,24X,'TRIPACK (TRLIST) Output')
-  101 FORMAT (//16X,'Node',7X,'X(Node)',10X,'Y(Node)'//)
-  102 FORMAT (16X,I4,2E17.6)
-  103 FORMAT (//1X,'Triangle',8X,'Vertices',12X,'Neighbors'/
-     .        4X,'KT',7X,'N1',5X,'N2',5X,'N3',4X,'KT1',4X,
-     .        'KT2',4X,'KT3'/)
-  104 FORMAT (//1X,'Triangle',8X,'Vertices',12X,'Neighbors',
-     .        14X,'Arcs'/
-     .        4X,'KT',7X,'N1',5X,'N2',5X,'N3',4X,'KT1',4X,
-     .        'KT2',4X,'KT3',4X,'KA1',4X,'KA2',4X,'KA3'/)
-  105 FORMAT (2X,I4,2X,6(3X,I4),3(2X,I5))
-  106 FORMAT (///)
-  107 FORMAT (/1X,'NB = ',I4,' Boundary Nodes',5X,
-     .        'NA = ',I5,' Arcs',5X,'NT = ',I5,
-     .        ' Triangles')
-  108 FORMAT (/1X,'NCC =',I3,' Constraint Curves')
-  109 FORMAT (1X,9X,14I5)
-  110 FORMAT (//1X,10X,'*** Invalid Parameter:  N =',I5,
-     .        ', NROW =',I5,', NT =',I5,' ***')
-      END
-      SUBROUTINE TRMESH (N,X,Y, LIST,LPTR,LEND,LNEW,NEAR,
-     .                   NEXT,DIST,IER)
-      INTEGER N, LIST(*), LPTR(*), LEND(N), LNEW, NEAR(N),
-     .        NEXT(N), IER
-      DOUBLE PRECISION X(N), Y(N), DIST(N)
+      SUBROUTINE TRMESH (N,X,Y, LIST,LPTR,LEND,LNEW,IER)
+      INTEGER N, LIST(*), LPTR(*), LEND(N), LNEW, IER
+      DOUBLE PRECISION    X(N), Y(N)
 C
 C***********************************************************
 C
@@ -4520,8 +4523,8 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/28/98
+C                                             (817) 565-2767
+C                                                   08/25/91
 C
 C   This subroutine creates a Delaunay triangulation of a
 C set of N arbitrarily distributed points in the plane re-
@@ -4546,13 +4549,13 @@ C for solving closest point problems and for triangle-based
 C interpolation.
 C
 C   The triangulation can be generalized to a constrained
-C Delaunay triangulation by a call to Subroutine ADDCST.
+C Delaunay triangulation by a call to subroutine ADDCST.
 C This allows for user-specified boundaries defining a non-
 C convex and/or multiply connected region.
 C
-C   The algorithm for constructing the triangulation has
-C expected time complexity O(N*log(N)) for most nodal dis-
-C tributions.  Also, since the algorithm proceeds by adding
+C   The operation count for constructing the triangulation
+C is close to O(N) if the nodes are presorted on X or Y com-
+C ponents.  Also, since the algorithm proceeds by adding
 C nodes incrementally, the triangulation may be updated with
 C the addition (or deletion) of a node very efficiently.
 C The adjacency information representing the triangulation
@@ -4600,14 +4603,19 @@ C
 C  INTSEC - Determines whether or not an arbitrary pair of
 C             line segments share a common point.
 C
-C  JRAND  - Generates a uniformly distributed pseudo-random
-C             integer.
-C
 C  LEFT   - Locates a point relative to a line.
 C
 C  NEARND - Returns the index of the nearest node to an
 C             arbitrary point, along with its squared
 C             distance.
+C
+C  PERMUT - Permutes a vector.
+C
+C  QSORT  - Defines a permutation by applying a Quick Sort
+C             to a vector.
+C
+C  REORDR - Reorders the nodes, using an order N*log(N)
+C             sort, for increased efficiency in TRMESH.
 C
 C  STORE  - Forces a value to be stored in main memory so
 C             that the precision of floating point numbers
@@ -4618,7 +4626,7 @@ C  TRLIST - Converts the triangulation data structure to a
 C             triangle list more suitable for use in a fin-
 C             ite element code.
 C
-C  TRLPRT - Prints the triangle list created by Subroutine
+C  TRLPRT - Prints the triangle list created by subroutine
 C             TRLIST.
 C
 C  TRMESH - Creates a Delaunay triangulation of a set of
@@ -4628,9 +4636,6 @@ C  TRMSHR - Creates a Delaunay triangulation (more effici-
 C             ently than TRMESH) of a set of nodes lying at
 C             the vertices of a (possibly skewed) rectangu-
 C             lar grid.
-C
-C  TRPLOT - Creates a level-2 Encapsulated Postscript (EPS)
-C             file containing a triangulation plot.
 C
 C  TRPRNT - Prints the triangulation data structure and,
 C             optionally, the nodal coordinates.
@@ -4651,12 +4656,6 @@ C
 C       LIST,LPTR = Arrays of length at least 6N-12.
 C
 C       LEND = Array of length at least N.
-C
-C       NEAR,NEXT,DIST = Work space arrays of length at
-C                        least N.  The space is used to
-C                        efficiently determine the nearest
-C                        triangulation node to each un-
-C                        processed node for use by ADDNOD.
 C
 C On output:
 C
@@ -4689,57 +4688,27 @@ C              and LPTR (list length plus one).  LIST, LPTR,
 C              LEND, and LNEW are not altered if IER < 0,
 C              and are incomplete if IER > 0.
 C
-C       NEAR,NEXT,DIST = Garbage.
-C
 C       IER = Error indicator:
 C             IER =  0 if no errors were encountered.
 C             IER = -1 if N < 3 on input.
 C             IER = -2 if the first three nodes are
 C                      collinear.
-C             IER = -4 if an error flag was returned by a
-C                      call to SWAP in ADDNOD.  This is an
-C                      internal error and should be reported
-C                      to the programmer.
 C             IER =  L if nodes L and M coincide for some
 C                      M > L.  The linked list represents
 C                      a triangulation of nodes 1 to M-1
 C                      in this case.
 C
 C Modules required by TRMESH:  ADDNOD, BDYADD, INSERT,
-C                                INTADD, JRAND, LEFT,
-C                                LSTPTR, STORE, SWAP,
-C                                SWPTST, TRFIND
-C
-C Intrinsic function called by TRMESH:  ABS
+C                                INTADD, LEFT, LSTPTR,
+C                                STORE, SWAP, SWPTST, TRFIND
 C
 C***********************************************************
 C
       LOGICAL LEFT
-      DOUBLE PRECISION STORE
-      INTEGER I, I0, J, K, KM1, LCC(1), LP, LPL, NCC, NEXTI,
-     .        NN
-      DOUBLE PRECISION D, D1, D2, D3, EPS, SWTOL
+      DOUBLE PRECISION    STORE
+      INTEGER K, KM1, LCC(1), NCC, NN
+      DOUBLE PRECISION    EPS, SWTOL
       COMMON/SWPCOM/SWTOL
-C
-C Local parameters:
-C
-C D =        Squared distance from node K to node I
-C D1,D2,D3 = Squared distances from node K to nodes 1, 2,
-C              and 3, respectively
-C EPS =      Half the machine precision
-C I,J =      Nodal indexes
-C I0 =       Index of the node preceding I in a sequence of
-C              unprocessed nodes:  I = NEXT(I0)
-C K =        Index of node to be added and DO-loop index:
-C              K > 3
-C KM1 =      K-1
-C LCC(1) =   Dummy array
-C LP =       LIST index (pointer) of a neighbor of K
-C LPL =      Pointer to the last neighbor of K
-C NCC =      Number of constraint curves
-C NEXTI =    NEXT(I)
-C NN =       Local copy of N
-C SWTOL =    Tolerance for function SWPTST
 C
       NN = N
       IF (NN .LT. 3) THEN
@@ -4760,7 +4729,7 @@ C Store the first triangle in the linked list.
 C
       IF ( .NOT. LEFT(X(1),Y(1),X(2),Y(2),X(3),Y(3)) ) THEN
 C
-C   The initial triangle is (3,2,1) = (2,1,3) = (1,3,2).
+C   The initial triangle is (1,3,2).
 C
         LIST(1) = 3
         LPTR(1) = 2
@@ -4811,152 +4780,36 @@ C
         RETURN
       ENDIF
 C
-C Initialize LNEW and test for N = 3.
+C Initialize LNEW and add the remaining nodes.  Parameters
+C   for ADDNOD are as follows:
+C
+C   K = Index of the node to be added.
+C   KM1 = Index of the starting node for the search in
+C         TRFIND and number of nodes in the triangulation
+C         on input.
+C   NCC = Number of constraint curves.
+C   LCC = Dummy array (since NCC = 0).
 C
       LNEW = 7
       IF (NN .EQ. 3) THEN
         IER = 0
         RETURN
       ENDIF
-C
-C A nearest-node data structure (NEAR, NEXT, and DIST) is
-C   used to obtain an expected-time (N*log(N)) incremental
-C   algorithm by enabling constant search time for locating
-C   each new node in the triangulation.
-C
-C For each unprocessed node K, NEAR(K) is the index of the
-C   triangulation node closest to K (used as the starting
-C   point for the search in Subroutine TRFIND) and DIST(K)
-C   is an increasing function of the distance between nodes
-C   K and NEAR(K).
-C
-C Since it is necessary to efficiently find the subset of
-C   unprocessed nodes associated with each triangulation
-C   node J (those that have J as their NEAR entries), the
-C   subsets are stored in NEAR and NEXT as follows:  for
-C   each node J in the triangulation, I = NEAR(J) is the
-C   first unprocessed node in J's set (with I = 0 if the
-C   set is empty), L = NEXT(I) (if I > 0) is the second,
-C   NEXT(L) (if L > 0) is the third, etc.  The nodes in each
-C   set are initially ordered by increasing indexes (which
-C   maximizes efficiency) but that ordering is not main-
-C   tained as the data structure is updated.
-C
-C Initialize the data structure for the single triangle.
-C
-      NEAR(1) = 0
-      NEAR(2) = 0
-      NEAR(3) = 0
-      DO 2 K = NN,4,-1
-        D1 = (X(K)-X(1))**2 + (Y(K)-Y(1))**2
-        D2 = (X(K)-X(2))**2 + (Y(K)-Y(2))**2
-        D3 = (X(K)-X(3))**2 + (Y(K)-Y(3))**2
-        IF (D1 .LE. D2  .AND.  D1 .LE. D3) THEN
-          NEAR(K) = 1
-          DIST(K) = D1
-          NEXT(K) = NEAR(1)
-          NEAR(1) = K
-        ELSEIF (D2 .LE. D1  .AND.  D2 .LE. D3) THEN
-          NEAR(K) = 2
-          DIST(K) = D2
-          NEXT(K) = NEAR(2)
-          NEAR(2) = K
-        ELSE
-          NEAR(K) = 3
-          DIST(K) = D3
-          NEXT(K) = NEAR(3)
-          NEAR(3) = K
-        ENDIF
-    2   CONTINUE
-C
-C Add the remaining nodes.  Parameters for ADDNOD are as
-C   follows:
-C
-C   K = Index of the node to be added.
-C   NEAR(K) = Index of the starting node for the search in
-C             TRFIND.
-C   NCC = Number of constraint curves.
-C   LCC = Dummy array (since NCC = 0).
-C   KM1 = Number of nodes in the triangulation.
-C
       NCC = 0
-      DO 7 K = 4,NN
-        KM1 = K-1
-        CALL ADDNOD (K,X(K),Y(K),NEAR(K),NCC, LCC,KM1,X,Y,
+      DO 2 K = 4,NN
+        KM1 = K - 1
+        CALL ADDNOD (K,X(K),Y(K),KM1,NCC, LCC,KM1,X,Y,
      .               LIST,LPTR,LEND,LNEW, IER)
         IF (IER .NE. 0) RETURN
-C
-C Remove K from the set of unprocessed nodes associated
-C   with NEAR(K).
-C
-        I = NEAR(K)
-        IF (NEAR(I) .EQ. K) THEN
-          NEAR(I) = NEXT(K)
-        ELSE
-          I = NEAR(I)
-    3     I0 = I
-            I = NEXT(I0)
-            IF (I .NE. K) GO TO 3
-          NEXT(I0) = NEXT(K)
-        ENDIF
-        NEAR(K) = 0
-C
-C Loop on neighbors J of node K.
-C
-        LPL = LEND(K)
-        LP = LPL
-    4   LP = LPTR(LP)
-          J = ABS(LIST(LP))
-C
-C Loop on elements I in the sequence of unprocessed nodes
-C   associated with J:  K is a candidate for replacing J
-C   as the nearest triangulation node to I.  The next value
-C   of I in the sequence, NEXT(I), must be saved before I
-C   is moved because it is altered by adding I to K's set.
-C
-          I = NEAR(J)
-    5     IF (I .EQ. 0) GO TO 6
-          NEXTI = NEXT(I)
-C
-C Test for the distance from I to K less than the distance
-C   from I to J.
-C
-          D = (X(K)-X(I))**2 + (Y(K)-Y(I))**2
-          IF (D .LT. DIST(I)) THEN
-C
-C Replace J by K as the nearest triangulation node to I:
-C   update NEAR(I) and DIST(I), and remove I from J's set
-C   of unprocessed nodes and add it to K's set.
-C
-            NEAR(I) = K
-            DIST(I) = D
-            IF (I .EQ. NEAR(J)) THEN
-              NEAR(J) = NEXTI
-            ELSE
-              NEXT(I0) = NEXTI
-            ENDIF
-            NEXT(I) = NEAR(K)
-            NEAR(K) = I
-          ELSE
-            I0 = I
-          ENDIF
-C
-C Bottom of loop on I.
-C
-          I = NEXTI
-          GO TO 5
-C
-C Bottom of loop on neighbors J.
-C
-    6     IF (LP .NE. LPL) GO TO 4
-    7   CONTINUE
+    2   CONTINUE
+      IER = 0
       RETURN
       END
       SUBROUTINE TRMSHR (N,NX,X,Y, NIT, LIST,LPTR,LEND,LNEW,
      .                   IER)
       INTEGER  N, NX, NIT, LIST(*), LPTR(*), LEND(N), LNEW,
      .         IER
-      DOUBLE PRECISION  X(N), Y(N)
+      DOUBLE PRECISION     X(N), Y(N)
 C
 C***********************************************************
 C
@@ -4964,8 +4817,8 @@ C                                               From TRIPACK
 C                                            Robert J. Renka
 C                                  Dept. of Computer Science
 C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   06/27/98
+C                                             (817) 565-2767
+C                                                   08/31/91
 C
 C   This subroutine creates a Delaunay triangulation of a
 C set of N nodes in the plane, where the nodes are the vert-
@@ -4981,8 +4834,8 @@ C mation from a rectangle to a grid cell which is bilinear
 C in both components has an invertible Jacobian.
 C
 C   If the nodes are not distributed and ordered as defined
-C above, Subroutine TRMESH must be called in place of this
-C routine.  Refer to Subroutine ADDCST for the treatment of
+C above, subroutine TRMESH must be called in place of this
+C routine.  Refer to subroutine ADDCST for the treatment of
 C constraints.
 C
 C   The first phase of the algorithm consists of construc-
@@ -5036,7 +4889,7 @@ C
 C       NIT = Number of iterations employed.
 C
 C       LIST,LPTR,LEND,LNEW = Data structure defining the
-C                             triangulation.  Refer to Sub-
+C                             triangulation.  Refer to sub-
 C                             routine TRMESH.
 C
 C       IER = Error indicator:
@@ -5065,12 +4918,12 @@ C***********************************************************
 C
       INTEGER LSTPTR, NBCNT
       LOGICAL LEFT, SWPTST
-      DOUBLE PRECISION STORE
+      DOUBLE PRECISION    STORE
       INTEGER I, ITER, J, K, KP1, LP, LPF, LPK, LPL, LPP,
      .        M1, M2, M3, M4, MAXIT, N0, N1, N2, N3, N4, NI,
      .        NJ, NM1, NN, NNB
       LOGICAL TST
-      DOUBLE PRECISION EPS, SWTOL
+      DOUBLE PRECISION    EPS, SWTOL
       COMMON/SWPCOM/SWTOL
 C
 C Store local variables and test for errors in input
@@ -5336,10 +5189,8 @@ C   Swap diagonal N1-N2 for N3-N4, set TST to TRUE, and set
 C     N2 to N4 (the neighbor preceding N3).
 C
                 CALL SWAP (N3,N4,N1,N2, LIST,LPTR,LEND, LPP)
-                IF (LPP .NE. 0) THEN
-                  TST = .TRUE.
-                  N2 = N4
-                ENDIF
+                TST = .TRUE.
+                N2 = N4
               ENDIF
             ENDIF
 C
@@ -5365,658 +5216,4 @@ C Invalid grid cell encountered.
 C
    12 IER = K
       RETURN
-      END
-      SUBROUTINE TRPLOT (LUN,PLTSIZ,WX1,WX2,WY1,WY2,NCC,LCC,
-     .                   N,X,Y,LIST,LPTR,LEND,TITLE,
-     .                   NUMBR, IER)
-      CHARACTER*(*) TITLE
-      INTEGER LUN, NCC, LCC(*), N, LIST(*), LPTR(*),
-     .        LEND(N), IER
-      LOGICAL NUMBR
-      DOUBLE PRECISION PLTSIZ, WX1, WX2, WY1, WY2, X(N), 
-     .        Y(N)
-C
-C***********************************************************
-C
-C                                               From TRIPACK
-C                                            Robert J. Renka
-C                                  Dept. of Computer Science
-C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   07/15/98
-C
-C   This subroutine creates a level-2 Encapsulated Post-
-C script (EPS) file containing a triangulation plot.
-C
-C
-C On input:
-C
-C       LUN = Logical unit number in the range 0 to 99.
-C             The unit should be opened with an appropriate
-C             file name before the call to this routine.
-C
-C       PLTSIZ = Plot size in inches.  The window is mapped,
-C                with aspect ratio preserved, to a rectangu-
-C                lar viewport with maximum side-length equal
-C                to .88*PLTSIZ (leaving room for labels out-
-C                side the viewport).  The viewport is
-C                centered on the 8.5 by 11 inch page, and
-C                its boundary is drawn.  1.0 .LE. PLTSIZ
-C                .LE. 8.5.
-C
-C       WX1,WX2,WY1,WY2 = Parameters defining a rectangular
-C                         window against which the triangu-
-C                         lation is clipped.  (Only the
-C                         portion of the triangulation that
-C                         lies in the window is drawn.)
-C                         (WX1,WY1) and (WX2,WY2) are the
-C                         lower left and upper right cor-
-C                         ners, respectively.  WX1 < WX2 and
-C                         WY1 < WY2.
-C
-C       NCC = Number of constraint curves.  Refer to Subrou-
-C             tine ADDCST.  NCC .GE. 0.
-C
-C       LCC = Array of length NCC (or dummy parameter if
-C             NCC = 0) containing the index of the first
-C             node of constraint I in LCC(I).  For I = 1 to
-C             NCC, LCC(I+1)-LCC(I) .GE. 3, where LCC(NCC+1)
-C             = N+1.
-C
-C       N = Number of nodes in the triangulation.  N .GE. 3.
-C
-C       X,Y = Arrays of length N containing the coordinates
-C             of the nodes with non-constraint nodes in the
-C             first LCC(1)-1 locations.
-C
-C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
-C                        TRMESH.
-C
-C       TITLE = Type CHARACTER variable or constant contain-
-C               ing a string to be centered above the plot.
-C               The string must be enclosed in parentheses;
-C               i.e., the first and last characters must be
-C               '(' and ')', respectively, but these are not
-C               displayed.  TITLE may have at most 80 char-
-C               acters including the parentheses.
-C
-C       NUMBR = Option indicator:  If NUMBR = TRUE, the
-C               nodal indexes are plotted next to the nodes.
-C
-C Input parameters are not altered by this routine.
-C
-C On output:
-C
-C       IER = Error indicator:
-C             IER = 0 if no errors were encountered.
-C             IER = 1 if LUN, PLTSIZ, NCC, or N is outside
-C                     its valid range.  LCC is not tested
-C                     for validity.
-C             IER = 2 if WX1 >= WX2 or WY1 >= WY2.
-C             IER = 3 if an error was encountered in writing
-C                     to unit LUN.
-C
-C   Various plotting options can be controlled by altering
-C the data statement below.
-C
-C Modules required by TRPLOT:  None
-C
-C Intrinsic functions called by TRPLOT:  ABS, CHAR, NINT,
-C                                          DBLE
-C
-C***********************************************************
-C
-      INTEGER I, IFRST, IH, ILAST, IPX1, IPX2, IPY1, IPY2,
-     .        IW, LP, LPL, N0, N0BAK, N0FOR, N1, NLS
-      LOGICAL ANNOT, CNSTR, PASS1
-      DOUBLE PRECISION DASHL, DX, DY, FSIZN, FSIZT, R, SFX, 
-     .        SFY, T, TX, TY, X0, Y0
-C
-      DATA    ANNOT/.TRUE./,  DASHL/4.0/,  FSIZN/10.0/,
-     .        FSIZT/16.0/
-C
-C Local parameters:
-C
-C ANNOT =     Logical variable with value TRUE iff the plot
-C               is to be annotated with the values of WX1,
-C               WX2, WY1, and WY2
-C CNSTR       Logical variable used to flag constraint arcs:
-C               TRUE iff N0-N1 lies in a constraint region
-C DASHL =     Length (in points, at 72 points per inch) of
-C               dashes and spaces in a dashed line pattern
-C               used for drawing constraint arcs
-C DX =        Window width WX2-WX1
-C DY =        Window height WY2-WY1
-C FSIZN =     Font size in points for labeling nodes with
-C               their indexes if NUMBR = TRUE
-C FSIZT =     Font size in points for the title (and
-C               annotation if ANNOT = TRUE)
-C I =         Constraint index (1 to NCC)
-C IFRST =     Index of the first node in constraint I
-C IH =        Height of the viewport in points
-C ILAST =     Index of the last node in constraint I
-C IPX1,IPY1 = X and y coordinates (in points) of the lower
-C               left corner of the bounding box or viewport
-C IPX2,IPY2 = X and y coordinates (in points) of the upper
-C               right corner of the bounding box or viewport
-C IW =        Width of the viewport in points
-C LP =        LIST index (pointer)
-C LPL =       Pointer to the last neighbor of N0
-C N0 =        Nodal index and DO-loop index
-C N0BAK =     Predecessor of N0 in a constraint curve
-C               (sequence of adjacent constraint nodes)
-C N0FOR =     Successor to N0 in a constraint curve
-C N1 =        Index of a neighbor of N0
-C NLS =       Index of the last non-constraint node
-C PASS1 =     Logical variable used to flag the first pass
-C               through the constraint nodes
-C R =         Aspect ratio DX/DY
-C SFX,SFY =   Scale factors for mapping world coordinates
-C               (window coordinates in [WX1,WX2] X [WY1,WY2])
-C               to viewport coordinates in [IPX1,IPX2] X
-C               [IPY1,IPY2]
-C T =         Temporary variable
-C TX,TY =     Translation vector for mapping world coordi-
-C               nates to viewport coordinates
-C X0,Y0 =     X(N0),Y(N0) or label location
-C
-C
-C Test for error 1, and set NLS to the last non-constraint
-C   node.
-C
-      IF (LUN .LT. 0  .OR.  LUN .GT. 99  .OR.
-     .    PLTSIZ .LT. 1.0  .OR.  PLTSIZ .GT. 8.5  .OR.
-     .    NCC .LT. 0  .OR.  N .LT. 3) GO TO 11
-      NLS = N
-      IF (NCC .GT. 0) NLS = LCC(1)-1
-C
-C Compute the aspect ratio of the window.
-C
-      DX = WX2 - WX1
-      DY = WY2 - WY1
-      IF (DX .LE. 0.0  .OR.  DY .LE. 0.0) GO TO 12
-      R = DX/DY
-C
-C Compute the lower left (IPX1,IPY1) and upper right
-C   (IPX2,IPY2) corner coordinates of the bounding box.
-C   The coordinates, specified in default user space units
-C   (points, at 72 points/inch with origin at the lower
-C   left corner of the page), are chosen to preserve the
-C   aspect ratio R, and to center the plot on the 8.5 by 11
-C   inch page.  The center of the page is (306,396), and
-C   T = PLTSIZ/2 in points.
-C
-      T = 36.0*PLTSIZ
-      IF (R .GE. 1.0) THEN
-        IPX1 = 306 - NINT(T)
-        IPX2 = 306 + NINT(T)
-        IPY1 = 396 - NINT(T/R)
-        IPY2 = 396 + NINT(T/R)
-      ELSE
-        IPX1 = 306 - NINT(T*R)
-        IPX2 = 306 + NINT(T*R)
-        IPY1 = 396 - NINT(T)
-        IPY2 = 396 + NINT(T)
-      ENDIF
-C
-C Output header comments.
-C
-C       WRITE (LUN,100,ERR=13) IPX1, IPY1, IPX2, IPY2
-  100 FORMAT ('%!PS-Adobe-3.0 EPSF-3.0'/
-     .        '%%BoundingBox:',4I4/
-     .        '%%Title:  Triangulation'/
-     .        '%%Creator:  TRIPACK'/
-     .        '%%EndComments')
-C
-C Set (IPX1,IPY1) and (IPX2,IPY2) to the corner coordinates
-C   of a viewport obtained by shrinking the bounding box by
-C   12% in each dimension.
-C
-      IW = NINT(0.88*DBLE(IPX2-IPX1))
-      IH = NINT(0.88*DBLE(IPY2-IPY1))
-      IPX1 = 306 - IW/2
-      IPX2 = 306 + IW/2
-      IPY1 = 396 - IH/2
-      IPY2 = 396 + IH/2
-C
-C Set the line thickness to 2 points, and draw the
-C   viewport boundary.
-C
-      T = 2.0
-C       WRITE (LUN,110,ERR=13) T
-C       WRITE (LUN,120,ERR=13) IPX1, IPY1
-C       WRITE (LUN,130,ERR=13) IPX1, IPY2
-C       WRITE (LUN,130,ERR=13) IPX2, IPY2
-C       WRITE (LUN,130,ERR=13) IPX2, IPY1
-C       WRITE (LUN,140,ERR=13)
-C       WRITE (LUN,150,ERR=13)
-  110 FORMAT (F12.6,' setlinewidth')
-  120 FORMAT (2I4,' moveto')
-  130 FORMAT (2I4,' lineto')
-  140 FORMAT ('closepath')
-  150 FORMAT ('stroke')
-C
-C Set up a mapping from the window to the viewport.
-C
-      SFX = DBLE(IW)/DX
-      SFY = DBLE(IH)/DY
-      TX = IPX1 - SFX*WX1
-      TY = IPY1 - SFY*WY1
-C       WRITE (LUN,160,ERR=13) TX, TY, SFX, SFY
-  160 FORMAT (2F12.6,' translate'/
-     .        2F12.6,' scale')
-C
-C The line thickness (believe it or fucking not) must be
-C   changed to reflect the new scaling which is applied to
-C   all subsequent output.  Set it to 1.0 point.
-C
-      T = 2.0/(SFX+SFY)
-C       WRITE (LUN,110,ERR=13) T
-C
-C Save the current graphics state, and set the clip path to
-C   the boundary of the window.
-C
-C       WRITE (LUN,170,ERR=13)
-C       WRITE (LUN,180,ERR=13) WX1, WY1
-C       WRITE (LUN,190,ERR=13) WX2, WY1
-C       WRITE (LUN,190,ERR=13) WX2, WY2
-C       WRITE (LUN,190,ERR=13) WX1, WY2
-C       WRITE (LUN,200,ERR=13)
-  170 FORMAT ('gsave')
-  180 FORMAT (2F12.6,' moveto')
-  190 FORMAT (2F12.6,' lineto')
-  200 FORMAT ('closepath clip newpath')
-C
-C Draw the edges N0->N1, where N1 > N0, beginning with a
-C   loop on non-constraint nodes N0.  LPL points to the
-C   last neighbor of N0.
-C
-      DO 3 N0 = 1,NLS
-        X0 = X(N0)
-        Y0 = Y(N0)
-        LPL = LEND(N0)
-        LP = LPL
-C
-C   Loop on neighbors N1 of N0.
-C
-    2   LP = LPTR(LP)
-          N1 = ABS(LIST(LP))
-          IF (N1 .GT. N0) THEN
-C
-C   Add the edge to the path.
-C
-C       WRITE (LUN,210,ERR=13) X0, Y0, X(N1), Y(N1)
-  210       FORMAT (2F12.6,' moveto',2F12.6,' lineto')
-          ENDIF
-          IF (LP .NE. LPL) GO TO 2
-    3   CONTINUE
-C
-C Loop through the constraint nodes twice.  The non-
-C   constraint arcs incident on constraint nodes are
-C   drawn (with solid lines) on the first pass, and the
-C   constraint arcs (both boundary and interior, if any)
-C   are drawn (with dashed lines) on the second pass.
-C
-      PASS1 = .TRUE.
-C
-C Loop on constraint nodes N0 with (N0BAK,N0,N0FOR) a sub-
-C   sequence of constraint I.  The outer loop is on
-C   constraints I with first and last nodes IFRST and ILAST.
-C
-    4 IFRST = N+1
-      DO 8 I = NCC,1,-1
-        ILAST = IFRST - 1
-        IFRST = LCC(I)
-        N0BAK = ILAST
-        DO 7 N0 = IFRST,ILAST
-          N0FOR = N0 + 1
-          IF (N0 .EQ. ILAST) N0FOR = IFRST
-          LPL = LEND(N0)
-          X0 = X(N0)
-          Y0 = Y(N0)
-          LP = LPL
-C
-C   Loop on neighbors N1 of N0.  CNSTR = TRUE iff N0-N1 is a
-C     constraint arc.
-C
-C   Initialize CNSTR to TRUE iff the first neighbor of N0
-C     strictly follows N0FOR and precedes or coincides with
-C     N0BAK (in counterclockwise order).
-C
-    5     LP = LPTR(LP)
-            N1 = ABS(LIST(LP))
-            IF (N1 .NE. N0FOR  .AND.  N1 .NE. N0BAK) GO TO 5
-          CNSTR = N1 .EQ. N0BAK
-          LP = LPL
-C
-C   Loop on neighbors N1 of N0.  Update CNSTR and test for
-C     N1 > N0.
-C
-    6     LP = LPTR(LP)
-            N1 = ABS(LIST(LP))
-            IF (N1 .EQ. N0FOR) CNSTR = .TRUE.
-            IF (N1 .GT. N0) THEN
-C
-C   Draw the edge iff (PASS1=TRUE and CNSTR=FALSE) or
-C     (PASS1=FALSE and CNSTR=TRUE); i.e., CNSTR and PASS1
-C     have opposite values.
-C
-C             IF (CNSTR .NEQV. PASS1)
-C     .          WRITE (LUN,210,ERR=13) X0, Y0, X(N1), Y(N1)
-            ENDIF
-            IF (N1 .EQ. N0BAK) CNSTR = .FALSE.
-C
-C   Bottom of loops.
-C
-            IF (LP .NE. LPL) GO TO 6
-          N0BAK = N0
-    7     CONTINUE
-    8   CONTINUE
-      IF (PASS1) THEN
-C
-C End of first pass:  paint the path and change to dashed
-C   lines for subsequent drawing.  Since the scale factors
-C   are applied to everything, the dash length must be
-C   specified in world coordinates.
-C
-        PASS1 = .FALSE.
-C       WRITE (LUN,150,ERR=13)
-        T = DASHL*2.0/(SFX+SFY)
-C       WRITE (LUN,220,ERR=13) T
-  220   FORMAT ('[',F12.6,'] 0 setdash')
-        GO TO 4
-      ENDIF
-C
-C Paint the path and restore the saved graphics state (with
-C   no clip path).
-C
-C       WRITE (LUN,150,ERR=13)
-C       WRITE (LUN,230,ERR=13)
-  230 FORMAT ('grestore')
-      IF (NUMBR) THEN
-C
-C Nodes in the window are to be labeled with their indexes.
-C   Convert FSIZN from points to world coordinates, and
-C   output the commands to select a font and scale it.
-C
-        T = FSIZN*2.0/(SFX+SFY)
-C       WRITE (LUN,240,ERR=13) T
-  240   FORMAT ('/Helvetica findfont'/
-     .          F12.6,' scalefont setfont')
-C
-C   Loop on nodes N0 with coordinates (X0,Y0).
-C
-        DO 9 N0 = 1,N
-          X0 = X(N0)
-          Y0 = Y(N0)
-          IF (X0 .LT. WX1  .OR.  X0 .GT. WX2  .OR.
-     .        Y0 .LT. WY1  .OR.  Y0 .GT. WY2) GO TO 9
-C
-C   Move to (X0,Y0), and draw the label N0.  The first char-
-C     acter will have its lower left corner about one
-C     character width to the right of the nodal position.
-C
-C       WRITE (LUN,180,ERR=13) X0, Y0
-C       WRITE (LUN,250,ERR=13) N0
-  250     FORMAT ('(',I3,') show')
-    9     CONTINUE
-      ENDIF
-C
-C Convert FSIZT from points to world coordinates, and output
-C   the commands to select a font and scale it.
-C
-      T = FSIZT*2.0/(SFX+SFY)
-C       WRITE (LUN,240,ERR=13) T
-C
-C Display TITLE centered above the plot:
-C
-      Y0 = WY2 + 3.0*T
-C       WRITE (LUN,260,ERR=13) TITLE, (WX1+WX2)/2.0, Y0
-  260 FORMAT (A80/'  stringwidth pop 2 div neg ',F12.6,
-     .        ' add ',F12.6,' moveto')
-C       WRITE (LUN,270,ERR=13) TITLE
-  270 FORMAT (A80/'  show')
-      IF (ANNOT) THEN
-C
-C Display the window extrema below the plot.
-C
-        X0 = WX1
-        Y0 = WY1 - 100.0/(SFX+SFY)
-C       WRITE (LUN,180,ERR=13) X0, Y0
-C       WRITE (LUN,280,ERR=13) WX1, WX2
-        Y0 = Y0 - 2.0*T
-C       WRITE (LUN,290,ERR=13) X0, Y0, WY1, WY2
-  280   FORMAT ('(Window:   WX1 = ',E9.3,',   WX2 = ',E9.3,
-     .          ') show')
-  290   FORMAT ('(Window:  ) stringwidth pop ',F12.6,' add',
-     .          F12.6,' moveto'/
-     .          '( WY1 = ',E9.3,',   WY2 = ',E9.3,') show')
-      ENDIF
-C
-C Paint the path and output the showpage command and
-C   end-of-file indicator.
-C
-C       WRITE (LUN,300,ERR=13)
-  300 FORMAT ('stroke'/
-     .        'showpage'/
-     .        '%%EOF')
-C
-C HP's interpreters require a one-byte End-of-PostScript-Job
-C   indicator (to eliminate a timeout error message):
-C   ASCII 4.
-C
-C       WRITE (LUN,310,ERR=13) CHAR(4)
-  310 FORMAT (A1)
-C
-C No error encountered.
-C
-      IER = 0
-      RETURN
-C
-C Invalid input parameter.
-C
-   11 IER = 1
-      RETURN
-C
-C DX or DY is not positive.
-C
-   12 IER = 2
-      RETURN
-C
-C Error writing to unit LUN.
-C
-   13 IER = 3
-      RETURN
-      END
-      SUBROUTINE TRPRNT (NCC,LCC,N,X,Y,LIST,LPTR,LEND,LOUT,
-     .                   PRNTX)
-      INTEGER NCC, LCC(*), N, LIST(*), LPTR(*), LEND(N),
-     .        LOUT
-      LOGICAL PRNTX
-      DOUBLE PRECISION X(N), Y(N)
-C
-C***********************************************************
-C
-C                                               From TRIPACK
-C                                            Robert J. Renka
-C                                  Dept. of Computer Science
-C                                       Univ. of North Texas
-C                                           renka@cs.unt.edu
-C                                                   07/30/98
-C
-C   Given a triangulation of a set of points in the plane,
-C this subroutine prints the adjacency lists and, option-
-C ally, the nodal coordinates on logical unit LOUT.  The
-C list of neighbors of a boundary node is followed by index
-C 0.  The numbers of boundary nodes, triangles, and arcs,
-C and the constraint curve starting indexes, if any, are
-C also printed.
-C
-C
-C On input:
-C
-C       NCC = Number of constraints.
-C
-C       LCC = List of constraint curve starting indexes (or
-C             dummy array of length 1 if NCC = 0).
-C
-C       N = Number of nodes in the triangulation.
-C           3 .LE. N .LE. 9999.
-C
-C       X,Y = Arrays of length N containing the coordinates
-C             of the nodes in the triangulation -- not used
-C             unless PRNTX = TRUE.
-C
-C       LIST,LPTR,LEND = Data structure defining the trian-
-C                        gulation.  Refer to Subroutine
-C                        TRMESH.
-C
-C       LOUT = Logical unit number for output.  0 .LE. LOUT
-C              .LE. 99.  Output is printed on unit 6 if LOUT
-C              is outside its valid range on input.
-C
-C       PRNTX = Logical variable with value TRUE if and only
-C               if X and Y are to be printed (to 6 decimal
-C               places).
-C
-C None of the parameters are altered by this routine.
-C
-C Modules required by TRPRNT:  None
-C
-C***********************************************************
-C
-      INTEGER I, INC, K, LP, LPL, LUN, NA, NABOR(100), NB,
-     .        ND, NL, NLMAX, NMAX, NODE, NN, NT
-      DATA  NMAX/9999/,  NLMAX/60/
-C
-      NN = N
-      LUN = LOUT
-      IF (LUN .LT. 0  .OR.  LUN .GT. 99) LUN = 6
-C
-C Print a heading and test the range of N.
-C
-C       WRITE (LUN,100) NN
-      IF (NN .LT. 3  .OR.  NN .GT. NMAX) THEN
-C
-C N is outside its valid range.
-C
-C       WRITE (LUN,110)
-        GO TO 5
-      ENDIF
-C
-C Initialize NL (the number of lines printed on the current
-C   page) and NB (the number of boundary nodes encountered).
-C
-      NL = 6
-      NB = 0
-      IF (.NOT. PRNTX) THEN
-C
-C Print LIST only.  K is the number of neighbors of NODE
-C   which are stored in NABOR.
-C
-C       WRITE (LUN,101)
-        DO 2 NODE = 1,NN
-          LPL = LEND(NODE)
-          LP = LPL
-          K = 0
-C
-    1     K = K + 1
-            LP = LPTR(LP)
-            ND = LIST(LP)
-            NABOR(K) = ND
-            IF (LP .NE. LPL) GO TO 1
-          IF (ND .LE. 0) THEN
-C
-C   NODE is a boundary node.  Correct the sign of the last
-C     neighbor, add 0 to the end of the list, and increment
-C     NB.
-C
-            NABOR(K) = -ND
-            K = K + 1
-            NABOR(K) = 0
-            NB = NB + 1
-          ENDIF
-C
-C   Increment NL and print the list of neighbors.
-C
-          INC = (K-1)/14 + 2
-          NL = NL + INC
-          IF (NL .GT. NLMAX) THEN
-C       WRITE (LUN,106)
-            NL = INC
-          ENDIF
-C       WRITE (LUN,103) NODE, (NABOR(I), I = 1,K)
-C          IF (K .NE. 14) WRITE (LUN,105)
-    2     CONTINUE
-      ELSE
-C
-C Print X, Y, and LIST.
-C
-C       WRITE (LUN,102)
-        DO 4 NODE = 1,NN
-          LPL = LEND(NODE)
-          LP = LPL
-          K = 0
-    3     K = K + 1
-            LP = LPTR(LP)
-            ND = LIST(LP)
-            NABOR(K) = ND
-            IF (LP .NE. LPL) GO TO 3
-          IF (ND .LE. 0) THEN
-C
-C   NODE is a boundary node.
-C
-            NABOR(K) = -ND
-            K = K + 1
-            NABOR(K) = 0
-            NB = NB + 1
-          ENDIF
-C
-C   Increment NL and print X, Y, and NABOR.
-C
-          INC = (K-1)/8 + 2
-          NL = NL + INC
-          IF (NL .GT. NLMAX) THEN
-C       WRITE (LUN,106)
-            NL = INC
-          ENDIF
-C       WRITE (LUN,104) NODE, X(NODE), Y(NODE),
-                                                                         .                    (NABOR(I), I = 1,K)
-C          IF (K .NE. 8) WRITE (LUN,105)
-    4     CONTINUE
-      ENDIF
-C
-C Print NB, NA, and NT (boundary nodes, arcs, and
-C   triangles).
-C
-      NT = 2*NN - NB - 2
-      NA = NT + NN - 1
-C      IF (NL .GT. NLMAX-6) WRITE (LUN,106)
-C       WRITE (LUN,107) NB, NA, NT
-C
-C Print NCC and LCC.
-C
-    5 CONTINUE
-C     WRITE (LUN,108) NCC
-C      IF (NCC .GT. 0) WRITE (LUN,109) (LCC(I), I = 1,NCC)
-      RETURN
-C
-C Print formats:
-C
-  100 FORMAT (///,26X,'Adjacency Sets,    N = ',I5//)
-  101 FORMAT (1X,'Node',32X,'Neighbors of Node'//)
-  102 FORMAT (1X,'Node',5X,'X(Node)',8X,'Y(Node)',
-     .        20X,'Neighbors of Node'//)
-  103 FORMAT (1X,I4,5X,14I5/(1X,9X,14I5))
-  104 FORMAT (1X,I4,2E15.6,5X,8I5/(1X,39X,8I5))
-  105 FORMAT (1X)
-  106 FORMAT (///)
-  107 FORMAT (/1X,'NB = ',I4,' Boundary Nodes',5X,
-     .        'NA = ',I5,' Arcs',5X,'NT = ',I5,
-     .        ' Triangles')
-  108 FORMAT (/1X,'NCC =',I3,' Constraint Curves')
-  109 FORMAT (1X,9X,14I5)
-  110 FORMAT (1X,10X,'*** N is outside its valid',
-     .        ' range ***')
       END

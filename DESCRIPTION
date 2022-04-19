@@ -1,12 +1,12 @@
 Package: akima
-Version: 0.6-2.3
-Date: 2021-08-17
+Version: 0.6-3.3
+Date: 2022-04-18
 Title: Interpolation of Irregularly and Regularly Spaced Data
 Authors@R: c(person("Hiroshi", "Akima", role = c("aut", "cph"),
 		     comment = "Fortran code (TOMS 760, 761, 697 and 433)"),
 	      person("Albrecht", "Gebhardt", role = c("aut", "cre", "cph"),
                      email = "albrecht.gebhardt@aau.at",
-                     comment = "R port (interp* functions), bicubic* functions"),
+                     comment = "R port (interp*, bicubic* functions), bilinear code"),
 	      person("Thomas", "Petzold", role = c("ctb", "cph"),
                      comment = "aspline function"),
               person("Martin", "Maechler", email="maechler@stat.math.ethz.ch",
@@ -26,14 +26,14 @@ License: ACM | file LICENSE
 Depends: R (>= 2.0.0)
 Imports: sp
 NeedsCompilation: yes
-Packaged: 2021-11-02 16:54:23 UTC; hornik
+Packaged: 2022-04-18 17:23:06 UTC; alge
 Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 760, 761, 697 and 433)),
-  Albrecht Gebhardt [aut, cre, cph] (R port (interp* functions), bicubic*
-    functions),
+  Albrecht Gebhardt [aut, cre, cph] (R port (interp*, bicubic*
+    functions), bilinear code),
   Thomas Petzold [ctb, cph] (aspline function),
   Martin Maechler [ctb, cph] (interp2xyz function + enhancements),
   YYYY Association for Computing Machinery, Inc. [cph] (covers code from
     TOMS 760, 761, 697 and 433)
 License_restricts_use: yes
 Repository: CRAN
-Date/Publication: 2021-11-02 17:00:48 UTC
+Date/Publication: 2022-04-19 05:32:29 UTC

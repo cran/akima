@@ -36,9 +36,6 @@ check <- function(){
                   tlptr=integer(6*n-12),
                   tlend=integer(n),
                   tlnew=as.integer(0),
-                  tnear=integer(n),
-                  tnext=integer(n),
-                  tdist=double(n),
                   ier=as.integer(0))
   if(length(ret$tdist[[is.na(ret\$tdist)]])==5)
     cat("export ALL_NAS=yes\n", file="conftest.out")
@@ -81,9 +78,6 @@ check <- function(){
                   tlptr=integer(6*n-12),
                   tlend=integer(n),
                   tlnew=as.integer(0),
-                  tnear=integer(n),
-                  tnext=integer(n),
-                  tdist=double(n),
                   ier=as.integer(0))
   if(length(ret$tdist[[is.na(ret\$tdist)]])==5)
     cat("export ALL_NAS=yes\n", file="conftest.out")

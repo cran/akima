@@ -24,39 +24,6 @@
 
 /* Fortran interface descriptions: */
 
-/* ACM 526, soon to be removed */
-static R_NativePrimitiveArgType idbvip_t[13] = {
-  INTSXP,  /* MD,   */
-  INTSXP,  /* NCP,  */
-  INTSXP,  /* NDP,  */
-  REALSXP, /* XD,   */
-  REALSXP, /* YD,   */
-  REALSXP, /* ZD,   */
-  INTSXP,  /* NIP,  */
-  REALSXP, /* XI,   */
-  REALSXP, /* YI,   */
-  REALSXP, /* ZI,   */
-  INTSXP,  /* IWK,  */
-  REALSXP, /* WK,   */
-  LGLSXP   /* MISSI */
-};
-
-static R_NativePrimitiveArgType idsfft_t[14] = {
-  INTSXP,  /* MD,   */
-  INTSXP,  /* NCP,  */
-  INTSXP,  /* NDP,  */
-  REALSXP, /* XD,   */
-  REALSXP, /* YD,   */
-  REALSXP, /* ZD,   */
-  INTSXP,  /* NXI,  */
-  INTSXP,  /* NYI,  */
-  REALSXP, /* XI,   */
-  REALSXP, /* YI,   */
-  REALSXP, /* ZI,   */
-  INTSXP,  /* IWK,  */
-  REALSXP, /* WK,   */
-  LGLSXP   /* MISSI */
-};
 
 /* ACM 760: */
 static R_NativePrimitiveArgType rgbi3p_t[12] = {
@@ -75,7 +42,7 @@ static R_NativePrimitiveArgType rgbi3p_t[12] = {
 };
 
 /* ACM 761: */
-static R_NativePrimitiveArgType sdbi3p_t[17] = {
+static R_NativePrimitiveArgType sdbi3p_t[16] = {
   INTSXP,  /* MD,     */
   INTSXP,  /* NDP,    */
   REALSXP, /* XD,     */
@@ -89,13 +56,12 @@ static R_NativePrimitiveArgType sdbi3p_t[17] = {
   REALSXP, /* WK,     */
   INTSXP,  /* IWK,    */
   LGLSXP,  /* EXTRPI, */
-  INTSXP,  /* NEAR,   */
-  INTSXP,  /* NEXT,   */
-  REALSXP, /* DIST    */
-  LGLSXP   /* LINEAR  */
+  LGLSXP,  /* LINEAR  */
+  REALSXP, /* HBRMN   */
+  INTSXP   /* NRRTT   */
 };
 
-static R_NativePrimitiveArgType sdsf3p_t[18] = {
+static R_NativePrimitiveArgType sdsf3p_t[17] = {
   INTSXP,  /* MD,     */
   INTSXP,  /* NDP,    */
   REALSXP, /* XD,     */
@@ -110,10 +76,9 @@ static R_NativePrimitiveArgType sdsf3p_t[18] = {
   REALSXP, /* WK,     */
   INTSXP,  /* IWK,    */
   LGLSXP,  /* EXTRPI, */
-  INTSXP,  /* NEAR,   */
-  INTSXP,  /* NEXT,   */
-  REALSXP, /* DIST    */
-  LGLSXP   /* LINEAR  */
+  LGLSXP,  /* LINEAR  */
+  REALSXP, /* HBRMN   */
+  INTSXP   /* NRRTT   */
 };
 
 /* ACM 697: */
@@ -140,7 +105,7 @@ static R_NativePrimitiveArgType intrpl_t[7] = {
 };
 
 /* A. Gebhardt, no ACM code: */
-static R_NativePrimitiveArgType biliip_t[9] = {
+static R_NativePrimitiveArgType biliip_t[10] = {
   REALSXP, /* X0,  */
   REALSXP, /* Y0,  */
   REALSXP, /* Z0,  */
@@ -149,19 +114,18 @@ static R_NativePrimitiveArgType biliip_t[9] = {
   REALSXP, /* Y,   */
   REALSXP, /* Z,   */
   INTSXP,  /* NX,  */
-  INTSXP   /* NY   */
+  INTSXP,  /* NY   */
+  INTSXP   /* IER  */
 };
 
 
 static R_FortranMethodDef fortranMethods[] = {
-  {"idbvip", (DL_FUNC) &F77_SUB(idbvip), 13, idbvip_t}, /* interpp.old, scheduled for removal */
-  {"idsfft", (DL_FUNC) &F77_SUB(idsfft), 14, idsfft_t}, /* interp.old, scheduled for removal  */
-  {"sdbi3p", (DL_FUNC) &F77_SUB(sdbi3p), 17, sdbi3p_t}, /* interpp     */
-  {"sdsf3p", (DL_FUNC) &F77_SUB(sdsf3p), 18, sdsf3p_t}, /* interp      */
+  {"sdbi3p", (DL_FUNC) &F77_SUB(sdbi3p), 16, sdbi3p_t}, /* interpp     */
+  {"sdsf3p", (DL_FUNC) &F77_SUB(sdsf3p), 17, sdsf3p_t}, /* interp      */
   {"uvip3p", (DL_FUNC) &F77_SUB(uvip3p), 8,  uvip3p_t}, /* aspline     */
   {"intrpl", (DL_FUNC) &F77_SUB(intrpl), 7,  intrpl_t}, /* aspline     */
   {"rgbi3p", (DL_FUNC) &F77_SUB(rgbi3p), 12, rgbi3p_t}, /* bicubic     */
-  {"biliip", (DL_FUNC) &F77_SUB(biliip), 9,  biliip_t}, /* bilinear    */
+  {"biliip", (DL_FUNC) &F77_SUB(biliip), 10, biliip_t}, /* bilinear    */
   {NULL, NULL, 0}
 };
 

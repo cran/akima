@@ -12,7 +12,8 @@ interp(x, y=NULL, z, xo=seq(min(x), max(x), length = nx),
        yo=seq(min(y), max(y), length = ny),
        linear = TRUE, extrap=FALSE, duplicate = "error", dupfun = NULL,
        nx = 40, ny = 40,
-       jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE)
+       jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE,
+       remove = !linear)
 }
 \arguments{
   \item{x}{
@@ -96,6 +97,12 @@ interp(x, y=NULL, z, xo=seq(min(x), max(x), length = nx),
   \item{jitter.random}{logical, see \code{jitter}, defaults to
     \code{FALSE}
   }
+  \item{remove}{logical, indicates whether Akimas removal of thin triangles along
+    the border of the convex hull should be performed, experimental setting!
+    defaults to \code{!linear}, so it will be left out for linear interpolation
+    by default. For some point configurations it is the only
+    available option to skip this removal step.
+  }
 }
 \value{
   list with 3 components:
@@ -113,12 +120,14 @@ interp(x, y=NULL, z, xo=seq(min(x), max(x), length = nx),
   \code{SpatialPixelssDataFrame} is returned.
 }
 \note{
-  \code{interp} uses Akimas new Fortran code from 1996
-  for spline interpolation, the triangulation (based on Renkas tripack)
-  is reused for linear interpolation. In this newer version Akima
-  switched from his own triangulation to Renkas tripack (=TOMS 751).
+  \code{interp} uses Akimas new Fortran code (ACM 761) from 1996 in the revised
+  version by Renka from 1998 for spline interpolation, the triangulation
+  (based on Renkas tripack) is reused for linear interpolation. In this
+  newer version Akima switched from his own triangulation to Renkas
+  tripack (ACM 751).
 
-  Note that S-Plus uses (used?) the old Fortran code from Akima 1978.
+  Note that earlier versions (up to version 0.5-12) as well as S-Plus
+  used the old Fortran code from Akima 1978 (ACM 526).
 
   The resulting structure is suitable for input to the
   functions \code{\link{contour}} and \code{\link{image}}.  Check
@@ -157,6 +166,10 @@ interp(x, y=NULL, z, xo=seq(min(x), max(x), length = nx),
   two-dimensional Delaunay triangulation package.
   ACM Transactions on Mathematical Software.
   \bold{22}, 1-8.
+
+  R. J. Renka and Ron Brown (1998). Remark on algorithm 761.
+  ACM Transactions on Mathematical Software.
+  \bold{24}, 383-385.
 }
 \seealso{
   \code{\link{contour}}, \code{\link{image}},

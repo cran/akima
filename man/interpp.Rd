@@ -6,7 +6,8 @@
 \usage{
 interpp(x, y=NULL, z, xo, yo=NULL, linear=TRUE, extrap=FALSE,
         duplicate = "error", dupfun = NULL,
-        jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE)
+        jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE,
+        remove = !linear)
 }
 \arguments{
   \item{x}{
@@ -80,6 +81,12 @@ interpp(x, y=NULL, z, xo, yo=NULL, linear=TRUE, extrap=FALSE,
   \item{jitter.random}{logical, see \code{jitter}, defaults to
     \code{FALSE}
   }
+  \item{remove}{logical, indicates whether Akimas removal of thin triangles along
+    the border of the convex hull should be performed, experimental setting!
+    defaults to \code{!linear}, so it will be left out for linear interpolation
+    by default. For some point configurations it is the only
+    available option to skip this removal step.
+  }
 }
 \value{
   list with 3 components:
@@ -145,6 +152,10 @@ interpp(x, y=NULL, z, xo, yo=NULL, linear=TRUE, extrap=FALSE,
   two-dimensional Delaunay triangulation package.
   ACM Transactions on Mathematical Software.
   \bold{22}, 1-8.
+
+  R. J. Renka and Ron Brown (1998). Remark on algorithm 761.
+  ACM Transactions on Mathematical Software.
+  \bold{24}, 383-385.
 }
 \seealso{
   \code{\link[graphics]{contour}}, \code{\link[graphics]{image}},
@@ -157,7 +168,7 @@ data(akima)
 # linear interpolation at points (1,2), (5,6) and (10,12)
 akima.lip<-interpp(akima$x, akima$y, akima$z,c(1,5,10),c(2,6,12))
 akima.lip$z
-# spline interpolation
+# spline interpolation at the same locations
 akima.sip<-interpp(akima$x, akima$y, akima$z,c(1,5,10),c(2,6,12),
   linear=FALSE)
 akima.sip$z
@@ -171,7 +182,7 @@ akima.sip$z
     ## interpolate on this 30 points:
     ## note: both "meuse" and "m0" are sp objects
     ## (SpatialPointsDataFrame) !!
-    ## arguments z and xo have to named, y has to be omitted!
+    ## arguments z and xo have to given, y has to be omitted!
     ipp <- interpp(meuse,z="zinc",xo=m0)
     spplot(ipp)
 }

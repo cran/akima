@@ -19,9 +19,12 @@ bilinear <- function(x,y,z,x0,y0){
                   as.double(z),
                   as.integer(nx),
                   as.integer(ny),
+                  ier=integer(1),
                   PACKAGE="akima")
-
-    list(x=x0,y=y0,z=ret$z0)
+  if(ret$ier==1)
+      stop("duplicate coordinates in input grid!")
+  else
+      list(x=x0,y=y0,z=ret$z0)
 }
 
 

@@ -4,7 +4,8 @@ interp <-
              yo = seq(min(y), max(y), length = ny), linear = TRUE,
              extrap = FALSE, duplicate = "error", dupfun = NULL,
              nx=40, ny=40,
-             jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE)
+             jitter = 10^-12, jitter.iter = 6, jitter.random = FALSE,
+             remove = !linear)
 {
     ## handle sp data, save coordinate and value names
     is.sp <- FALSE
@@ -12,7 +13,7 @@ interp <-
     sp.z <- NULL
     sp.proj4string <- NULL
     if(is.null(y)&&is.character(z)){
-        if(class(x)=="SpatialPointsDataFrame"){
+        if(inherits(x,"SpatialPointsDataFrame")){
             sp.coord <- dimnames(coordinates(x))[[2]]
             sp.z <- z
             sp.proj4string <- x@proj4string
@@ -25,12 +26,6 @@ interp <-
         } else
             stop("either x,y,z are numerical or x is SpatialPointsDataFrame and z a name of a data column in x")
     }
-    ## FIXME: drop old akima code
-    if(linear)
-    ret <- interp.old(x,y,z,xo,yo,ncp=0,extrap=FALSE,
-                      duplicate=duplicate,dupfun=dupfun)
-    else {
-
     if(!(all(is.finite(x)) && all(is.finite(y)) && all(is.finite(z))))
         stop("missing values and Infs not allowed")
 
@@ -77,6 +72,12 @@ interp <-
     ## storage.mode(zo) <- "double"
     miss <- !extrap             # if not extrapolating, set missing values
 
+    ## Defaults from Fortran code for triangle removal moved to R code,
+    ## see SDTRTT:
+    hbrmn <- 0.1 # height to base ratio for thin triangles
+    nrrtt <- 5   # recursion depth for triangle removal, 0 disables
+    if(!remove) nrrtt <- 0
+
     ans <- .Fortran("sdsf3p",
                     md = as.integer(1),
                     ndp = as.integer(n),
@@ -89,16 +90,20 @@ interp <-
                     y = as.double(yo),
                     z = as.double(matrix(0,nx,ny)),
                     ier = integer(1),
-                    wk = double(36 * n),
-                    iwk = integer(25 * n),
+                    wk = double(36 * 5* n),
+                    iwk = integer(39 * n),
                     extrap = as.logical(matrix(extrap,nx,ny)),
-                    near = integer(n),
-                    nxt = integer(n),
-                    dist = double(n),
                     linear = as.logical(linear),
+                    hbrmn = as.double(hbrmn),
+                    nrrtt = as.integer(nrrtt),
                     PACKAGE = "akima")
     if(miss)
         ans$z[ans$extrap] <- NA
+
+    ## Error code 11 from sdsf3p indicates failure of thin triangle removal.
+    if(ans$ier==11){
+        stop("removal of thin triangles from border failed. try to re-run with remove=FALSE")
+    }
 
     ## Error code 10 from sdsf3p indicates error code -2 from trmesh:
     ## first three points collinear.
@@ -150,13 +155,12 @@ interp <-
                             y = as.double(yo),
                             z = as.double(matrix(0,nx,ny)),
                             ier = integer(1),
-                            double(36 * n),
-                            integer(25 * n),
+                            double(36 * 5* n),
+                            integer(39 * n),
                             extrap = as.logical(matrix(extrap,nx,ny)),
-                            near = integer(n),
-                            nxt = integer(n),
-                            dist = double(n),
                             linear = as.logical(linear),
+                            hbrmn = as.double(hbrmn),
+                            nrrtt = as.integer(nrrtt),
                             PACKAGE = "akima")
             if(miss)
                 ans$z[ans$extrap] <- NA
@@ -170,8 +174,8 @@ interp <-
     }
     ## prepare return value
     if(is.sp){
-        zm <- dim(ans$z)[1]
-        zn <- dim(ans$z)[2]
+        zm <- nx
+        zn <- ny
         zvec <- c(ans$z)
         xvec <- c(matrix(rep(ans$x,zn),nrow=zm,ncol=zn,byrow=FALSE))
         yvec <- c(matrix(rep(ans$y,zm),nrow=zm,ncol=zn,byrow=TRUE))
@@ -184,6 +188,5 @@ interp <-
     } else {
         ret <- list(x=ans$x,y=ans$y,z=matrix(ans$z,nx,ny))
     }
-    } ## END FIXME
     ret
 }

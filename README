@@ -2,8 +2,8 @@ This library contains an R implementation of the S-Plus function interp().
 
 I used Fortran code for cubic spline interpolation from H. Akima available 
 at http://www.netlib.org/toms .
-There are two version, one from 1978 (AMS code 526, used in SPlus 3.x) and a 
-newer one (AMS 761) from 1996. The original versions are in the directory orig/.
+There are two version, one from 1978 (ACM code 526, used in SPlus 3.x) and a 
+newer one (ACM 761) from 1996. The original versions are in the directory orig/.
 
 I only had to write a subroutine idptli.f for linear interpolation within
 triangles from the delauney triangulation.
@@ -14,6 +14,10 @@ arbitraryly choosen points and generates no regular grid as interp() does.
 interp() actually calls interp.new() or interp.old() depending on its arguments,
 linear interpolation is done by interp.old(), spline interpolation by interp.new
 .
+
+UPDATE (27.12.2016):
+Remove ACM 526 code, switch completely to ACM 761 in Renka/Browns version
+from 1998
 
 UPDATE (13.12.2004):
 
@@ -26,6 +30,7 @@ ACM subscription):
 TOMS 433: http://dl.acm.org/citation.cfm?id=355604.355605
 TOMS 526: http://dl.acm.org/citation.cfm?id=355780.355787
 TOMS 697: http://dl.acm.org/citation.cfm?id=114697.116808
+TOMS 760: http://dl.acm.org/citation.cfm?id=232854.232854
 TOMS 761: http://dl.acm.org/citation.cfm?id=232826.232856
 
 Original Fortran code is freely available at Netlib/TOMS -- Collected Algorithms 
@@ -33,6 +38,7 @@ of the ACM at:
 http://www.netlib.org/toms/433
 http://www.netlib.org/toms/526
 http://www.netlib.org/toms/697
+http://www.netlib.org/toms/760
 http://www.netlib.org/toms/761
 
 UPDATE: (28.02.2013)

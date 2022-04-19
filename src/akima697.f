@@ -86,7 +86,7 @@ C Initialization added by ThPe
       ID2=0
       ID3=0
 C Error check
-   10 IF (ND.LE.1)   GO TO 90
+      IF (ND.LE.1)   GO TO 90
       IF (NI.LE.0)   GO TO 91
       DO 11  ID=2,ND
         IF (XD(ID).LE.XD(ID-1))     GO TO 92
@@ -95,13 +95,13 @@ C Branches off special cases.
       IF (ND.LE.4)   GO TO 50
 C General case  --  Five data points of more
 C Calculates some local variables.
-   20 NP0=MAX(3,NP)
+      NP0=MAX(3,NP)
       NPM1=NP0-1
       RENPM1=NPM1
       RENNM2=NP0*(NP0-2)
 C Main calculation for the general case
 C First (outermost) DO-loop with respect to the desired points
-   30 DO 39  II=1,NI
+      DO 39  II=1,NI
         IF (II.EQ.1)      IINTPV=-1
         XII=XI(II)
 C Locates the interval that includes the desired point by binary
@@ -395,7 +395,5 @@ C Error exit
    91 ERR=2
       RETURN
    92 ERR=3
-      RETURN
-   99 ERR=10
       RETURN
       END

@@ -3,13 +3,14 @@ http://www.acm.org/publications/policies/software-copyright-notice
 
 In detail:
 
-1. Fortran code (src/*.f): 
+1. Fortran code (src/*.f except src/bilinear.f): 
 
 Copyrighted and Licensed by ACM, 
 see http://www.acm.org/publications/policies/software-copyright-notice
 
 
-2. R interface (src/init.c src/akima.h R/*.R man/*.Rd data/*): 
+2. R interface (src/init.c src/akima.h R/*.R man/*.Rd data/* 
+   except */bilinear.*)
 
 The R interface code has been developed as work based on the 
 ACM licensed code, hence it is also ACM licensed, copyright 
@@ -21,6 +22,7 @@ and to fulfill this, the modified work including the R interface
 is available free to secondary users, and no charge is associated 
 with such copies.
 
-
+3. Bilinear interpolation (*/bilinear*): Copyright A. Gebhardt, 
+   free to reuse whithout restrictions.
 
 

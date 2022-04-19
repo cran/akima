@@ -1,5 +1,5 @@
-      SUBROUTINE SDBI3P(MD,NDP,XD,YD,ZD,NIP,XI,YI, ZI,IER, WK,IWK,
-     +                  EXTRPI,NEAR,NEXT,DIST,LINEAR)
+      SUBROUTINE SDBI3P(MD,NDP,XD,YD,ZD,NIP,XI,YI,ZI,IER,WK,IWK,
+     +                  EXTRPI,LINEAR,HBRMN,NRRTT)
 *
 * Scattered-data bivariate interpolation
 * (a master subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -40,18 +40,24 @@
 *       = 1 for NDP = 9 or less
 *       = 2 for NDP not equal to NDPPV
 *       = 3 for NIP = 0 or less
-*       = 9 for errors in SDTRAN called by this subroutine, except the next one
+*       = 9 for errors in SDTRAN called by this subroutine.
+*       agebhard:
 *       =10 for error 2 in SDTRAN (first three points collinear), as this can
 *           be fixed by adding jitter to the locations in the calling routine.
 *
 * The other arguments are
 *   WK  = two-dimensional array of dimension NDP*17 used
 *         internally as a work area,
-*   IWK = two-dimensional integer array of dimension NDP*25
+*   IWK = two-dimensional integer array of dimension NDP*39
 *         used internally as a work area.
+* agebhard: additional arguments:
+* LINEAR = switches between splines (Akima) and linear interpolation
+* EXTRPI = indicates whether point was extrapolated or not
 *
-* agebhard@uni-klu.ac.at: added from new TRIPACK:
-*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
+*     HBRMN and NRRTT = (experimental!) params of SDTRTT changed to arguments
+*              use NRRTT=0 to completely switch off Akimas "remove
+*              triangles from boundary step", should be default for
+*              linear interpolation.
 *
 * The very first call to this subroutine and the call with a new
 * NDP value or new XD and YD arrays must be made with MD=1.  The
@@ -63,11 +69,6 @@
 * the call with MD=3 and its preceding call, the WK and IWK
 * arrays must not be disturbed.
 *
-* The user of this subroutine can save the storage, by NDP*6
-* numerical storage units, by placing the statement
-*     EQUIVALENCE (WK(1,1),IWK(1,20))
-* in the program that calls this subroutine.
-*
 * The constant in the PARAMETER statement below is
 *   NIPIMX = maximum number of output points to be processed
 *            at a time.
@@ -76,6 +77,15 @@
 * This subroutine calls the SDTRAN, SDPD3P, SDLCTN, and SDPLNL
 * subroutines.
 *
+* Comments added to Remark:
+*
+* It also calls TRMESH from the TRIPACK package of ACM Algorithm
+* 751 by R. J. Renka.  The TRMESH subroutine in turn calls either
+* directly or indirectly 12 other subprograms included in the
+* package.  In addition, a newly added routine, GRADC, is called
+* to compute partial derivatives at those nodes for which the
+* cubic fit failed due to ill-conditioning.
+*
 *
 * Specification statements
 *     .. Parameters ..
@@ -83,24 +93,26 @@
       PARAMETER        (NIPIMX=51)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IER,MD,NDP,NIP,NEAR(NDP),NEXT(NDP)
+      DOUBLE PRECISION HBRMN
+      INTEGER          IER,MD,NDP,NIP,NRRTT
       LOGICAL          LINEAR
-
 *     ..
 *     .. Array Arguments ..
-      DOUBLE PRECISION             WK(NDP,17),XD(NDP),XI(NIP),YD(NDP),
-     +                 YI(NIP),ZD(NDP),ZI(NIP),DIST(NDP)
-      INTEGER          IWK(NDP,25)
+*     agebhard: increase linenumber of WK by factor 5
+      DOUBLE PRECISION             WK(NDP*5,17),XD(NDP),XI(NIP),YD(NDP),
+     +                 YI(NIP),ZD(NDP),ZI(NIP)
+      INTEGER          IWK(NDP,39)
       LOGICAL          EXTRPI(NIP)
 *     ..
 *     .. Local Scalars ..
-      INTEGER          IERT,IIP,NDPPV,NIPI,NL,NT
+      DOUBLE PRECISION             PDX,PDXX,PDXY,PDY,PDYY
+      INTEGER          I,IERT,IIP,J,K,L,LNEW,NDPPV,NIPI,NL,NT
 *     ..
 *     .. Local Arrays ..
-      INTEGER          ITLI(NIPIMX),KTLI(NIPIMX)
+      INTEGER          ITLI(NIPIMX),KTLI(NIPIMX),LCC(1)
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL         SDLCTN,SDPD3P,SDPLNL,SDTRAN
+      EXTERNAL         GRADC,ICOPY,SDLCTN,SDPD3P,SDPLNL,SDTRAN,TRMESH
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC        MIN
@@ -109,78 +121,109 @@
       SAVE             NDPPV,NT,NL
 *     ..
 * Error check
-      IF (NDP.LE.9) GO TO 20
+      IF (NDP.LE.9) GO TO 30
       IF (MD.NE.2 .AND. MD.NE.3) THEN
           NDPPV = NDP
       ELSE
-          IF (NDP.NE.NDPPV) GO TO 30
+          IF (NDP.NE.NDPPV) GO TO 40
       END IF
-      IF (NIP.LE.0) GO TO 40
+      IF (NIP.LE.0) GO TO 50
 * Triangulates the x-y plane.  (for MD=1)
       IF (MD.NE.2 .AND. MD.NE.3) THEN
-          CALL SDTRAN(NDP,XD,YD, NT,IWK(1,1),NL,IWK(1,7),IERT,
-     +                IWK(1,1),IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9),
-     +                NEAR,NEXT,DIST)
-*         CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
-*    +                LIST,LPTR,LEND,LTRI,ITL)
-          IF (IERT.EQ.2) GO TO 55
-          IF (IERT.GT.0) GO TO 50
+          CALL TRMESH(NDP,XD,YD,IWK(1,1),IWK(1,7),IWK(1,13),LNEW,IERT)
+          IF (IERT.EQ.-2) GO TO 55
+          IF (IERT.LT.0) GO TO 60
+* Copies triangulation data structure to IWK(1,26).
+          CALL ICOPY(LNEW-1,IWK(1,1),IWK(1,26))
+          CALL ICOPY(LNEW-1,IWK(1,7),IWK(1,32))
+          CALL ICOPY(NDP,IWK(1,13),IWK(1,38))
+          CALL SDTRAN(NDP,XD,YD,NT,IWK(1,1),NL,IWK(1,7),IERT,IWK(1,1),
+     +                IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9),HBRMN,NRRTT)
+*       CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
+*    1              LIST,LPTR,LEND,LTRI,ITL)
+          IF (IERT.EQ.6) GO TO 65
+          IF (IERT.GT.0) GO TO 60
       END IF
 * Estimates partial derivatives at all data points.  (for MD=1,2)
-      IF (MD.NE.3) THEN
-          CALL SDPD3P(NDP,XD,YD,ZD, WK(1,1), WK(1,6),WK(1,15),WK(1,17),
-     +                IWK(1,9),IWK(1,10),IWK(1,19))
-*         CALL SDPD3P(NDP,XD,YD,ZD, PDD, CF3,CFL1,DSQ,IDSQ,IPC,NCP)
+      IF (MD.NE.3 .AND. (.NOT. LINEAR)) THEN
+          CALL SDPD3P(NDP,XD,YD,ZD,WK(1,1),WK(1,6),WK(1,15),WK(1,17),
+     +                IWK(1,9),IWK(1,10),IWK(1,19),IWK(1,39))
+*       CALL SDPD3P(NDP,XD,YD,ZD, PDD,
+*    1              CF3,CFL1,DSQ,IDSQ,IPC,NCP)
+* If non-cubic order at node, replace with cubic from GRADC
+* agebhard: this uses 5*NDP lines of WK, so increase its size, see above
+          L = 0
+          DO 10 K = 1,NDP
+              IF (IWK(K,39).LT.3 .AND. (.NOT. LINEAR)) THEN
+                  CALL GRADC(K,0,LCC,NDP,XD,YD,ZD,IWK(1,26),IWK(1,32),
+     +                       IWK(1,38),PDX,PDY,PDXX,PDXY,PDYY,IERT)
+                  IF (IERT.GE.0) THEN
+                      J = L/NDP
+                      I = L-NDP*J
+                      J = J + 1
+                      WK(I+1,J) = PDX
+                      WK(I+2,J) = PDY
+                      WK(I+3,J) = PDXX
+                      WK(I+4,J) = PDXY
+                      WK(I+5,J) = PDYY
+                  END IF
+              END IF
+              L = L + 5
+   10     CONTINUE
       END IF
 * Locates all points at which interpolation is to be performed
 * and interpolates the ZI values.  (for MD=1,2,3)
-      DO 10 IIP = 1,NIP,NIPIMX
+      DO 20 IIP = 1,NIP,NIPIMX
           NIPI = MIN(NIP-IIP+1,NIPIMX)
           CALL SDLCTN(NDP,XD,YD,NT,IWK(1,1),NL,IWK(1,7),NIPI,XI(IIP),
-     +                YI(IIP), KTLI,ITLI)
-*         CALL SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,NIP,XI,YI, KTLI,ITLI)
-          CALL SDPLNL(NDP,XD,YD,ZD,NT,IWK(1,1),NL,IWK(1,7),WK(1,1),NIPI,
-     +                XI(IIP),YI(IIP),KTLI,ITLI, ZI(IIP), EXTRPI(IIP))
-*         CALL SDPLNL(NDP,XD,YD,ZD,NT,IPT,NL,IPL,PDD,
-*    +                NIP,XI,YI,KTLI,ITLI, ZI)
-   10 CONTINUE
+     +                YI(IIP),KTLI,ITLI)
+*       CALL SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,
+*    1              NIP,XI,YI, KTLI,ITLI)
+          IF (LINEAR) THEN
+             CALL SDLIPL(NDP,XD,YD,ZD,NT,IWK(1,1),
+     +            NIPI,XI(IIP),YI(IIP),KTLI,ITLI, ZI(IIP),
+     +            EXTRPI(IIP))
+          ELSE
+             CALL SDPLNL(NDP,XD,YD,ZD,NT,IWK(1,1),NL,IWK(1,7),WK(1,1),
+     +            NIPI,XI(IIP),YI(IIP),KTLI,ITLI,ZI(IIP),
+     +            EXTRPI(IIP))
+*       CALL SDPLNL(NDP,XD,YD,ZD,NT,IPT,NL,IPL,PDD,
+*    1              NIP,XI,YI,KTLI,ITLI, ZI)
+             END IF
+   20 CONTINUE
 * Normal return
       IER = 0
       RETURN
 * Error exit
-   20 CONTINUE
-C     WRITE (*,FMT=9000) MD,NDP
+ 30   CONTINUE
+c   30 WRITE (*,FMT=9000) MD,NDP
       IER = 1
       RETURN
-   30 CONTINUE
-C     WRITE (*,FMT=9010) MD,NDP,NDPPV
+ 40   CONTINUE
+c   40 WRITE (*,FMT=9010) MD,NDP,NDPPV
       IER = 2
       RETURN
-   40 CONTINUE
-C     WRITE (*,FMT=9020) MD,NDP,NIP
+ 50   CONTINUE
+c   50 WRITE (*,FMT=9020) MD,NDP,NIP
       IER = 3
-      RETURN
-   50 CONTINUE
-C     WRITE (*,FMT=9030)
-      IER = 9
       RETURN
  55   CONTINUE
 C first three points collinear:
       IER = 10
       RETURN
-* Format statement for error message
- 9000 FORMAT (' ',/,'*** SDBI3P Error 1: NDP = 9 or less',/,'    MD =',
-     +       I5,',  NDP =',I5,/)
- 9010 FORMAT (' ',/,'*** SDBI3P Error 2: NDP not equal to NDPPV',/,
-     +       '    MD =',I5,',  NDP =',I5,',  NDPPV =',I5,/)
- 9020 FORMAT (' ',/,'*** SDBI3P Error 3: NIP = 0 or less',/,'    MD =',
-     +       I5,',  NDP =',I5,',  NIP =',I5,/)
- 9030 FORMAT ('    Error detected in SDTRAN called by SDBI3P',/)
+ 60   CONTINUE
+c   60 WRITE (*,FMT=9030)
+      IER = 9
+      RETURN
+ 65   CONTINUE
+c     triangle removal fails
+      IER = 11
+      RETURN
       END
 
 
-      SUBROUTINE SDSF3P(MD,NDP,XD,YD,ZD,NXI,XI,NYI,YI, ZI,IER, WK,IWK,
-     +                  EXTRPI,NEAR,NEXT,DIST,LINEAR)
+      SUBROUTINE SDSF3P(MD,NDP,XD,YD,ZD,NXI,XI,NYI,YI,ZI,IER,WK,IWK,
+     +                  EXTRPI,LINEAR,HBRMN,NRRTT)
 *
 * Scattered-data smooth surface fitting
 * (a master subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -225,18 +268,25 @@ C first three points collinear:
 *       = 2 for NDP not equal to NDPPV
 *       = 3 for NXI = 0 or less
 *       = 4 for NYI = 0 or less
-*       = 9 for errors in SDTRAN called by this subroutine, except the next one
-*       =10 for error 2 in SDTRAN (first three points collinear), as this can
+*       = 9 for errors in SDTRAN and TRMESH called by this subroutine.
+*       agebhard:
+*       =10 for error 2 in TRMESH (first three points collinear), as this can
 *           be fixed by adding jitter to the locations in the calling routine.
+*       =11 if triangle removal fails, caller should rerun with NRRTT=0
 *
 * The other arguments are
 *   WK  = two-dimensional array of dimension NDP*36 used
 *         internally as a work area,
-*   IWK = two-dimensional integer array of dimension NDP*25
+*   IWK = two-dimensional integer array of dimension NDP*39
 *         used internally as a work area.
 *
-* agebhard@uni-klu.ac.at: added from new TRIPACK:
-*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
+* agebhard: additional arguments:
+* LINEAR = switches between splines (Akima) and linear interpolation
+* EXTRPI = indicates whether point was extrapolated or not
+*     HBRMN and NRRTT = (experimental!) params of SDTRTT changed to arguments
+*              use NRRTT=0 to completely switch off Akimas "remove
+*              triangles from boundary step", should be default for
+*              linear interpolation.
 *
 * The very first call to this subroutine and the call with a new
 * NDP value or new XD and YD arrays must be made with MD=1.  The
@@ -248,11 +298,6 @@ C first three points collinear:
 * the call with MD=3 and its preceding call, the WK and IWK
 * arrays must not be disturbed.
 *
-* The user of this subroutine can save the storage, by NDP*6
-* numeric storage units, by placing the statement
-*     EQUIVALENCE (WK(1,1),IWK(1,20))
-* in the program that calls this subroutine.
-*
 * The constant in the PARAMETER statement below is
 *   NIPIMX = maximum number of output points to be processed
 *            at a time.
@@ -261,6 +306,13 @@ C first three points collinear:
 * This subroutine calls the SDTRAN, SDPD3P, SDLCTN, and SDPLNL
 * subroutines.
 *
+* It also calls TRMESH from the TRIPACK package of ACM Algorithm
+* 751 by R. J. Renka.  The TRMESH subroutine in turn calls either
+* directly or indirectly 12 other subprograms included in the
+* package.  In addition, a newly added routine, GRADC, is called
+* to compute partial derivatives at those nodes for which the
+* cubic fit failed due to ill-conditioning.
+*
 *
 * Specification statements
 *     .. Parameters ..
@@ -268,24 +320,27 @@ C first three points collinear:
       PARAMETER        (NIPIMX=51)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IER,MD,NDP,NXI,NYI,NEAR(NDP),NEXT(NDP)
-      LOGICAL          LINEAR
+      DOUBLE PRECISION HBRMN
+      INTEGER          IER,MD,NDP,NXI,NYI,NRRTT
+      LOGICAL LINEAR
 *     ..
 *     .. Array Arguments ..
-      DOUBLE PRECISION             WK(NDP,17),XD(NDP),XI(NXI),YD(NDP),
-     +                 YI(NYI),ZD(NDP),ZI(NXI,NYI),DIST(NDP)
-      INTEGER          IWK(NDP,25)
+*     agebhard: increase linenumber of WK by factor 5!
+      DOUBLE PRECISION             WK(NDP*5,17),XD(NDP),XI(NXI),YD(NDP),
+     +                 YI(NYI),ZD(NDP),ZI(NXI,NYI)
+      INTEGER          IWK(NDP,39)
       LOGICAL          EXTRPI(NXI,NYI)
 *     ..
 *     .. Local Scalars ..
-      INTEGER          IERT,IIP,IXI,IYI,NDPPV,NIPI,NL,NT
+      DOUBLE PRECISION             PDX,PDXX,PDXY,PDY,PDYY
+      INTEGER          I,IERT,IIP,IXI,IYI,J,K,L,LNEW,NDPPV,NIPI,NL,NT
 *     ..
 *     .. Local Arrays ..
       DOUBLE PRECISION             YII(NIPIMX)
-      INTEGER          ITLI(NIPIMX),KTLI(NIPIMX)
+      INTEGER          ITLI(NIPIMX),KTLI(NIPIMX),LCC(1)
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL         SDLCTN,SDPD3P,SDPLNL,SDTRAN
+      EXTERNAL         GRADC,ICOPY,SDLCTN,SDPD3P,SDPLNL,SDTRAN,TRMESH
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC        MIN
@@ -294,97 +349,126 @@ C first three points collinear:
       SAVE             NDPPV,NT,NL
 *     ..
 * Error check
-      IF (NDP.LE.9) GO TO 40
+      IF (NDP.LE.9) GO TO 50
       IF (MD.NE.2 .AND. MD.NE.3) THEN
           NDPPV = NDP
       ELSE
-          IF (NDP.NE.NDPPV) GO TO 50
+          IF (NDP.NE.NDPPV) GO TO 60
       END IF
-      IF (NXI.LE.0) GO TO 60
-      IF (NYI.LE.0) GO TO 70
+      IF (NXI.LE.0) GO TO 70
+      IF (NYI.LE.0) GO TO 80
 * Triangulates the x-y plane.  (for MD=1)
       IF (MD.NE.2 .AND. MD.NE.3) THEN
-          CALL SDTRAN(NDP,XD,YD, NT,IWK(1,1),NL,IWK(1,7),IERT,
-     +                IWK(1,1),IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9),
-     +                NEAR,NEXT,DIST)
-*         CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
-*    +                LIST,LPTR,LEND,LTRI,ITL)
-          IF (IERT.EQ.2) GO TO 85
-          IF (IERT.GT.0) GO TO 80
+          CALL TRMESH(NDP,XD,YD,IWK(1,1),IWK(1,7),IWK(1,13),LNEW,IERT)
+*   IERT = error flag from the TRMESH subroutine,
+*        =  0 for no errors
+*        = -1 for NDP = 3 or less
+*        = -2 for the first three collinear data points,
+*        =  L for the Lth data point identical to some
+*           Mth data point, M > L.
+          IF (IERT.EQ.-2) GO TO 85
+          IF (IERT.LT.0) GO TO 90
+* Copies triangulation data structure to IWK(1,26).
+          CALL ICOPY(LNEW-1,IWK(1,1),IWK(1,26))
+          CALL ICOPY(LNEW-1,IWK(1,7),IWK(1,32))
+          CALL ICOPY(NDP,IWK(1,13),IWK(1,38))
+          CALL SDTRAN(NDP,XD,YD,NT,IWK(1,1),NL,IWK(1,7),IERT,IWK(1,1),
+     +                IWK(1,7),IWK(1,13),IWK(1,14),IWK(1,9),HBRMN,NRRTT)
+*       CALL SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT,
+*    1              LIST,LPTR,LEND,LTRI,ITL)
+          IF (IERT.EQ.6) GO TO 95
+          IF (IERT.GT.0) GO TO 90
       END IF
 * Estimates partial derivatives at all data points.  (for MD=1,2)
       IF (MD.NE.3 .AND. (.NOT. LINEAR)) THEN
-          CALL SDPD3P(NDP,XD,YD,ZD, WK(1,1), WK(1,6),WK(1,15),WK(1,17),
-     +                IWK(1,9),IWK(1,10),IWK(1,19))
-*         CALL SDPD3P(NDP,XD,YD,ZD, PDD, CF3,CFL1,DSQ,IDSQ,IPC,NCP)
+          CALL SDPD3P(NDP,XD,YD,ZD,WK(1,1),WK(1,6),WK(1,15),WK(1,17),
+     +                IWK(1,9),IWK(1,10),IWK(1,19),IWK(1,39))
+*       CALL SDPD3P(NDP,XD,YD,ZD, PDD,
+*    1              CF3,CFL1,DSQ,IDSQ,IPC,NCP)
+* If non-cubic order at node, replace with cubic from GRADC
+* agebhard: this uses 5*NDP lines of WK, so increase its size, see above
+          L = 0
+          DO 10 K = 1,NDP
+              IF (IWK(K,39).LT.3 .AND. (.NOT. LINEAR)) THEN
+                  CALL GRADC(K,0,LCC,NDP,XD,YD,ZD,IWK(1,26),IWK(1,32),
+     +                       IWK(1,38),PDX,PDY,PDXX,PDXY,PDYY,IERT)
+                  IF (IERT.GE.0) THEN
+                      J = L/NDP
+                      I = L-NDP*J
+                      J = J + 1
+                      WK(I+1,J) = PDX
+                      WK(I+2,J) = PDY
+                      WK(I+3,J) = PDXX
+                      WK(I+4,J) = PDXY
+                      WK(I+5,J) = PDYY
+                  END IF
+              END IF
+              L = L + 5
+   10     CONTINUE
       END IF
 * Locates all grid points at which interpolation is to be
 * performed and interpolates the ZI values.  (for MD=1,2,3)
-      DO 30 IYI = 1,NYI
-          DO 10 IIP = 1,NIPIMX
+      DO 40 IYI = 1,NYI
+          DO 20 IIP = 1,NIPIMX
               YII(IIP) = YI(IYI)
-   10     CONTINUE
-          DO 20 IXI = 1,NXI,NIPIMX
+   20     CONTINUE
+          DO 30 IXI = 1,NXI,NIPIMX
               NIPI = MIN(NXI-IXI+1,NIPIMX)
               CALL SDLCTN(NDP,XD,YD,NT,IWK(1,1),NL,IWK(1,7),NIPI,
-     +                    XI(IXI),YII, KTLI,ITLI)
-*             CALL SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,NIP,XI,YI, KTLI,ITLI)
+     +                    XI(IXI),YII,KTLI,ITLI)
+*         CALL SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,
+*    1                NIP,XI,YI, KTLI,ITLI)
+*    agebhard: add linear interpolation:
               IF (LINEAR) THEN
-              CALL SDLIPL(NDP,XD,YD,ZD,NT,IWK(1,1),NL,IWK(1,7),
-     +                    NIPI,XI(IXI),YII,KTLI,ITLI, ZI(IXI,IYI),
-     +                    EXTRPI(IXI,IYI))
+                 CALL SDLIPL(NDP,XD,YD,ZD,NT,IWK(1,1),
+     +                       NIPI,XI(IXI),YII,KTLI,ITLI, ZI(IXI,IYI),
+     +                       EXTRPI(IXI,IYI))
               ELSE
               CALL SDPLNL(NDP,XD,YD,ZD,NT,IWK(1,1),NL,IWK(1,7),WK(1,1),
-     +                    NIPI,XI(IXI),YII,KTLI,ITLI, ZI(IXI,IYI),
+     +                    NIPI,XI(IXI),YII,KTLI,ITLI,ZI(IXI,IYI),
      +                    EXTRPI(IXI,IYI))
-*             CALL SDPLNL(NDP,XD,YD,ZD,NT,ITP,NL,IPL,PDD,
-*    +                    NIP,XI,YI,KTLI,ITLI, ZI)
+*         CALL SDPLNL(NDP,XD,YD,ZD,NT,ITP,NL,IPL,PDD,
+*    1                NIP,XI,YI,KTLI,ITLI, ZI)
               END IF
-   20     CONTINUE
-   30 CONTINUE
+   30     CONTINUE
+   40 CONTINUE
 * Normal return
       IER = 0
       RETURN
 * Error exit
-   40 CONTINUE
-C     WRITE (*,FMT=9000) MD,NDP
+ 50   CONTINUE
+c   50 WRITE (*,FMT=9000) MD,NDP
       IER = 1
       RETURN
-   50 CONTINUE
-C     WRITE (*,FMT=9010) MD,NDP,NDPPV
+ 60   CONTINUE
+c   60 WRITE (*,FMT=9010) MD,NDP,NDPPV
       IER = 2
       RETURN
-   60 CONTINUE
-C     WRITE (*,FMT=9020) MD,NDP,NXI,NYI
+ 70   CONTINUE
+c   70 WRITE (*,FMT=9020) MD,NDP,NXI,NYI
       IER = 3
       RETURN
-   70 CONTINUE
-C     WRITE (*,FMT=9030) MD,NDP,NXI,NYI
+ 80   CONTINUE
+c   80 WRITE (*,FMT=9030) MD,NDP,NXI,NYI
       IER = 4
-      RETURN
-   80 CONTINUE
-C     WRITE (*,FMT=9040)
-      IER = 9
       RETURN
  85   CONTINUE
 C first three points collinear:
       IER = 10
       RETURN
-* Format statement for error message
- 9000 FORMAT (' ',/,'*** SDSF3P Error 1: NDP = 9 or less',/,'    MD =',
-     +       I5,',  NDP =',I5,/)
- 9010 FORMAT (' ',/,'*** SDSF3P Error 2: NDP not equal to NDPPV',/,
-     +       '    MD =',I5,',  NDP =',I5,'  NDPPV =',I5,/)
- 9020 FORMAT (' ',/,'*** SDSF3P Error 3: NXI = 0 or less',/,'    MD =',
-     +       I5,',  NDP =',I5,'  NXI =',I5,',  NYI =',I5,/)
- 9030 FORMAT (' ',/,'*** SDSF3P Error 4: NYI = 0 or less',/,'    MD =',
-     +       I5,',  NDP =',I5,'  NXI =',I5,',  NYI =',I5,/)
- 9040 FORMAT ('    Error detected in SDTRAN called by SDSF3P',/)
+ 90   CONTINUE
+c   90 WRITE (*,FMT=9040)
+      IER = 9
+      RETURN
+ 95   CONTINUE
+c     triangle removal fails
+      IER = 11
+      RETURN
       END
 
 
-      SUBROUTINE SDTRAN(NDP,XD,YD, NT,IPT,NL,IPL,IERT, LIST,LPTR,LEND,
-     +                  LTRI,ITL,NEAR,NEXT,DIST)
+      SUBROUTINE SDTRAN(NDP,XD,YD,NT,IPT,NL,IPL,IERT,LIST,LPTR,LEND,
+     +                  LTRI,ITL,HBRMN,NRRTT)
 *
 * Triangulation of the data area in a plane with a scattered data
 * point set
@@ -405,12 +489,19 @@ C first three points collinear:
 * data area.  It calls the SDTRCH and SDTRTT subroutines, that
 * correspond to Steps (1) and (2), respectively.
 *
+* The SDTRCH subroutine depends on the TRIPACK package of ACM
+* Algorithm XXX by R. J. Renka.  It calls the TRLIST subroutine
+* included in the package.
+*
 * The input arguments are
 *   NDP  = number of data points (must be greater than 3),
 *   XD   = array of dimension NDP containing the x
 *          coordinates of the data points,
 *   YD   = array of dimension NDP containing the y
 *          coordinates of the data points.
+*   LIST = integer array of dimension 6*NDP returned by TRMESH.
+*   LPTR = integer array of dimension 6*NDP returned by TRMESH.
+*   LEND = integer array of dimension NDP returned by TRMESH.
 *
 * The output arguments are
 *   NT   = number of triangles (its maximum is 2*NDP-5),
@@ -430,94 +521,66 @@ C first three points collinear:
 *   IERT = error flag
 *        = 0 for no errors
 *        = 1 for NDP = 3 or less
-*        = 2 for first three data points are collinear
-*        = 3 for identical data points
-*        = 4 for invalid NCC, NDP, or NROW value.
-*        = 5 for invalid data structure (LIST,LPTR,LEND).
+*        = 2 for identical data points
+*        = 3 for all collinear data points.
+*     agebhard:
+*        = 6 when triangle removal fails
+*     HBRMN and NRRTT = (experimental!) params of SDTRTT changed to arguments
+*              use NRRTT=0 to completely switch off Akimas "remove
+*              triangles from boundary step", should be default for
+*              linear interpolation.
 *
 * The other arguments are
-*   LIST = integer array of dimension 6*NDP USED internally
-*          as a work area,
-*   LPTR = integer array of dimension 6*NDP USED internally
-*          as a work area,
-*   LEND = integer array of dimension NDP USED internally as
-*          a work area,
 *   LTRI = two-dimensional integer array of dimension 12*NDP
 *          used internally as a work area.
 *   ITL  = integer array of dimension NDP used internally as
 *          a work area.
 *
-* agebhard@uni-klu.ac.at: added from new TRIPACK:
-*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
-*
 *
 * Specification statements
 *     .. Scalar Arguments ..
-      INTEGER          IERT,NDP,NL,NT,NEAR(NDP),NEXT(NDP)
+      DOUBLE PRECISION HBRMN
+      INTEGER          IERT,NDP,NL,NT,NRRTT
 *     ..
 *     .. Array Arguments ..
-      DOUBLE PRECISION             XD(NDP),YD(NDP),DIST(NDP)
+      DOUBLE PRECISION             XD(NDP),YD(NDP)
       INTEGER          IPL(2,*),IPT(3,*),ITL(NDP),LEND(NDP),LIST(6,NDP),
      +                 LPTR(6,NDP),LTRI(12,NDP)
 *     ..
 *     .. Local Scalars ..
-      INTEGER          IERTL,IERTM,IP1
+      INTEGER          IERTL
 *     ..
 *     .. External Subroutines ..
       EXTERNAL         SDTRCH,SDTRTT
 *     ..
 * Basic triangulation
-      CALL SDTRCH(NDP,XD,YD, NT,IPT,NL,IPL,IERTM,IERTL, LIST,LPTR,LEND,
-     +            LTRI,NEAR,NEXT,DIST)
-      IF (IERTM.NE.0) GO TO 10
-      IF (IERTL.NE.0) GO TO 20
+      CALL SDTRCH(NDP,NT,IPT,NL,IPL,IERTL,LIST,LPTR,LEND,LTRI)
+      IF (IERTL.NE.0) GO TO 10
       IERT = 0
 * Removal of thin triangles that share border line segments
-      CALL SDTRTT(NDP,XD,YD, NT,IPT,NL,IPL, ITL)
+* agebhard:
+* FIXME: is this necessary at all? at least not for linear interpolation:
+* parameter REMOVE=.FALSE. enables skiping
+      IF (NRRTT.GT.0) THEN
+         CALL SDTRTT(NDP,XD,YD,NT,IPT,NL,IPL,ITL,HBRMN,NRRTT,IERTL)
+         IF (IERTL.NE.0) GO TO 10
+      END IF
       RETURN
 * Error exit
-   10 IF (IERTM.EQ.-1) THEN
-          IERT = 1
-          CONTINUE
-C     WRITE (*,FMT=9000) NDP
-      ELSE IF (IERTM.EQ.-2) THEN
-          IERT = 2
-          CONTINUE
-C     WRITE (*,FMT=9010)
-      ELSE
-          IERT = 3
-          IP1 = IERTM
-          CONTINUE
-C     WRITE (*,FMT=9020) NDP,IP1,XD(IP1),YD(IP1)
-      END IF
-      RETURN
-   20 IF (IERTL.EQ.1) THEN
+   10 IF (IERTL.EQ.1) THEN
           IERT = 4
-          CONTINUE
-C     WRITE (*,FMT=9030) NDP
+c          WRITE (*,FMT=9000) NDP
       ELSE IF (IERTL.EQ.2) THEN
           IERT = 5
-          CONTINUE
-C     WRITE (*,FMT=9040)
+c          WRITE (*,FMT=9010)
+      ELSE IF (IERTL.EQ.-1) THEN
+          IERT = 6
       END IF
       RETURN
-* Format statements
- 9000 FORMAT (' ',/,'*** SDTRAN Error 1: NDP = 3 or less',/,'    NDP =',
-     +       I5)
- 9010 FORMAT (' ',/,'*** SDTRAN Error 2: ',
-     +       'The first three data points are collinear.',/)
- 9020 FORMAT (' ',/,'*** SDTRAN Error 3: Identical data points',/,
-     +       '    NDP =',I5,',  IP1 =',I5,',  XD =',E11.3,',  YD =',
-     +       E11.3)
- 9030 FORMAT (' ',/,'*** SDTRAN Error 4: NDP outside its valid',
-     +       ' range',/,'    NDP =',I5)
- 9040 FORMAT (' ',/,'*** SDTRAN Error 5: ',
-     +       'Invalid data structure (LIST,LPTR,LEND)',/)
       END
 
 
-      SUBROUTINE SDTRCH(NDP,XD,YD, NT,IPT,NL,IPL,IERTM,IERTL,
-     +                  LIST,LPTR,LEND,LTRI,NEAR,NEXT,DIST)
+      SUBROUTINE SDTRCH(NDP,NT,IPT,NL,IPL,IERTL,LIST,LPTR,LEND,LTRI)
 *
 * Basic triangulation in the convex hull of a scattered data point
 * set in a plane
@@ -533,17 +596,14 @@ C     WRITE (*,FMT=9040)
 * that form the border of the data area.
 *
 * This subroutine depends on the TRIPACK package of ACM Algorithm
-* 751 by R. J. Renka.  It calls the TRMESH and TRLIST subroutines
-* included in the package.  The TRMESH subroutine in turn calls
-* either directly or indirectly 12 other subprograms included in
+* 751 by R. J. Renka.  It calls the TRLIST subroutine included in
 * the package.
 *
 * The input arguments are
 *   NDP   = number of data points (must be greater than 3),
-*   XD    = array of dimension NDP containing the x
-*           coordinates of the data points,
-*   YD    = array of dimension NDP containing the y
-*           coordinates of the data points.
+*   LIST = integer array of dimension 6*NDP returned by TRMESH.
+*   LPTR = integer array of dimension 6*NDP returned by TRMESH.
+*   LEND = integer array of dimension NDP returned by TRMESH.
 *
 * The output arguments are
 *   NT    = number of triangles (its maximum is 2*NDP-5),
@@ -560,29 +620,15 @@ C     WRITE (*,FMT=9040)
 *           be stored counterclockwise in the ILth column,
 *           where IL = 1, 2, ..., NL, with the line segments
 *           stored counterclockwise,
-*   IERTM = error flag from the TRMESH subroutine,
-*         =  0 for no errors
-*         = -1 for NDP = 3 or less
-*         = -2 for the first three collinear data points,
-*         =  L for the Lth data point identical to some
-*            Mth data point, M > L.
 *   IERTL = error flag from the TRLIST subroutine,
 *         = 0 for no errors
 *         = 1 for invalid NCC, NDP, or NROW value.
 *         = 2 for invalid data structure (LIST,LPTR,LEND).
 *
 * The other arguments are
-*   LIST  = integer array of dimension 6*NDP USED internally
-*           as a work area,
-*   LPTR  = integer array of dimension 6*NDP USED internally
-*           as a work area,
-*   LEND  = integer array of dimension NDP USED internally as
-*           a work area,
 *   LTRI  = two-dimensional integer array of dimension 12*NDP
 *           used internally as a work area.
 *
-* agebhard@uni-klu.ac.at: added from new TRIPACK:
-*   NEAR, NEXT, DIST work arrays from TRMESH, size NDP
 *
 * Specification statements
 *     .. Parameters ..
@@ -590,29 +636,26 @@ C     WRITE (*,FMT=9040)
       PARAMETER        (NCC=0,NROW=6)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          IERTL,IERTM,NDP,NL,NT,NEAR(NDP),NEXT(NDP)
+      INTEGER          IERTL,NDP,NL,NT
 *     ..
 *     .. Array Arguments ..
-      DOUBLE PRECISION             XD(NDP),YD(NDP),DIST(NDP)
       INTEGER          IPL(2,*),IPT(3,*),LEND(NDP),LIST(*),LPTR(*),
      +                 LTRI(NROW,*)
 *     ..
 *     .. Local Scalars ..
-      INTEGER          I,I1,I2,IL,IL1,IL2,IPL11,IPL21,J,LNEW
+      INTEGER          I,I1,I2,IL,IL1,IL2,IPL11,IPL21,J
 *     ..
 *     .. Local Arrays ..
       INTEGER          LCC(1),LCT(1)
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL         TRLIST,TRMESH
+      EXTERNAL         TRLIST
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC        MOD
 *     ..
 * Performs basic triangulation.
-      CALL TRMESH(NDP,XD,YD, LIST,LPTR,LEND,LNEW,NEAR,NEXT,DIST,IERTM)
-      IF (IERTM.NE.0) RETURN
-      CALL TRLIST(NCC,LCC,NDP,LIST,LPTR,LEND,NROW, NT,LTRI,LCT,IERTL)
+      CALL TRLIST(NCC,LCC,NDP,LIST,LPTR,LEND,NROW,NT,LTRI,LCT,IERTL)
       IF (IERTL.NE.0) RETURN
 * Extracts the triangle data from the LTRI array and set the IPT
 * array.
@@ -624,35 +667,35 @@ C     WRITE (*,FMT=9040)
 * Extracts the border-line-segment data from the LTRI array and
 * set the IPL array.
       IL = 0
-      DO 50 J = 1,NT
+      DO 40 J = 1,NT
           DO 30 I = 1,3
-              IF (LTRI(I+3,J).LE.0) GO TO 40
+              IF (LTRI(I+3,J).LE.0) THEN
+                  IL = IL + 1
+                  I1 = MOD(I,3) + 1
+                  I2 = MOD(I+1,3) + 1
+                  IPL(1,IL) = LTRI(I1,J)
+                  IPL(2,IL) = LTRI(I2,J)
+              END IF
    30     CONTINUE
-          GO TO 50
-   40     IL = IL + 1
-          I1 = MOD(I,3) + 1
-          I2 = MOD(I+1,3) + 1
-          IPL(1,IL) = LTRI(I1,J)
-          IPL(2,IL) = LTRI(I2,J)
-   50 CONTINUE
+   40 CONTINUE
       NL = IL
 * Sorts the IPL array.
-      DO 80 IL1 = 1,NL - 1
-          DO 60 IL2 = IL1 + 1,NL
-              IF (IPL(1,IL2).EQ.IPL(2,IL1)) GO TO 70
-   60     CONTINUE
-   70     IPL11 = IPL(1,IL1+1)
+      DO 70 IL1 = 1,NL - 1
+          DO 50 IL2 = IL1 + 1,NL
+              IF (IPL(1,IL2).EQ.IPL(2,IL1)) GO TO 60
+   50     CONTINUE
+   60     IPL11 = IPL(1,IL1+1)
           IPL21 = IPL(2,IL1+1)
           IPL(1,IL1+1) = IPL(1,IL2)
           IPL(2,IL1+1) = IPL(2,IL2)
           IPL(1,IL2) = IPL11
           IPL(2,IL2) = IPL21
-   80 CONTINUE
+   70 CONTINUE
       RETURN
       END
 
 
-      SUBROUTINE SDTRTT(NDP,XD,YD, NT,IPT,NL,IPL, ITL)
+      SUBROUTINE SDTRTT(NDP,XD,YD,NT,IPT,NL,IPL,ITL,HBRMN,NRRTT,IER)
 *
 * Removal of thin triangles along the border line of triangulation
 * (a supporting subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -696,35 +739,45 @@ C     WRITE (*,FMT=9040)
 *           triangle along the border line of the data area,
 *   NRRTT = number of repetitions in thin triangle removal.
 * The constant values have been selected empirically.
+* agebhard:
+*     change HBRMN and NRRTT to arguments
+*     IER = -1 : array overrun due to triangle removal in
+*                strange configuration, e.g.:
+*       x= 8.0  8.5  9.0  9.5 10.0 10.5 11.0 11.5 12.0 12.5 13.0
+*       y= 7.62 36.70 62.30 65.70 73.84 74.26 78.52 83.60 83.94 84.04 87.30
+*                will fail with NRRTT>=3 and HBRMN=0.1
 *
 * Specification statements
 *     .. Parameters ..
       DOUBLE PRECISION             HBRMN
       INTEGER          NRRTT
-      PARAMETER        (HBRMN=0.10,NRRTT=5)
+*      PARAMETER        (HBRMN=0.10D0,NRRTT=5)
 *     ..
 *     .. Scalar Arguments ..
-      INTEGER          NDP,NL,NT
+      INTEGER          NDP,NL,NT,IER
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION             XD(NDP),YD(NDP)
       INTEGER          IPL(2,*),IPT(3,*),ITL(NDP)
 *     ..
 *     .. Local Scalars ..
-      DOUBLE PRECISION             HBR,U1,U2,U3,V1,V2,V3
+      DOUBLE PRECISION             DXA,DYA,HBR,U1,U2,U3,U4,V1,V2,V3,V4
       INTEGER          IL,IL0,IL00,IL1,ILP1,ILR1,IP1,IP2,IP3,IPL1,IPL2,
      +                 IREP,IT,IT0,ITP1,IV,IVP1,MODIF,NL0
 *     ..
 *     .. Intrinsic Functions ..
-      INTRINSIC        MOD
+      INTRINSIC        DABS,MOD,DBLE
 *     ..
 *     .. Statement Functions ..
       DOUBLE PRECISION             DSQF,VPDT
 *     ..
-* Statement Function definitions
-      DSQF(U1,V1,U2,V2) = (U2-U1)**2 + (V2-V1)**2
-      VPDT(U1,V1,U2,V2,U3,V3) = (V3-V1)* (U2-U1) - (U3-U1)* (V2-V1)
+*     .. Statement Function definitions ..
+      DSQF(U1,V1,U2,V2,U3,V3) = ((U2-U1)/U3)**2 + ((V2-V1)/V3)**2
+      VPDT(U1,V1,U2,V2,U3,V3,U4,V4) = ((V3-V1)/V4)* ((U2-U1)/U4) -
+     +                                ((U3-U1)/U4)* ((V2-V1)/V4)
 *     ..
+*     initialization:
+      IER=0
 * Triangle numbers of triangles that share line segments with the
 * border line.
       DO 20 IL = 1,NL
@@ -741,13 +794,24 @@ C     WRITE (*,FMT=9040)
               END IF
    10     CONTINUE
    20 CONTINUE
+* Average delta x and y for boundary line segments
+      DXA = 0.0D0
+      DYA = 0.0D0
+      DO 30 IL = 1,NL
+          IP1 = IPL(1,IL)
+          IP2 = IPL(2,IL)
+          DXA = DXA + DABS(XD(IP1)-XD(IP2))
+          DYA = DYA + DABS(YD(IP1)-YD(IP2))
+   30 CONTINUE
+      DXA = DXA/DBLE(NL)
+      DYA = DYA/DBLE(NL)
 * Removes thin triangles that share line segments with the border
 * line.
-      DO 130 IREP = 1,NRRTT
+      DO 140 IREP = 1,NRRTT
           MODIF = 0
           NL0 = NL
           IL = 0
-          DO 120 IL0 = 1,NL0
+          DO 130 IL0 = 1,NL0
               IL = IL + 1
               IP1 = IPL(1,IL)
               IP2 = IPL(2,IL)
@@ -761,69 +825,86 @@ C     WRITE (*,FMT=9040)
                   IP3 = IPT(3,IT)
               END IF
               HBR = VPDT(XD(IP1),YD(IP1),XD(IP2),YD(IP2),XD(IP3),
-     +              YD(IP3))/DSQF(XD(IP1),YD(IP1),XD(IP2),YD(IP2))
+     +              YD(IP3),DXA,DYA)/DSQF(XD(IP1),YD(IP1),XD(IP2),
+     +              YD(IP2),DXA,DYA)
               IF (HBR.LT.HBRMN) THEN
                   MODIF = 1
 * Removes this triangle when applicable.
                   ITP1 = IT + 1
-                  DO 30 IT0 = ITP1,NT
+                  DO 40 IT0 = ITP1,NT
                       IPT(1,IT0-1) = IPT(1,IT0)
                       IPT(2,IT0-1) = IPT(2,IT0)
                       IPT(3,IT0-1) = IPT(3,IT0)
-   30             CONTINUE
-                  NT = NT - 1
-                  DO 40 IL00 = 1,NL
-                      IF (ITL(IL00).GT.IT) ITL(IL00) = ITL(IL00) - 1
    40             CONTINUE
+                  NT = NT - 1
+                  DO 50 IL00 = 1,NL
+*     agebhard:check for array overrun in ITL, indicates problems with
+*     triangle removal, report back (IER=-1) to caller and retry without
+*     triangle removal (TODO: autmatically retry with decreased NTTRR)
+                     IF ((IL00).LE.NDP) THEN
+                        IF (ITL(IL00).GT.IT) ITL(IL00) = ITL(IL00) - 1
+                     ELSE
+                        IER=-1
+                        RETURN
+                     END IF
+   50             CONTINUE
 * Replaces the border line segment with two new line segments.
                   IF (IL.LT.NL) THEN
                       ILP1 = IL + 1
-                      DO 50 ILR1 = ILP1,NL
+                      DO 60 ILR1 = ILP1,NL
                           IL1 = NL + ILP1 - ILR1
                           IPL(1,IL1+1) = IPL(1,IL1)
                           IPL(2,IL1+1) = IPL(2,IL1)
-                          ITL(IL1+1) = ITL(IL1)
-   50                 CONTINUE
+*     agebhard: check for array overrun in ITL, indicates problems with
+*     triangle removal, report back to caller and retry without
+*     triangle removal (TODO: autmatically retry with decreased NTTRR)
+                          IF ((IL1+1).LE.NDP) THEN
+                             ITL(IL1+1) = ITL(IL1)
+                          ELSE
+                             IER=-1
+                             RETURN
+                          END IF
+   60                 CONTINUE
                   END IF
 * - Adds the first new line segment.
                   IPL(1,IL) = IP1
                   IPL(2,IL) = IP3
-                  DO 70 IT0 = 1,NT
-                      DO 60 IV = 1,3
+                  DO 80 IT0 = 1,NT
+                      DO 70 IV = 1,3
                           IF (IPT(IV,IT0).EQ.IP1 .OR.
      +                        IPT(IV,IT0).EQ.IP3) THEN
                               IVP1 = MOD(IV,3) + 1
                               IF (IPT(IVP1,IT0).EQ.IP1 .OR.
-     +                            IPT(IVP1,IT0).EQ.IP3) GO TO 80
+     +                            IPT(IVP1,IT0).EQ.IP3) GO TO 90
                           END IF
-   60                 CONTINUE
-   70             CONTINUE
-   80             ITL(IL) = IT0
+   70                 CONTINUE
+   80             CONTINUE
+   90             ITL(IL) = IT0
 * - Adds the second new line segment.
                   IL = IL + 1
                   IPL(1,IL) = IP3
                   IPL(2,IL) = IP2
-                  DO 100 IT0 = 1,NT
-                      DO 90 IV = 1,3
+                  DO 110 IT0 = 1,NT
+                      DO 100 IV = 1,3
                           IF (IPT(IV,IT0).EQ.IP3 .OR.
      +                        IPT(IV,IT0).EQ.IP2) THEN
                               IVP1 = MOD(IV,3) + 1
                               IF (IPT(IVP1,IT0).EQ.IP3 .OR.
-     +                            IPT(IVP1,IT0).EQ.IP2) GO TO 110
+     +                            IPT(IVP1,IT0).EQ.IP2) GO TO 120
                           END IF
-   90                 CONTINUE
-  100             CONTINUE
-  110             ITL(IL) = IT0
+  100                 CONTINUE
+  110             CONTINUE
+  120             ITL(IL) = IT0
                   NL = NL + 1
               END IF
-  120     CONTINUE
+  130     CONTINUE
           IF (MODIF.EQ.0) RETURN
-  130 CONTINUE
+  140 CONTINUE
       RETURN
       END
 
 
-      SUBROUTINE SDPD3P(NDP,XD,YD,ZD, PDD, CF3,CFL1,DSQ,IDSQ,IPC,NCP)
+      SUBROUTINE SDPD3P(NDP,XD,YD,ZD,PDD,CF3,CFL1,DSQ,IDSQ,IPC,NCP,IORD)
 *
 * Partial derivatives for bivariate interpolation and surface
 * fitting for scattered data
@@ -848,11 +929,13 @@ C     WRITE (*,FMT=9040)
 *   ZD   = array of dimension NDP containing the z values
 *          at the data points.
 *
-* The output argument is
+* The output arguments are
 *   PDD  = two-dimensional array of dimension 5*NDP, where
 *          the estimated zx, zy, zxx, zxy, and zyy values
 *          at the IDPth data point are to be stored in the
 *          IDPth row, where IDP = 1, 2, ..., NDP.
+*   IORD = integer array of dimension NDP containing the
+*          degree of the polynomial used to compute PDD.
 *
 * The other arguments are
 *   CF3  = two-dimensional array of dimension 9*NDP used
@@ -895,7 +978,7 @@ C     WRITE (*,FMT=9040)
 *     .. Array Arguments ..
       DOUBLE PRECISION             CF3(9,NDP),CFL1(2,NDP),DSQ(NDP),
      +                 PDD(5,NDP),XD(NDP),YD(NDP),ZD(NDP)
-      INTEGER          IDSQ(NDP),IPC(9,NDP),NCP(NDP)
+      INTEGER          IDSQ(NDP),IORD(NDP),IPC(9,NDP),NCP(NDP)
 *     ..
 *     .. Local Scalars ..
       DOUBLE PRECISION             A01,A02,A03,A10,A11,A12,A20,A21,A30,
@@ -912,19 +995,19 @@ C     WRITE (*,FMT=9040)
       EXTERNAL         SDCF3P,SDCLDP,SDLS1P
 *     ..
 *     .. Intrinsic Functions ..
-      INTRINSIC        EXP,DBLE
+      INTRINSIC        DEXP,DBLE
 *     ..
 * Calculation
 * Selects, at each of the data points, nine data points closest
 * to the data point in question.
-      CALL SDCLDP(NDP,XD,YD, IPC, DSQ,IDSQ)
+      CALL SDCLDP(NDP,XD,YD,IPC,DSQ,IDSQ)
 * Fits, at each of the data points, a cubic (third-degree)
 * polynomial to z values at the 10 data points that consist of
 * the data point in question and 9 data points closest to it.
-      CALL SDCF3P(NDP,XD,YD,ZD,IPC, CF3,NCP)
+      CALL SDCF3P(NDP,XD,YD,ZD,IPC,CF3,NCP,IORD)
 * Performs, at each of the data points, the least-squares fit of
 * a plane to z values at the 10 data points.
-      CALL SDLS1P(NDP,XD,YD,ZD,IPC,NCP, CFL1)
+      CALL SDLS1P(NDP,XD,YD,ZD,IPC,NCP,CFL1)
 * Outermost DO-loop with respect to the data point
       DO 310 IDP1 = 1,NDP
 * Selects data point sets for sets of primary estimates of partial
@@ -1025,37 +1108,46 @@ C     WRITE (*,FMT=9040)
               A02 = CF3(7,IDPI)
               A12 = CF3(8,IDPI)
               A03 = CF3(9,IDPI)
-              PDPE(1,IPE) = A10 + X* (2.0*A20+X*3.0*A30) +
-     +                      Y* (A11+2.0*A21*X+A12*Y)
-              PDPE(2,IPE) = A01 + Y* (2.0*A02+Y*3.0*A03) +
-     +                      X* (A11+2.0*A12*Y+A21*X)
-              PDPE(3,IPE) = 2.0*A20 + 6.0*A30*X + 2.0*A21*Y
-              PDPE(4,IPE) = A11 + 2.0*A21*X + 2.0*A12*Y
-              PDPE(5,IPE) = 2.0*A02 + 6.0*A03*Y + 2.0*A12*X
+              PDPE(1,IPE) = A10 + X* (2.0D0*A20+X*3.0D0*A30) +
+     +                      Y* (A11+2.0D0*A21*X+A12*Y)
+              PDPE(2,IPE) = A01 + Y* (2.0D0*A02+Y*3.0D0*A03) +
+     +                      X* (A11+2.0D0*A12*Y+A21*X)
+              PDPE(3,IPE) = 2.0D0*A20 + 6.0D0*A30*X + 2.0D0*A21*Y
+              PDPE(4,IPE) = A11 + 2.0D0*A21*X + 2.0D0*A12*Y
+              PDPE(5,IPE) = 2.0D0*A02 + 6.0D0*A03*Y + 2.0D0*A12*X
   170     CONTINUE
           IF (NPE.EQ.1) GO TO 290
-* Weighted values of partial derivatives (through the statement
-* labeled 280 + 1)
+* Weighted values of partial derivatives.
+*
 * Calculates the probability weight.
           ANPE = DBLE(NPE)
           ANPEM1 = DBLE(NPE-1)
           DO 190 K = 1,5
-              AMPDPE(K) = 0.0
-              SSPDPE(K) = 0.0
+              AMPDPE(K) = 0.0D0
+*DELETED from Valtulina  SSPDPE(K) = 0.0
               DO 180 IPE = 1,NPE
                   AMPDPE(K) = AMPDPE(K) + PDPE(K,IPE)
-                  SSPDPE(K) = SSPDPE(K) + PDPE(K,IPE)**2
+*DELETED from Valtulina  SSPDPE(K) = SSPDPE(K) + PDPE(K,IPE)**2
   180         CONTINUE
               AMPDPE(K) = AMPDPE(K)/ANPE
-              SSPDPE(K) = (SSPDPE(K)-ANPE*AMPDPE(K)**2)/ANPEM1
+*DELETED from Valtulina  SSPDPE(K) = (SSPDPE(K)-ANPE*AMPDPE(K)**2)/ANPEM1
   190     CONTINUE
+* ADDED from Valtulina
+* Calculates the unbiased estimate of variance
+          DO 191 K=1,5
+              SSPDPE(K) = 0.0D0
+              DO 181 IPE = 1,NPE
+                 SSPDPE(K) = SSPDPE(K)+(PDPE(K,IPE)-AMPDPE(K))**2
+  181         CONTINUE
+              SSPDPE(K) = SSPDPE(K)/ANPEM1
+  191      CONTINUE
           DO 210 IPE = 1,NPE
-              ALPWT = 0.0
+              ALPWT = 0.0D0
               DO 200 K = 1,5
-                  IF (SSPDPE(K).NE.0.0) ALPWT = ALPWT +
+                  IF (SSPDPE(K).NE.0.0D0) ALPWT = ALPWT +
      +                ((PDPE(K,IPE)-AMPDPE(K))**2)/SSPDPE(K)
   200         CONTINUE
-              PWT(IPE) = EXP(-ALPWT/2.0)
+              PWT(IPE) = DEXP(-ALPWT/2.0D0)
   210     CONTINUE
 * Calculates the reciprocal of the volatility weight.
           DO 220 IPE = 1,NPE
@@ -1063,24 +1155,25 @@ C     WRITE (*,FMT=9040)
               ZX = CFL1(1,IDPI)
               ZY = CFL1(2,IDPI)
               RVWT(IPE) = ((PDPE(1,IPE)-ZX)**2+ (PDPE(2,IPE)-ZY)**2)*
-     +                    (PDPE(3,IPE)**2+2.0*PDPE(4,IPE)**2+
+     +                    (PDPE(3,IPE)**2+2.0D0*PDPE(4,IPE)**2+
      +                    PDPE(5,IPE)**2)
-*             ZXX=0.0
-*             ZXY=0.0
-*             ZYY=0.0
-*             RVWT(IPE)=((PDPE(1,IPE)-ZX)**2+(PDPE(2,IPE)-ZY)**2)
-*    +                 *((PDPE(3,IPE)-ZXX)**2+2.0*(PDPE(4,IPE)-ZXY)**2
-*    +                  +(PDPE(5,IPE)-ZYY)**2)
+*         ZXX=0.0
+*         ZXY=0.0
+*         ZYY=0.0
+*         RVWT(IPE)=((PDPE(1,IPE)-ZX)**2+(PDPE(2,IPE)-ZY)**2)
+*    1             *((PDPE(3,IPE)-ZXX)**2+2.0*(PDPE(4,IPE)-ZXY)**2
+*    2              +(PDPE(5,IPE)-ZYY)**2)
   220     CONTINUE
 * Calculates the weighted values of partial derivatives.
           DO 230 K = 1,5
-              PDDIF(K) = 0.0
-              PDDII(K) = 0.0
+              PDDIF(K) = 0.0D0
+              PDDII(K) = 0.0D0
   230     CONTINUE
-          SMWTF = 0.0
-          SMWTI = 0.0
+          SMWTF = 0.0D0
+          SMWTI = 0.0D0
           DO 260 IPE = 1,NPE
-              IF (RVWT(IPE).GT.0.0) THEN
+*CHANGED from Valtulina : IF (RVWT(IPE).GT.0.0) THEN
+              IF (RVWT(IPE).GT.1.0D-38) THEN
                   WTF = PWT(IPE)/RVWT(IPE)
                   DO 240 K = 1,5
                       PDDIF(K) = PDDIF(K) + PDPE(K,IPE)*WTF
@@ -1094,7 +1187,7 @@ C     WRITE (*,FMT=9040)
                   SMWTI = SMWTI + WTI
               END IF
   260     CONTINUE
-          IF (SMWTI.LE.0.0) THEN
+          IF (SMWTI.LE.0.0D0) THEN
               DO 270 K = 1,5
                   PDD(K,IDP1) = PDDIF(K)/SMWTF
   270         CONTINUE
@@ -1113,7 +1206,7 @@ C     WRITE (*,FMT=9040)
       END
 
 
-      SUBROUTINE SDCLDP(NDP,XD,YD, IPC, DSQ,IDSQ)
+      SUBROUTINE SDCLDP(NDP,XD,YD,IPC,DSQ,IDSQ)
 *
 * Closest data points
 * (a supporting subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -1175,7 +1268,7 @@ C     WRITE (*,FMT=9040)
           IDSQ(IDP) = 1
           DSQ(IDP) = DSQ(1)
           IDSQ(1) = IDP
-          DSQ(1) = 0.0
+          DSQ(1) = 0.0D0
 * Selects nine data points closest to the IDPth data point and
 * stores the data point numbers in the IPC array.
           JIPCMX = MIN(NDP-1,10)
@@ -1202,7 +1295,7 @@ C     WRITE (*,FMT=9040)
       END
 
 
-      SUBROUTINE SDCF3P(NDP,XD,YD,ZD,IPC, CF,NCP)
+      SUBROUTINE SDCF3P(NDP,XD,YD,ZD,IPC,CF,NCP,IORD)
 *
 * Coefficients of the third-degree polynomial for z(x,y)
 * (a supporting subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -1253,6 +1346,8 @@ C     WRITE (*,FMT=9040)
 *         ..., NDP,
 *   NCP = integer array of dimension NDP, where the numbers
 *         of the closest points used are to be stored.
+*   IORD = integer array of dimension NDP containing the
+*          degree of the polynomial used to compute PDD.
 *
 * The constant in the first PARAMETER statement below is
 *   CNRMX = maximum value of the ratio of the condition
@@ -1270,7 +1365,8 @@ C     WRITE (*,FMT=9040)
 * Specification statements
 *     .. Parameters ..
       DOUBLE PRECISION             CNRMX
-      PARAMETER        (CNRMX=1.5E+04)
+*CHANGED from Valtulina : PARAMETER        (CNRMX=1.5E+04)
+      PARAMETER        (CNRMX=3.5E+07)
       INTEGER          N1,N2,N3
       PARAMETER        (N1=3,N2=6,N3=10)
 *     ..
@@ -1279,7 +1375,7 @@ C     WRITE (*,FMT=9040)
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION             CF(9,NDP),XD(NDP),YD(NDP),ZD(NDP)
-      INTEGER          IPC(9,NDP),NCP(NDP)
+      INTEGER          IORD(NDP),IPC(9,NDP),NCP(NDP)
 *     ..
 *     .. Local Scalars ..
       DOUBLE PRECISION             CN,DET,X,X1,X2,Y,Y1,Y2,Z1,Z2
@@ -1299,7 +1395,7 @@ C     WRITE (*,FMT=9040)
 * Main DO-loop with respect to the data point
       DO 60 IDP = 1,NDP
           DO 10 J = 1,9
-              CF(J,IDP) = 0.0
+              CF(J,IDP) = 0.0D0
    10     CONTINUE
 * Calculates the coefficients of the set of linear equations
 * with the 10-point data point set.
@@ -1311,7 +1407,7 @@ C     WRITE (*,FMT=9040)
               END IF
               X = XD(IDPI)
               Y = YD(IDPI)
-              AA3(I,1) = 1.0
+              AA3(I,1) = 1.0D0
               AA3(I,2) = X
               AA3(I,3) = X*X
               AA3(I,4) = X*X*X
@@ -1324,15 +1420,16 @@ C     WRITE (*,FMT=9040)
               B(I) = ZD(IDPI)
    20     CONTINUE
 * Solves the set of linear equations.
-          CALL SDLEQN(N3,AA3,B, CFI,DET,CN, K,EE,ZZ)
+          CALL SDLEQN(N3,AA3,B,CFI,DET,CN,K,EE,ZZ)
 * Stores the calculated results as the coefficients of the
 * third-degree polynomial when applicable.
-          IF (DET.NE.0.0) THEN
+          IF (DET.NE.0.0D0) THEN
               IF (CN.LE.CNRMX*DBLE(N3)) THEN
                   DO 30 J = 2,N3
                       CF(J-1,IDP) = CFI(J)
    30             CONTINUE
                   NCP(IDP) = N3 - 1
+                  IORD(IDP) = 3
                   GO TO 60
               END IF
           END IF
@@ -1346,7 +1443,7 @@ C     WRITE (*,FMT=9040)
               END IF
               X = XD(IDPI)
               Y = YD(IDPI)
-              AA2(I,1) = 1.0
+              AA2(I,1) = 1.0D0
               AA2(I,2) = X
               AA2(I,3) = X*X
               AA2(I,4) = Y
@@ -1355,10 +1452,10 @@ C     WRITE (*,FMT=9040)
               B(I) = ZD(IDPI)
    40     CONTINUE
 * Solves the set of linear equations.
-          CALL SDLEQN(N2,AA2,B, CFI,DET,CN, K,EE,ZZ)
+          CALL SDLEQN(N2,AA2,B,CFI,DET,CN,K,EE,ZZ)
 * Stores the calculated results as the coefficients of the
 * second-degree polynomial when applicable.
-          IF (DET.NE.0.0) THEN
+          IF (DET.NE.0.0D0) THEN
               IF (CN.LE.CNRMX*DBLE(N2)) THEN
                   CF(1,IDP) = CFI(2)
                   CF(2,IDP) = CFI(3)
@@ -1366,6 +1463,7 @@ C     WRITE (*,FMT=9040)
                   CF(5,IDP) = CFI(5)
                   CF(7,IDP) = CFI(6)
                   NCP(IDP) = N2 - 1
+                  IORD(IDP) = 2
                   GO TO 60
               END IF
           END IF
@@ -1375,20 +1473,21 @@ C     WRITE (*,FMT=9040)
               IDPI = IPC(I,IDP)
               X = XD(IDPI)
               Y = YD(IDPI)
-              AA1(I,1) = 1.0
+              AA1(I,1) = 1.0D0
               AA1(I,2) = X
               AA1(I,3) = Y
               B(I) = ZD(IDPI)
    50     CONTINUE
 * Solves the set of linear equations.
-          CALL SDLEQN(N1,AA1,B, CFI,DET,CN, K,EE,ZZ)
+          CALL SDLEQN(N1,AA1,B,CFI,DET,CN,K,EE,ZZ)
 * Stores the calculated results as the coefficients of the
 * first-degree polynomial when applicable.
-          IF (DET.NE.0.0) THEN
+          IF (DET.NE.0.0D0) THEN
               IF (CN.LE.CNRMX*DBLE(N1)) THEN
                   CF(1,IDP) = CFI(2)
                   CF(4,IDP) = CFI(3)
                   NCP(IDP) = N1
+                  IORD(IDP) = 1
                   GO TO 60
               END IF
           END IF
@@ -1405,12 +1504,13 @@ C     WRITE (*,FMT=9040)
           CF(1,IDP) = (X2-X1)* (Z2-Z1)/ ((X2-X1)**2+ (Y2-Y1)**2)
           CF(4,IDP) = (Y2-Y1)* (Z2-Z1)/ ((X2-X1)**2+ (Y2-Y1)**2)
           NCP(IDP) = 1
+          IORD(NDP) = 0
    60 CONTINUE
       RETURN
       END
 
 
-      SUBROUTINE SDLEQN(N,AA,B, X,DET,CN, K,EE,ZZ)
+      SUBROUTINE SDLEQN(N,AA,B,X,DET,CN,K,EE,ZZ)
 *
 * Solution of a set of linear equations
 * (a supporting subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -1453,32 +1553,38 @@ C     WRITE (*,FMT=9040)
       INTEGER          K(N)
 *     ..
 *     .. Local Scalars ..
-      DOUBLE PRECISION             AAIIJ,AAIJIJ,AAIJMX,AAMX,SA,SZ
+      DOUBLE PRECISION             AANORM, ASOM, ZSOM, ZZNORM
+      DOUBLE PRECISION             AAIIJ,AAIJIJ,AAIJMX,AAMX
       INTEGER          I,IJ,IJP1,IJR,J,JJ,JMX,KJMX
 *     ..
 *     .. Intrinsic Functions ..
-      INTRINSIC        ABS,SQRT
+      INTRINSIC        DABS
 *     ..
 * Calculation
 * Initial setting
       DO 10 J = 1,N
           K(J) = J
    10 CONTINUE
+*ADDED from Valtulina : calculation of AANORM=NORMinf(AA)
+      AANORM=0.0D0
       DO 30 I = 1,N
+          ASOM=0.0D0
           DO 20 J = 1,N
-              EE(I,J) = 0.0
+              EE(I,J) = 0.0D0
+              ASOM=ASOM+DABS(AA(I,J))
    20     CONTINUE
-          EE(I,I) = 1.0
+          EE(I,I) = 1.0D0
+          IF (ASOM.GT.AANORM) AANORM=ASOM
    30 CONTINUE
 * Calculation of inverse matrix of AA
       DO 110 IJ = 1,N
 * Finds out the element having the maximum absolute value in the
 * IJ th row.
-          AAMX = ABS(AA(IJ,IJ))
+          AAMX = DABS(AA(IJ,IJ))
           JMX = IJ
           DO 40 J = IJ,N
-              IF (ABS(AA(IJ,J)).GT.AAMX) THEN
-                  AAMX = ABS(AA(IJ,J))
+              IF (DABS(AA(IJ,J)).GT.AAMX) THEN
+                  AAMX = DABS(AA(IJ,J))
                   JMX = J
               END IF
    40     CONTINUE
@@ -1494,7 +1600,8 @@ C     WRITE (*,FMT=9040)
           K(JMX) = KJMX
 * Makes the diagonal element to be unity.
           AAIJIJ = AA(IJ,IJ)
-          IF (AAIJIJ.EQ.0.0) GO TO 210
+*CHANGED from Valtulina : IF (AAIJIJ.EQ.0.0) GO TO 210
+          IF (DABS(AAIJIJ).LT.1.0D-8) GO TO 210
           DO 60 J = IJ,N
               AA(IJ,J) = AA(IJ,J)/AAIJIJ
    60     CONTINUE
@@ -1515,11 +1622,21 @@ C     WRITE (*,FMT=9040)
   100         CONTINUE
           END IF
 * Calculates the determinant.
-          IF (IJ.EQ.1) THEN
-              DET = 1.0
-          END IF
-          DET = DET*AAIJIJ* ((-1)** (IJ+JMX))
+*DELETED from Valtulina
+*DELETED          IF (IJ.EQ.1) THEN
+*DELETED              DET = 0.0
+*DELETED              SGN = 1.0
+*DELETED          END IF
+*DELETED          SGN = SGN* ((-1)** (IJ+JMX))
+*DELETED          DET = DET + LOG(ABS(AAIJIJ))
   110 CONTINUE
+*DELETED      IF (DET.LT.85.0) THEN
+*DELETED          DET = SGN*EXP(DET)
+*DELETED      ELSE
+*DELETED          DET = SGN*1.0E38
+*DELETED      END IF
+*ADDED from Valtulina : at this point DET must be not equal 0
+      DET=1.0D0
 * Calculates the elements of the inverse matrix.
       DO 140 IJR = 1,N
           IJ = N + 1 - IJR
@@ -1539,18 +1656,24 @@ C     WRITE (*,FMT=9040)
   150     CONTINUE
   160 CONTINUE
 * Calculation of the condition number of AA
-      SA = 0.0
-      SZ = 0.0
+*ADDED from Valtulina : calculation of ZZNORM=NORMinf(ZZ)
+*DELETED      SA = 0.0
+*DELETED      SZ = 0.0
+      ZZNORM=0.0D0
       DO 180 I = 1,N
+          ZSOM=0.0D0
           DO 170 J = 1,N
-              SA = SA + AA(I,J)*AA(J,I)
-              SZ = SZ + ZZ(I,J)*ZZ(J,I)
+*DELETED              SA = SA + AA(I,J)*AA(J,I)
+*DELETED              SZ = SZ + ZZ(I,J)*ZZ(J,I)
+             ZSOM=ZSOM+DABS(ZZ(I,J))
   170     CONTINUE
+          IF (ZSOM.GT.ZZNORM) ZZNORM=ZSOM
   180 CONTINUE
-      CN = SQRT(ABS(SA*SZ))
+*DELETED      CN = SQRT(ABS(SA*SZ))
+      CN=AANORM*ZZNORM
 * Calculation of X vector
       DO 200 I = 1,N
-          X(I) = 0.0
+          X(I) = 0.0D0
           DO 190 J = 1,N
               X(I) = X(I) + ZZ(I,J)*B(J)
   190     CONTINUE
@@ -1558,14 +1681,14 @@ C     WRITE (*,FMT=9040)
       RETURN
 * Special case where the determinant is zero
   210 DO 220 I = 1,N
-          X(I) = 0.0
+          X(I) = 0.0D0
   220 CONTINUE
-      DET = 0.0
+      DET = 0.0D0
       RETURN
       END
 
 
-      SUBROUTINE SDLS1P(NDP,XD,YD,ZD,IPC,NCP, CFL1)
+      SUBROUTINE SDLS1P(NDP,XD,YD,ZD,IPC,NCP,CFL1)
 *
 * Least squares fit of a linear surface (plane) to z(x,y) values
 * (a supporting subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -1624,14 +1747,14 @@ C     WRITE (*,FMT=9040)
           NPLS = NCP(IDP) + 1
           IF (NPLS.EQ.2) GO TO 20
 * Performs the least squares fit of a plane.
-          SX = 0.0
-          SY = 0.0
-          SXX = 0.0
-          SXY = 0.0
-          SYY = 0.0
-          SZ = 0.0
-          SXZ = 0.0
-          SYZ = 0.0
+          SX = 0.0D0
+          SY = 0.0D0
+          SXX = 0.0D0
+          SXY = 0.0D0
+          SYY = 0.0D0
+          SZ = 0.0D0
+          SXZ = 0.0D0
+          SYZ = 0.0D0
           DO 10 I = 1,NPLS
               IF (I.EQ.1) THEN
                   IDPI = IDP
@@ -1675,7 +1798,7 @@ C     WRITE (*,FMT=9040)
       END
 
 
-      SUBROUTINE SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,NIP,XI,YI, KTLI,ITLI)
+      SUBROUTINE SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,NIP,XI,YI,KTLI,ITLI)
 *
 * Locating points in a scattered data point set
 * (a supporting subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -1741,7 +1864,7 @@ C     WRITE (*,FMT=9040)
 *     ..
 *     .. Local Scalars ..
       DOUBLE PRECISION             U1,U2,U3,V1,V2,V3,X0,X1,X2,X3,Y0,Y1,
-     +                             Y2,Y3
+     +                 Y2,Y3
       INTEGER          IIP,IL1,IL2,ILII,IP1,IP2,IP3,ITII,ITLIPV,KTLIPV
 *     ..
 *     .. Intrinsic Functions ..
@@ -1750,7 +1873,7 @@ C     WRITE (*,FMT=9040)
 *     .. Statement Functions ..
       DOUBLE PRECISION             SPDT,VPDT
 *     ..
-* Statement Function definitions
+*     .. Statement Function definitions ..
       SPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (U2-U3) + (V1-V3)* (V2-V3)
       VPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (V2-V3) - (V1-V3)* (U2-U3)
 *     ..
@@ -1777,9 +1900,9 @@ C     WRITE (*,FMT=9040)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF ((VPDT(X1,Y1,X2,Y2,X0,Y0).GE.0.0) .AND.
-     +            (VPDT(X2,Y2,X3,Y3,X0,Y0).GE.0.0) .AND.
-     +            (VPDT(X3,Y3,X1,Y1,X0,Y0).GE.0.0)) THEN
+              IF ((VPDT(X1,Y1,X2,Y2,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT(X2,Y2,X3,Y3,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT(X3,Y3,X1,Y1,X0,Y0).GE.0.0D0)) THEN
                   KTLI(IIP) = 1
                   ITLI(IIP) = ITII
                   GO TO 40
@@ -1796,9 +1919,9 @@ C     WRITE (*,FMT=9040)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF ((VPDT(X1,Y1,X2,Y2,X0,Y0).GE.0.0) .AND.
-     +            (VPDT(X2,Y2,X3,Y3,X0,Y0).GE.0.0) .AND.
-     +            (VPDT(X3,Y3,X1,Y1,X0,Y0).GE.0.0)) THEN
+              IF ((VPDT(X1,Y1,X2,Y2,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT(X2,Y2,X3,Y3,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT(X3,Y3,X1,Y1,X0,Y0).GE.0.0D0)) THEN
                   KTLI(IIP) = 1
                   ITLI(IIP) = ITII
                   GO TO 40
@@ -1817,18 +1940,18 @@ C     WRITE (*,FMT=9040)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF (VPDT(X1,Y1,X3,Y3,X0,Y0).LE.0.0) THEN
-                  IF (VPDT(X1,Y1,X3,Y3,X2,Y2).LE.0.0) THEN
-                      IF ((SPDT(X1,Y1,X0,Y0,X2,Y2).LE.0.0) .AND.
-     +                    (SPDT(X3,Y3,X0,Y0,X2,Y2).LE.0.0)) THEN
+              IF (VPDT(X1,Y1,X3,Y3,X0,Y0).LE.0.0D0) THEN
+                  IF (VPDT(X1,Y1,X3,Y3,X2,Y2).LE.0.0D0) THEN
+                      IF ((SPDT(X1,Y1,X0,Y0,X2,Y2).LE.0.0D0) .AND.
+     +                    (SPDT(X3,Y3,X0,Y0,X2,Y2).LE.0.0D0)) THEN
                           KTLI(IIP) = 3
                           ITLI(IIP) = IL2
                           GO TO 40
                       END IF
                   END IF
-                  IF (VPDT(X1,Y1,X3,Y3,X2,Y2).GE.0.0) THEN
-                      IF ((SPDT(X1,Y1,X0,Y0,X2,Y2).GE.0.0) .AND.
-     +                    (SPDT(X3,Y3,X0,Y0,X2,Y2).GE.0.0)) THEN
+                  IF (VPDT(X1,Y1,X3,Y3,X2,Y2).GE.0.0D0) THEN
+                      IF ((SPDT(X1,Y1,X0,Y0,X2,Y2).GE.0.0D0) .AND.
+     +                    (SPDT(X3,Y3,X0,Y0,X2,Y2).GE.0.0D0)) THEN
                           KTLI(IIP) = 4
                           ITLI(IIP) = IL2
                           GO TO 40
@@ -1844,9 +1967,9 @@ C     WRITE (*,FMT=9040)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF (VPDT(X2,Y2,X3,Y3,X0,Y0).LE.0.0) THEN
-                  IF ((SPDT(X3,Y3,X0,Y0,X2,Y2).GE.0.0) .AND.
-     +                (SPDT(X2,Y2,X0,Y0,X3,Y3).GE.0.0)) THEN
+              IF (VPDT(X2,Y2,X3,Y3,X0,Y0).LE.0.0D0) THEN
+                  IF ((SPDT(X3,Y3,X0,Y0,X2,Y2).GE.0.0D0) .AND.
+     +                (SPDT(X2,Y2,X0,Y0,X3,Y3).GE.0.0D0)) THEN
                       KTLI(IIP) = 2
                       ITLI(IIP) = IL2
                       GO TO 40
@@ -1858,7 +1981,7 @@ C     WRITE (*,FMT=9040)
 
 
       SUBROUTINE SDPLNL(NDP,XD,YD,ZD,NT,IPT,NL,IPL,PDD,NIP,XI,YI,KTLI,
-     +                  ITLI, ZI, EXTRPI)
+     +                  ITLI,ZI,EXTRPI)
 *
 * Polynomials
 * (a supporting subroutine of the SDBI3P/SDSF3P subroutine package)
@@ -1918,6 +2041,8 @@ C     WRITE (*,FMT=9040)
 * The output argument is
 *   ZI   = array of dimension NIP, where the calculated z
 *          values are to be stored.
+*
+*     agebhard:
 *   EXTRPI = logical array of dimension NIP, indicating
 *            if a point resides outside the convex hull (and its Z value
 *            has been extrapolated)
@@ -1949,6 +2074,34 @@ C     WRITE (*,FMT=9040)
 *     .. Intrinsic Functions ..
       INTRINSIC        MOD
 *     ..
+* initialize some variables to silence compiler warnings      
+      P00=0.0D0
+      P01=0.0D0
+      P02=0.0D0
+      P03=0.0D0
+      P04=0.0D0
+      P05=0.0D0
+      P10=0.0D0
+      P11=0.0D0
+      P12=0.0D0
+      P13=0.0D0
+      P14=0.0D0
+      P20=0.0D0
+      P21=0.0D0
+      P22=0.0D0
+      P23=0.0D0
+      P30=0.0D0
+      P31=0.0D0
+      P32=0.0D0
+      P40=0.0D0
+      P41=0.0D0
+      P50=0.0D0
+      Y0=0.0D0
+      X0=0.0D0
+      AP=0.0D0
+      BP=0.0D0
+      CP=0.0D0
+      DP=0.0D0
 * Outermost DO-loop with respect to the output point
       DO 120 IIP = 1,NIP
           XII = XI(IIP)
@@ -2015,41 +2168,41 @@ C     WRITE (*,FMT=9040)
                   P00 = Z(1)
                   P10 = ZU(1)
                   P01 = ZV(1)
-                  P20 = 0.5*ZUU(1)
+                  P20 = 0.5D0*ZUU(1)
                   P11 = ZUV(1)
-                  P02 = 0.5*ZVV(1)
+                  P02 = 0.5D0*ZVV(1)
                   H1 = Z(2) - P00 - P10 - P20
                   H2 = ZU(2) - P10 - ZUU(1)
                   H3 = ZUU(2) - ZUU(1)
-                  P30 = 10.0*H1 - 4.0*H2 + 0.5*H3
-                  P40 = -15.0*H1 + 7.0*H2 - H3
-                  P50 = 6.0*H1 - 3.0*H2 + 0.5*H3
+                  P30 = 10.0D0*H1 - 4.0D0*H2 + 0.5D0*H3
+                  P40 = -15.0D0*H1 + 7.0D0*H2 - H3
+                  P50 = 6.0D0*H1 - 3.0D0*H2 + 0.5D0*H3
                   H1 = Z(3) - P00 - P01 - P02
                   H2 = ZV(3) - P01 - ZVV(1)
                   H3 = ZVV(3) - ZVV(1)
-                  P03 = 10.0*H1 - 4.0*H2 + 0.5*H3
-                  P04 = -15.0*H1 + 7.0*H2 - H3
-                  P05 = 6.0*H1 - 3.0*H2 + 0.5*H3
+                  P03 = 10.0D0*H1 - 4.0D0*H2 + 0.5D0*H3
+                  P04 = -15.0D0*H1 + 7.0D0*H2 - H3
+                  P05 = 6.0D0*H1 - 3.0D0*H2 + 0.5D0*H3
                   LUSQ = AA + CC
                   LVSQ = BB + DD
                   SPUV = AB + CD
-                  P41 = 5.0*SPUV/LUSQ*P50
-                  P14 = 5.0*SPUV/LVSQ*P05
+                  P41 = 5.0D0*SPUV/LUSQ*P50
+                  P14 = 5.0D0*SPUV/LVSQ*P05
                   H1 = ZV(2) - P01 - P11 - P41
-                  H2 = ZUV(2) - P11 - 4.0*P41
-                  P21 = 3.0*H1 - H2
-                  P31 = -2.0*H1 + H2
+                  H2 = ZUV(2) - P11 - 4.0D0*P41
+                  P21 = 3.0D0*H1 - H2
+                  P31 = -2.0D0*H1 + H2
                   H1 = ZU(3) - P10 - P11 - P14
-                  H2 = ZUV(3) - P11 - 4.0*P14
-                  P12 = 3.0*H1 - H2
-                  P13 = -2.0*H1 + H2
+                  H2 = ZUV(3) - P11 - 4.0D0*P14
+                  P12 = 3.0D0*H1 - H2
+                  P13 = -2.0D0*H1 + H2
                   E1 = (LVSQ-SPUV)/ ((LVSQ-SPUV)+ (LUSQ-SPUV))
-                  E2 = 1.0 - E1
-                  G1 = 5.0*E1 - 2.0
-                  G2 = 1.0 - G1
-                  H1 = 5.0* (E1* (P50-P41)+E2* (P05-P14)) + (P41+P14)
-                  H2 = 0.5*ZVV(2) - P02 - P12
-                  H3 = 0.5*ZUU(3) - P20 - P21
+                  E2 = 1.0D0 - E1
+                  G1 = 5.0D0*E1 - 2.0D0
+                  G2 = 1.0D0 - G1
+                  H1 = 5.0D0* (E1* (P50-P41)+E2* (P05-P14)) + (P41+P14)
+                  H2 = 0.5D0*ZVV(2) - P02 - P12
+                  H3 = 0.5D0*ZUU(3) - P20 - P21
                   P22 = H1 + G1*H2 + G2*H3
                   P32 = H2 - P22
                   P23 = H3 - P22
@@ -2103,13 +2256,13 @@ C     WRITE (*,FMT=9040)
 * Converts the partial derivatives at the end points of the
 * border line segment for the u-v coordinate system.
                   AA = A*A
-                  ACT2 = 2.0*A*C
+                  ACT2 = 2.0D0*A*C
                   CC = C*C
                   AB = A*B
                   ADBC = AD + BC
                   CD = C*D
                   BB = B*B
-                  BDT2 = 2.0*B*D
+                  BDT2 = 2.0D0*B*D
                   DD = D*D
                   DO 60 I = 1,2
                       ZU(I) = A*PD(1,I) + C*PD(2,I)
@@ -2122,20 +2275,20 @@ C     WRITE (*,FMT=9040)
                   P00 = Z(1)
                   P10 = ZU(1)
                   P01 = ZV(1)
-                  P20 = 0.5*ZUU(1)
+                  P20 = 0.5D0*ZUU(1)
                   P11 = ZUV(1)
-                  P02 = 0.5*ZVV(1)
+                  P02 = 0.5D0*ZVV(1)
                   H1 = Z(2) - P00 - P01 - P02
                   H2 = ZV(2) - P01 - ZVV(1)
                   H3 = ZVV(2) - ZVV(1)
-                  P03 = 10.0*H1 - 4.0*H2 + 0.5*H3
-                  P04 = -15.0*H1 + 7.0*H2 - H3
-                  P05 = 6.0*H1 - 3.0*H2 + 0.5*H3
+                  P03 = 10.0D0*H1 - 4.0D0*H2 + 0.5D0*H3
+                  P04 = -15.0D0*H1 + 7.0D0*H2 - H3
+                  P05 = 6.0D0*H1 - 3.0D0*H2 + 0.5D0*H3
                   H1 = ZU(2) - P10 - P11
                   H2 = ZUV(2) - P11
-                  P12 = 3.0*H1 - H2
-                  P13 = -2.0*H1 + H2
-                  P21 = 0.5* (ZUU(2)-ZUU(1))
+                  P12 = 3.0D0*H1 - H2
+                  P13 = -2.0D0*H1 + H2
+                  P21 = 0.5D0* (ZUU(2)-ZUU(1))
               END IF
 * Converts XII and YII to u-v system.
               DX = XII - X0
@@ -2166,9 +2319,9 @@ C     WRITE (*,FMT=9040)
                   P00 = Z0
                   P10 = PD(1,1)
                   P01 = PD(2,1)
-                  P20 = 0.5*PD(3,1)
+                  P20 = 0.5D0*PD(3,1)
                   P11 = PD(4,1)
-                  P02 = 0.5*PD(5,1)
+                  P02 = 0.5D0*PD(5,1)
               END IF
 * Converts XII and YII to U-V system.
               U = XII - X0
@@ -2219,13 +2372,13 @@ C     WRITE (*,FMT=9040)
 * Converts the partial derivatives at the end points of the
 * border line segment for the u-v coordinate system.
                   AA = A*A
-                  ACT2 = 2.0*A*C
+                  ACT2 = 2.0D0*A*C
                   CC = C*C
                   AB = A*B
                   ADBC = AD + BC
                   CD = C*D
                   BB = B*B
-                  BDT2 = 2.0*B*D
+                  BDT2 = 2.0D0*B*D
                   DD = D*D
                   DO 100 I = 1,2
                       ZU(I) = A*PD(1,I) + C*PD(2,I)
@@ -2238,20 +2391,20 @@ C     WRITE (*,FMT=9040)
                   P00 = Z(1)
                   P10 = ZU(1)
                   P01 = ZV(1)
-                  P20 = 0.5*ZUU(1)
+                  P20 = 0.5D0*ZUU(1)
                   P11 = ZUV(1)
-                  P02 = 0.5*ZVV(1)
+                  P02 = 0.5D0*ZVV(1)
                   H1 = Z(2) - P00 - P01 - P02
                   H2 = ZV(2) - P01 - ZVV(1)
                   H3 = ZVV(2) - ZVV(1)
-                  P03 = 10.0*H1 - 4.0*H2 + 0.5*H3
-                  P04 = -15.0*H1 + 7.0*H2 - H3
-                  P05 = 6.0*H1 - 3.0*H2 + 0.5*H3
+                  P03 = 10.0D0*H1 - 4.0D0*H2 + 0.5D0*H3
+                  P04 = -15.0D0*H1 + 7.0D0*H2 - H3
+                  P05 = 6.0D0*H1 - 3.0D0*H2 + 0.5D0*H3
                   H1 = ZU(2) - P10 - P11
                   H2 = ZUV(2) - P11
-                  P12 = 3.0*H1 - H2
-                  P13 = -2.0*H1 + H2
-                  P21 = 0.5* (ZUU(2)-ZUU(1))
+                  P12 = 3.0D0*H1 - H2
+                  P13 = -2.0D0*H1 + H2
+                  P21 = 0.5D0* (ZUU(2)-ZUU(1))
 * Converts XII and YII to u-v system.
                   DX = XII - X0
                   DY = YII - Y0
@@ -2277,10 +2430,650 @@ C     WRITE (*,FMT=9040)
           END IF
   120 CONTINUE
       END
+      SUBROUTINE ICOPY (N,IA1,IA2)
+      INTEGER N, IA1(N), IA2(N)
+C
+C***********************************************************
+C
+C   This subroutine copies integer array IA1 into array IA2.
+C
+C On input:
+C
+C       N = Number of elements to be copied.  No elements
+C           are copied if N < 1.
+C
+C       IA1,IA2 = Source and destination, respectively, for
+C                 the copy.  The first N contiguously stored
+C                 elements are copied regardless of the num-
+C                 ber of dimensions of the arrays in the
+C                 calling program.
+C
+C Parameters N and IA1 are not altered by this routine.
+C
+C On output:
+C
+C       IA2 = Copy of IA1.
+C
+C Subprograms required by ICOPY:  None
+C
+C***********************************************************
+C
+      INTEGER I
+C
+      DO 1 I = 1,N
+        IA2(I) = IA1(I)
+    1   CONTINUE
+      RETURN
+      END
+      SUBROUTINE GRADC(K,NCC,LCC,N,X,Y,Z,LIST,LPTR,LEND,DX,DY,DXX,DXY,
+     +                 DYY,IER)
+*
+************************************************************
+*
+*                                               From SRFPACK
+*                                            Robert J. Renka
+*                                  Dept. of Computer Science
+*                                       Univ. of North Texas
+*                                             (817) 565-2816
+*                                                   01/25/97
+*
+*   Given a Delaunay triangulation of N points in the plane
+* with associated data values Z, this subroutine estimates
+* first and second partial derivatives at node K.  The der-
+* ivatives are taken to be the partials at K of a cubic
+* function which interpolates Z(K) and fits the data values
+* at a set of nearby nodes in a weighted least squares
+* sense.  A Marquardt stabilization factor is used if neces-
+* sary to ensure a well-conditioned system.  Thus, a unique
+* solution exists if there are at least 10 noncollinear
+* nodes.
+*
+*   The triangulation may include constraints introduced by
+* subroutine ADDCST, in which case the derivative estimates
+* are influenced by the nonconvex geometry of the domain.
+* Refer to subroutine GETNP.  If data values at the con-
+* straint nodes are not known, subroutine ZGRADL, which
+* computes approximate data values at constraint nodes along
+* with gradients, should be called in place of this routine.
+*
+*   An alternative routine, GRADG, employs a global method
+* to compute the first partial derivatives at all of the
+* nodes at once.  That method is usually more efficient
+* (when all first partials are needed) and may be more ac-
+* curate, depending on the data.
+*
+* On input:
+*
+*       K = Index of the node at which derivatives are to be
+*           estimated.  1 .LE. K .LE. N.
+*
+*       NCC = Number of constraint curves (refer to TRIPACK
+*             subroutine ADDCST).  NCC .GE. 0.
+*
+*       LCC = Array of length NCC (or dummy array of length
+*             1 if NCC = 0) containing the index of the
+*             first node of constraint I in LCC(I).  For I =
+*             1 to NCC, LCC(I+1)-LCC(I) .GE. 3, where
+*             LCC(NCC+1) = N+1.
+*
+*       N = Number of nodes in the triangulation.
+*           N .GE. 10.
+*
+*       X,Y = Arrays of length N containing the coordinates
+*             of the nodes with non-constraint nodes in the
+*             first LCC(1)-1 locations, followed by NCC se-
+*             quences of constraint nodes.
+*
+*       Z = Array of length N containing data values associ-
+*           ated with the nodes.
+*
+*       LIST,LPTR,LEND = Data structure defining the trian-
+*                        gulation.  Refer to TRIPACK
+*                        Subroutine TRMESH.
+*
+* Input parameters are not altered by this routine.
+*
+* On output:
+*
+*       DX,DY = Estimated first partial derivatives at node
+*               K unless IER < 0.
+*
+*       DXX,DXY,DYY = Estimated second partial derivatives
+*                     at node K unless IER < 0.
+*
+*       IER = Error indicator:
+*             IER = L > 0 if no errors were encountered and
+*                         L nodes (including node K) were
+*                         employed in the least squares fit.
+*             IER = -1 if K, NCC, an LCC entry, or N is
+*                      outside its valid range on input.
+*             IER = -2 if all nodes are collinear.
+*
+* TRIPACK modules required by GRADC:  GETNP, INTSEC
+*
+* SRFPACK modules required by GRADC:  GIVENS, ROTATE, SETRO3
+*
+* Intrinsic functions called by GRADC:  DABS, MIN, DBLE, DSQRT
+*
+************************************************************
+*
+*     .. Parameters ..
+      INTEGER          LMN,LMX
+      PARAMETER        (LMN=14,LMX=30)
+*     ..
+*     .. Scalar Arguments ..
+      DOUBLE PRECISION             DX,DXX,DXY,DY,DYY
+      INTEGER          IER,K,N,NCC
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION             X(N),Y(N),Z(N)
+      INTEGER          LCC(*),LEND(N),LIST(*),LPTR(*)
+*     ..
+*     .. Local Scalars ..
+      DOUBLE PRECISION             C,DMIN,DS,DTOL,RIN,RS,RTOL,S,SF,SFC,
+     +                 SFS,STF,SUM,W,XK,YK,ZK
+      INTEGER          I,IERR,J,JP1,KK,L,LM1,LMAX,LMIN,LNP,NP
+*     ..
+*     .. Local Arrays ..
+      DOUBLE PRECISION             A(10,10),DIST(LMX)
+      INTEGER          NPTS(LMX)
+*     ..
+*     .. External Subroutines ..
+      EXTERNAL         GETNP,GIVENS,ROTATE,SETRO3
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC        DABS,MIN,DBLE,DSQRT
+*     ..
+*     .. Data statements ..
+      DATA             RTOL/1.0D-5/,DTOL/0.01D0/
+*     ..
+*
+* Local parameters:
+*
+* A =         Transpose of the augmented regression matrix
+* C =         First component of the plane rotation deter-
+*               mined by subroutine GIVENS
+* DIST =      Array containing the distances between K and
+*               the elements of NPTS (refer to GETNP)
+* DMIN =      Minimum of the magnitudes of the diagonal
+*               elements of the regression matrix after
+*               zeros are introduced below the diagonal
+* DS =        Squared distance between nodes K and NPTS(LNP)
+* DTOL =      Tolerance for detecting an ill-conditioned
+*               system.  The system is accepted when DMIN/W
+*               .GE. DTOL.
+* I =         DO-loop index
+* IERR =      Error flag for calls to GETNP
+* J =         DO-loop index
+* JP1 =       J+1
+* KK =        Local copy of K
+* L =         Number of columns of A**T to which a rotation
+*               is applied
+* LMAX,LMIN = Min(LMX,N), Min(LMN,N)
+* LMN,LMX =   Minimum and maximum values of LNP for N
+*               sufficiently large.  In most cases LMN-1
+*               nodes are used in the fit.  4 .LE. LMN .LE.
+*               LMX.
+* LM1 =       LMIN-1 or LNP-1
+* LNP =       Length of NPTS
+* NP =        Element of NPTS to be added to the system
+* NPTS =      Array containing the indexes of a sequence of
+*               nodes ordered by distance from K.  NPTS(1)=K
+*               and the first LNP-1 elements of NPTS are
+*               used in the least squares fit.  Unless LNP
+*               exceeds LMAX, NPTS(LNP) determines R.
+* RIN =       Inverse of the distance R between node K and
+*               NPTS(LNP) or some point further from K than
+*               NPTS(LMAX) if NPTS(LMAX) is used in the fit.
+*               R is a radius of influence which enters into
+*               the weight W.
+* RS =        R*R
+* RTOL =      Tolerance for determining R.  If the relative
+*               change in DS between two elements of NPTS is
+*               not greater than RTOL, they are treated as
+*               being the same distance from node K.
+* S =         Second component of the plane rotation deter-
+*               mined by subroutine GIVENS
+* SF =        Scale factor for the linear terms (columns 8
+*               and 9) in the least squares fit -- inverse
+*               of the root-mean-square distance between K
+*               and the nodes (other than K) in the least
+*               squares fit
+* SFS =       Scale factor for the quadratic terms (columns
+*               5, 6, and 7) in the least squares fit --
+*               SF*SF
+* SFC =       Scale factor for the cubic terms (first 4
+*               columns) in the least squares fit -- SF**3
+* STF =       Marquardt stabilization factor used to damp
+*               out the first 4 solution components (third
+*               partials of the cubic) when the system is
+*               ill-conditioned.  As STF increases, the
+*               fitting function approaches a quadratic
+*               polynomial.
+* SUM =       Sum of squared distances between node K and
+*               the nodes used in the least squares fit
+* W =         Weight associated with a row of the augmented
+*               regression matrix -- 1/D - 1/R, where D < R
+*               and D is the distance between K and a node
+*               entering into the least squares fit
+* XK,YK,ZK =  Coordinates and data value associated with K
+*
+* initialize some variables to silence compiler warnings      
+      RS=0.0D0
+
+      KK = K
+*
+* Test for errors and initialize LMIN and LMAX.
+*
+      IF (KK.LT.1 .OR. KK.GT.N .OR. NCC.LT.0 .OR. N.LT.10) GO TO 130
+      LMIN = MIN(LMN,N)
+      LMAX = MIN(LMX,N)
+*
+* Compute NPTS, DIST, LNP, SF, SFS, SFC, and RIN --
+*
+*   Set NPTS to the closest LMIN-1 nodes to K.
+*
+      SUM = 0.0D0
+      NPTS(1) = KK
+      DIST(1) = 0.0D0
+      LM1 = LMIN - 1
+      DO 10 LNP = 2,LM1
+          CALL GETNP(NCC,LCC,N,X,Y,LIST,LPTR,LEND,LNP,NPTS,DIST,IERR)
+          IF (IERR.NE.0) GO TO 130
+          DS = DIST(LNP)**2
+          SUM = SUM + DS
+   10 CONTINUE
+*
+* Add additional nodes to NPTS until the relative increase
+*   in DS is at least RTOL.
+*
+      DO 30 LNP = LMIN,LMAX
+          CALL GETNP(NCC,LCC,N,X,Y,LIST,LPTR,LEND,LNP,NPTS,DIST,IERR)
+          RS = DIST(LNP)**2
+          IF ((RS-DS)/DS.LE.RTOL) GO TO 20
+          IF (LNP.GT.10) GO TO 40
+   20     SUM = SUM + RS
+   30 CONTINUE
+*
+* Use all LMAX nodes in the least squares fit.  RS is
+*   arbitrarily increased by 10 per cent.
+*
+      RS = 1.1D0*RS
+      LNP = LMAX + 1
+*
+* There are LNP-2 equations corresponding to nodes NPTS(2),
+*   ...,NPTS(LNP-1).
+*
+   40 SFS = DBLE(LNP-2)/SUM
+      SF = DSQRT(SFS)
+      SFC = SF*SFS
+      RIN = 1.0D0/DSQRT(RS)
+      XK = X(KK)
+      YK = Y(KK)
+      ZK = Z(KK)
+*
+* A Q-R decomposition is used to solve the least squares
+*   system.  The transpose of the augmented regression
+*   matrix is stored in A with columns (rows of A) defined
+*   as follows:  1-4 are the cubic terms, 5-7 are the quad-
+*   ratic terms with coefficients DXX/2, DXY, and DYY/2,
+*   8 and 9 are the linear terms with coefficients DX and
+*   DY, and the last column is the right hand side.
+*
+* Set up the first 9 equations and zero out the lower tri-
+*   angle with Givens rotations.
+*
+      DO 60 I = 1,9
+          NP = NPTS(I+1)
+          W = 1.0D0/DIST(I+1) - RIN
+          CALL SETRO3(XK,YK,ZK,X(NP),Y(NP),Z(NP),SF,SFS,SFC,W,A(1,I))
+          IF (I.EQ.1) GO TO 60
+          DO 50 J = 1,I - 1
+              JP1 = J + 1
+              L = 10 - J
+              CALL GIVENS(A(J,J),A(J,I),C,S)
+              CALL ROTATE(L,C,S,A(JP1,J),A(JP1,I))
+   50     CONTINUE
+   60 CONTINUE
+*
+* Add the additional equations to the system using
+*   the last column of A.  I .LE. LNP.
+*
+      I = 11
+   70 IF (I.LT.LNP) THEN
+          NP = NPTS(I)
+          W = 1.0D0/DIST(I) - RIN
+          CALL SETRO3(XK,YK,ZK,X(NP),Y(NP),Z(NP),SF,SFS,SFC,W,A(1,10))
+          DO 80 J = 1,9
+              JP1 = J + 1
+              L = 10 - J
+              CALL GIVENS(A(J,J),A(J,10),C,S)
+              CALL ROTATE(L,C,S,A(JP1,J),A(JP1,10))
+   80     CONTINUE
+          I = I + 1
+          GO TO 70
+      END IF
+*
+* Test the system for ill-conditioning.
+*
+      DMIN = MIN(DABS(A(1,1)),DABS(A(2,2)),DABS(A(3,3)),DABS(A(4,4)),
+     +       DABS(A(5,5)),DABS(A(6,6)),DABS(A(7,7)),DABS(A(8,8)),
+     +       DABS(A(9,9)))
+      IF (DMIN/W.GE.DTOL) GO TO 120
+      IF (LNP.LE.LMAX) THEN
+*
+*   Add another node to the system and increase R.  Note
+*     that I = LNP.
+*
+          LNP = LNP + 1
+          IF (LNP.LE.LMAX) THEN
+              CALL GETNP(NCC,LCC,N,X,Y,LIST,LPTR,LEND,LNP,NPTS,DIST,
+     +                   IERR)
+              RS = DIST(LNP)**2
+          END IF
+          RIN = 1.0D0/DSQRT(1.1D0*RS)
+          GO TO 70
+      END IF
+*
+* Stabilize the system by damping third partials -- add
+*   multiples of the first four unit vectors to the first
+*   four equations.
+*
+      STF = W
+      DO 110 I = 1,4
+          A(I,10) = STF
+          DO 90 J = I + 1,10
+              A(J,10) = 0.0D0
+   90     CONTINUE
+          DO 100 J = I,9
+              JP1 = J + 1
+              L = 10 - J
+              CALL GIVENS(A(J,J),A(J,10),C,S)
+              CALL ROTATE(L,C,S,A(JP1,J),A(JP1,10))
+  100     CONTINUE
+  110 CONTINUE
+*
+* Test the damped system for ill-conditioning.
+*
+      DMIN = MIN(DABS(A(5,5)),DABS(A(6,6)),DABS(A(7,7)),DABS(A(8,8)),
+     +       DABS(A(9,9)))
+      IF (DMIN/W.LT.DTOL) GO TO 140
+*
+* Solve the 9 by 9 triangular system for the last 5
+*   components (first and second partial derivatives).
+*
+  120 DY = A(10,9)/A(9,9)
+      DX = (A(10,8)-A(9,8)*DY)/A(8,8)
+      DYY = (A(10,7)-A(8,7)*DX-A(9,7)*DY)/A(7,7)
+      DXY = (A(10,6)-A(7,6)*DYY-A(8,6)*DX-A(9,6)*DY)/A(6,6)
+      DXX = (A(10,5)-A(6,5)*DXY-A(7,5)*DYY-A(8,5)*DX-A(9,5)*DY)/A(5,5)
+*
+* Scale the solution components.
+*
+      DX = SF*DX
+      DY = SF*DY
+      DXX = 2.*SFS*DXX
+      DXY = SFS*DXY
+      DYY = 2.*SFS*DYY
+      IER = LNP - 1
+      RETURN
+*
+* Invalid input parameter.
+*
+  130 IER = -1
+      RETURN
+*
+* No unique solution due to collinear nodes.
+*
+  140 IER = -2
+      RETURN
+      END
+      SUBROUTINE GIVENS(A,B,C,S)
+*
+************************************************************
+*
+*                                               From SRFPACK
+*                                            Robert J. Renka
+*                                  Dept. of Computer Science
+*                                       Univ. of North Texas
+*                                             (817) 565-2767
+*                                                   09/01/88
+*
+*   This subroutine constructs the Givens plane rotation,
+*
+*           ( C  S)
+*       G = (     ) , where C*C + S*S = 1,
+*           (-S  C)
+*
+* which zeros the second component of the vector (A,B)**T
+* (transposed).  Subroutine ROTATE may be called to apply
+* the transformation to a 2 by N matrix.
+*
+*   This routine is identical to subroutine SROTG from the
+* LINPACK BLAS (Basic Linear Algebra Subroutines).
+*
+* On input:
+*
+*       A,B = Components of the vector defining the rota-
+*             tion.  These are overwritten by values R
+*             and Z (described below) which define C and S.
+*
+* On output:
+*
+*       A = Signed Euclidean norm R of the input vector:
+*           R = +/-SQRT(A*A + B*B)
+*
+*       B = Value Z such that:
+*             C = SQRT(1-Z*Z) and S=Z if ABS(Z) .LE. 1, and
+*             C = 1/Z and S = SQRT(1-C*C) if ABS(Z) > 1.
+*
+*       C = +/-(A/R) or 1 if R = 0.
+*
+*       S = +/-(B/R) or 0 if R = 0.
+*
+* Modules required by GIVENS:  None
+*
+* Intrinsic functions called by GIVENS:  DABS, SQRT
+*
+************************************************************
+*
+*
+* Local parameters:
+*
+* AA,BB = Local copies of A and B
+* R =     C*A + S*B = +/-SQRT(A*A+B*B)
+* U,V =   Variables used to scale A and B for computing R
+*
+*     .. Scalar Arguments ..
+      DOUBLE PRECISION             A,B,C,S
+*     ..
+*     .. Local Scalars ..
+      DOUBLE PRECISION             AA,BB,R,U,V
+*     ..
+*     .. Intrinsic Functions ..
+      INTRINSIC        DABS,DSQRT
+*     ..
+      AA = A
+      BB = B
+      IF (DABS(AA).LE.DABS(BB)) GO TO 10
+*
+* ABS(A) > ABS(B).
+*
+      U = AA + AA
+      V = BB/U
+      R = DSQRT(.25+V*V)*U
+      C = AA/R
+      S = V* (C+C)
+*
+* Note that R has the sign of A, C > 0, and S has
+*   SIGN(A)*SIGN(B).
+*
+      B = S
+      A = R
+      RETURN
+*
+* ABS(A) .LE. ABS(B).
+*
+   10 IF (BB.EQ.0.0D0) GO TO 20
+      U = BB + BB
+      V = AA/U
+*
+* Store R in A.
+*
+      A = DSQRT(.25+V*V)*U
+      S = BB/A
+      C = V* (S+S)
+*
+* Note that R has the sign of B, S > 0, and C has
+*   SIGN(A)*SIGN(B).
+*
+      B = 1.0D0
+      IF (C.NE.0.0D0) B = 1.0D0/C
+      RETURN
+*
+* A = B = 0.0D0
+*
+   20 C = 1.0D0
+      S = 0.0D0
+      RETURN
+      END
+      SUBROUTINE ROTATE(N,C,S,X,Y)
+*
+************************************************************
+*
+*                                               From SRFPACK
+*                                            Robert J. Renka
+*                                  Dept. of Computer Science
+*                                       Univ. of North Texas
+*                                             (817) 565-2767
+*                                                   09/01/88
+*
+*                                                ( C  S)
+*   This subroutine applies the Givens rotation  (     )  to
+*                                                (-S  C)
+*                    (X(1) ... X(N))
+* the 2 by N matrix  (             ) .
+*                    (Y(1) ... Y(N))
+*
+*   This routine is identical to subroutine SROT from the
+* LINPACK BLAS (Basic Linear Algebra Subroutines).
+*
+* On input:
+*
+*       N = Number of columns to be rotated.
+*
+*       C,S = Elements of the Givens rotation.  Refer to
+*             subroutine GIVENS.
+*
+* The above parameters are not altered by this routine.
+*
+*       X,Y = Arrays of length .GE. N containing the compo-
+*             nents of the vectors to be rotated.
+*
+* On output:
+*
+*       X,Y = Arrays containing the rotated vectors (not
+*             altered if N < 1).
+*
+* Modules required by ROTATE:  None
+*
+************************************************************
+*
+*
+*     .. Scalar Arguments ..
+      DOUBLE PRECISION             C,S
+      INTEGER          N
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION             X(N),Y(N)
+*     ..
+*     .. Local Scalars ..
+      DOUBLE PRECISION             XI,YI
+      INTEGER          I
+*     ..
+      DO 10 I = 1,N
+          XI = X(I)
+          YI = Y(I)
+          X(I) = C*XI + S*YI
+          Y(I) = -S*XI + C*YI
+   10 CONTINUE
+      RETURN
+      END
+      SUBROUTINE SETRO3(XK,YK,ZK,XI,YI,ZI,S1,S2,S3,W,ROW)
+*
+************************************************************
+*
+*                                               From SRFPACK
+*                                            Robert J. Renka
+*                                  Dept. of Computer Science
+*                                       Univ. of North Texas
+*                                             (817) 565-2767
+*                                                   01/25/97
+*
+*   This subroutine sets up the I-th row of an augmented re-
+* gression matrix for a weighted least squares fit of a
+* cubic function f(x,y) to a set of data values z, where
+* f(XK,YK) = ZK.  The first four columns (cubic terms) are
+* scaled by S3, the next three columns (quadratic terms)
+* are scaled by S2, and the eighth and ninth columns (lin-
+* ear terms) are scaled by S1.
+*
+* On input:
+*
+*       XK,YK = Coordinates of node K.
+*
+*       ZK = Data value at node K to be interpolated by f.
+*
+*       XI,YI,ZI = Coordinates and data value at node I.
+*
+*       S1,S2,S3 = Scale factors.
+*
+*       W = Weight associated with node I.
+*
+* The above parameters are not altered by this routine.
+*
+*       ROW = Array of length 10.
+*
+* On output:
+*
+*       ROW = Array containing a row of the augmented re-
+*             gression matrix.
+*
+* Modules required by SETRO3:  None
+*
+************************************************************
+*
+*
+*     .. Scalar Arguments ..
+      DOUBLE PRECISION             S1,S2,S3,W,XI,XK,YI,YK,ZI,ZK
+*     ..
+*     .. Array Arguments ..
+      DOUBLE PRECISION             ROW(10)
+*     ..
+*     .. Local Scalars ..
+      DOUBLE PRECISION             DX,DY,W1,W2,W3
+*     ..
+      DX = XI - XK
+      DY = YI - YK
+      W1 = S1*W
+      W2 = S2*W
+      W3 = S3*W
+      ROW(1) = DX*DX*DX*W3
+      ROW(2) = DX*DX*DY*W3
+      ROW(3) = DX*DY*DY*W3
+      ROW(4) = DY*DY*DY*W3
+      ROW(5) = DX*DX*W2
+      ROW(6) = DX*DY*W2
+      ROW(7) = DY*DY*W2
+      ROW(8) = DX*W1
+      ROW(9) = DY*W1
+      ROW(10) = (ZI-ZK)*W
+      RETURN
+      END
 
 * agebhard: add a linear interpolator, along the lines of sdplnl
 
-      SUBROUTINE SDLIPL(NDP,XD,YD,ZD,NT,IPT,NL,IPL,NIP,XI,YI,KTLI,
+      SUBROUTINE SDLIPL(NDP,XD,YD,ZD,NT,IPT,NIP,XI,YI,KTLI,
      +                  ITLI, ZI, EXTRPI)
 *
 * A. Gebhardt:
@@ -2298,10 +3091,6 @@ C     WRITE (*,FMT=9040)
 *   IPT  = two-dimensional integer array of dimension 3*NT
 *          containing the point numbers of the vertexes of
 *          the triangles,
-*   NL   = number of border line segments,
-*   IPL  = two-dimensional integer array of dimension 2*NL
-*          containing the point numbers of the end points of
-*          the border line segments,
 *   NIP  = number of output points at which interpolation is
 *          to be performed,
 *   XI   = array of dimension NIP containing the x
@@ -2334,7 +3123,7 @@ C     WRITE (*,FMT=9040)
 *
 * Specification statements
 *     .. Scalar Arguments ..
-      INTEGER          NDP,NIP,NL,NT
+      INTEGER          NDP,NIP,NT
 *     ..
 *     .. Array Arguments ..
       DOUBLE PRECISION             XD(NDP),XI(NIP),YD(NDP),
@@ -2347,11 +3136,10 @@ C     WRITE (*,FMT=9040)
       INTEGER          I,IDP,IIP,ITLII,ITLIPV,KTLII,KTLIPV
 *     ..
 *     .. Local Arrays ..
-      DOUBLE PRECISION             X(3),Y(3),Z(3),
-     +     ZUV(3),ZV(3),ZVV(3)
+      DOUBLE PRECISION             X(3),Y(3),Z(3)
 *     ..
 *     .. Intrinsic Functions ..
-      INTRINSIC        MOD
+      INTRINSIC        DABS,MOD
 *     ..
 *     Outermost DO-loop with respect to the output point
       DO 121 IIP = 1,NIP
