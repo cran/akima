@@ -695,6 +695,19 @@ c          WRITE (*,FMT=9010)
       END
 
 
+*     converted from Statement Function definitions ..
+      DOUBLE PRECISION FUNCTION DSQF(U1,V1,U2,V2,U3,V3)
+      IMPLICIT DOUBLE PRECISION (U-V) 
+      DSQF=((U2-U1)/U3)**2 + ((V2-V1)/V3)**2
+      RETURN
+      END
+      DOUBLE PRECISION FUNCTION VPDT(U1,V1,U2,V2,U3,V3,U4,V4)
+      IMPLICIT DOUBLE PRECISION (U-V) 
+      VPDT=((V3-V1)/V4)* ((U2-U1)/U4) -
+     +     ((U3-U1)/U4)* ((V2-V1)/V4)
+      RETURN
+      END
+
       SUBROUTINE SDTRTT(NDP,XD,YD,NT,IPT,NL,IPL,ITL,HBRMN,NRRTT,IER)
 *
 * Removal of thin triangles along the border line of triangulation
@@ -761,7 +774,7 @@ c          WRITE (*,FMT=9010)
       INTEGER          IPL(2,*),IPT(3,*),ITL(NDP)
 *     ..
 *     .. Local Scalars ..
-      DOUBLE PRECISION             DXA,DYA,HBR,U1,U2,U3,U4,V1,V2,V3,V4
+      DOUBLE PRECISION             DXA,DYA,HBR
       INTEGER          IL,IL0,IL00,IL1,ILP1,ILR1,IP1,IP2,IP3,IPL1,IPL2,
      +                 IREP,IT,IT0,ITP1,IV,IVP1,MODIF,NL0
 *     ..
@@ -772,9 +785,9 @@ c          WRITE (*,FMT=9010)
       DOUBLE PRECISION             DSQF,VPDT
 *     ..
 *     .. Statement Function definitions ..
-      DSQF(U1,V1,U2,V2,U3,V3) = ((U2-U1)/U3)**2 + ((V2-V1)/V3)**2
-      VPDT(U1,V1,U2,V2,U3,V3,U4,V4) = ((V3-V1)/V4)* ((U2-U1)/U4) -
-     +                                ((U3-U1)/U4)* ((V2-V1)/V4)
+*      DSQF(U1,V1,U2,V2,U3,V3) = ((U2-U1)/U3)**2 + ((V2-V1)/V3)**2
+*      VPDT(U1,V1,U2,V2,U3,V3,U4,V4) = ((V3-V1)/V4)* ((U2-U1)/U4) -
+*     +                                ((U3-U1)/U4)* ((V2-V1)/V4)
 *     ..
 *     initialization:
       IER=0
@@ -1797,6 +1810,18 @@ c          WRITE (*,FMT=9010)
       RETURN
       END
 
+*     converted from Statement Function definitions ..
+      DOUBLE PRECISION FUNCTION SPDT(U1,V1,U2,V2,U3,V3)
+      IMPLICIT DOUBLE PRECISION (U-V) 
+      SPDT=(U1-U3)* (U2-U3) + (V1-V3)* (V2-V3)
+      RETURN 
+      END
+*     renamed to VPDT3 as from above already a VPDT exists:
+      DOUBLE PRECISION FUNCTION VPDT3(U1,V1,U2,V2,U3,V3)
+      IMPLICIT DOUBLE PRECISION (U-V) 
+      VPDT3=(U1-U3)* (V2-V3) - (V1-V3)* (U2-U3)
+      RETURN 
+      END
 
       SUBROUTINE SDLCTN(NDP,XD,YD,NT,IPT,NL,IPL,NIP,XI,YI,KTLI,ITLI)
 *
@@ -1863,7 +1888,7 @@ c          WRITE (*,FMT=9010)
       INTEGER          IPL(2,NL),IPT(3,NT),ITLI(NIP),KTLI(NIP)
 *     ..
 *     .. Local Scalars ..
-      DOUBLE PRECISION             U1,U2,U3,V1,V2,V3,X0,X1,X2,X3,Y0,Y1,
+      DOUBLE PRECISION             X0,X1,X2,X3,Y0,Y1,
      +                 Y2,Y3
       INTEGER          IIP,IL1,IL2,ILII,IP1,IP2,IP3,ITII,ITLIPV,KTLIPV
 *     ..
@@ -1871,11 +1896,11 @@ c          WRITE (*,FMT=9010)
       INTRINSIC        MOD
 *     ..
 *     .. Statement Functions ..
-      DOUBLE PRECISION             SPDT,VPDT
+      DOUBLE PRECISION             SPDT,VPDT3
 *     ..
 *     .. Statement Function definitions ..
-      SPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (U2-U3) + (V1-V3)* (V2-V3)
-      VPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (V2-V3) - (V1-V3)* (U2-U3)
+*      SPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (U2-U3) + (V1-V3)* (V2-V3)
+*      VPDT(U1,V1,U2,V2,U3,V3) = (U1-U3)* (V2-V3) - (V1-V3)* (U2-U3)
 *     ..
 * Outermost DO-loop with respect to the points to be located
       DO 40 IIP = 1,NIP
@@ -1900,9 +1925,9 @@ c          WRITE (*,FMT=9010)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF ((VPDT(X1,Y1,X2,Y2,X0,Y0).GE.0.0D0) .AND.
-     +            (VPDT(X2,Y2,X3,Y3,X0,Y0).GE.0.0D0) .AND.
-     +            (VPDT(X3,Y3,X1,Y1,X0,Y0).GE.0.0D0)) THEN
+              IF ((VPDT3(X1,Y1,X2,Y2,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT3(X2,Y2,X3,Y3,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT3(X3,Y3,X1,Y1,X0,Y0).GE.0.0D0)) THEN
                   KTLI(IIP) = 1
                   ITLI(IIP) = ITII
                   GO TO 40
@@ -1919,9 +1944,9 @@ c          WRITE (*,FMT=9010)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF ((VPDT(X1,Y1,X2,Y2,X0,Y0).GE.0.0D0) .AND.
-     +            (VPDT(X2,Y2,X3,Y3,X0,Y0).GE.0.0D0) .AND.
-     +            (VPDT(X3,Y3,X1,Y1,X0,Y0).GE.0.0D0)) THEN
+              IF ((VPDT3(X1,Y1,X2,Y2,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT3(X2,Y2,X3,Y3,X0,Y0).GE.0.0D0) .AND.
+     +            (VPDT3(X3,Y3,X1,Y1,X0,Y0).GE.0.0D0)) THEN
                   KTLI(IIP) = 1
                   ITLI(IIP) = ITII
                   GO TO 40
@@ -1940,8 +1965,8 @@ c          WRITE (*,FMT=9010)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF (VPDT(X1,Y1,X3,Y3,X0,Y0).LE.0.0D0) THEN
-                  IF (VPDT(X1,Y1,X3,Y3,X2,Y2).LE.0.0D0) THEN
+              IF (VPDT3(X1,Y1,X3,Y3,X0,Y0).LE.0.0D0) THEN
+                  IF (VPDT3(X1,Y1,X3,Y3,X2,Y2).LE.0.0D0) THEN
                       IF ((SPDT(X1,Y1,X0,Y0,X2,Y2).LE.0.0D0) .AND.
      +                    (SPDT(X3,Y3,X0,Y0,X2,Y2).LE.0.0D0)) THEN
                           KTLI(IIP) = 3
@@ -1949,7 +1974,7 @@ c          WRITE (*,FMT=9010)
                           GO TO 40
                       END IF
                   END IF
-                  IF (VPDT(X1,Y1,X3,Y3,X2,Y2).GE.0.0D0) THEN
+                  IF (VPDT3(X1,Y1,X3,Y3,X2,Y2).GE.0.0D0) THEN
                       IF ((SPDT(X1,Y1,X0,Y0,X2,Y2).GE.0.0D0) .AND.
      +                    (SPDT(X3,Y3,X0,Y0,X2,Y2).GE.0.0D0)) THEN
                           KTLI(IIP) = 4
@@ -1967,7 +1992,7 @@ c          WRITE (*,FMT=9010)
               Y2 = YD(IP2)
               X3 = XD(IP3)
               Y3 = YD(IP3)
-              IF (VPDT(X2,Y2,X3,Y3,X0,Y0).LE.0.0D0) THEN
+              IF (VPDT3(X2,Y2,X3,Y3,X0,Y0).LE.0.0D0) THEN
                   IF ((SPDT(X3,Y3,X0,Y0,X2,Y2).GE.0.0D0) .AND.
      +                (SPDT(X2,Y2,X0,Y0,X3,Y3).GE.0.0D0)) THEN
                       KTLI(IIP) = 2

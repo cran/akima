@@ -1,4 +1,4 @@
-50736ab3cebfec5884f79b33cff412f1 *DESCRIPTION
+95d014cdfeab60dbe1c73612f494cc06 *DESCRIPTION
 25856faff6b2326e3e7c774a0b4a6d70 *LICENSE
 09ed5edd41e822a32d295dec50890666 *NAMESPACE
 1e49c05a50df3cc84d7d92b89a9d649b *R/aspline.R
@@ -35,10 +35,10 @@ cbc19816fcb783867b0de8285b5a7202 *man/interp2xyz.Rd
 b7b66926fbc5f6a890fe51c320c78cea *src/Makevars.in
 7ffef2238a6e4bfef7ffaf36470fa5fa *src/akima.h
 0fc59d4c8d1f1facd49baad7910e3895 *src/akima433.f
-40d8094b5466cdfe1e474b11c0aa1d63 *src/akima697.f
-d9a1cde1d61245ce93ef35f900852bdf *src/akima760.f
-99b3299fcba883cd1fd015bc6bbec7f8 *src/akima761.f
+a44eb9f08231c68deb71e05a1663f96e *src/akima697.f
+fa7cd424aecc5b59393966ccf0f29cb9 *src/akima760.f
+01a0d6936cfbe9cd22b9067fec17e8bb *src/akima761.f
 1922148cc6a3aa3ca756b3a441eeab85 *src/bilinear.f
 8b430e53330e7484bc9ed9b78d9ba3fb *src/init.c
-4cd74f0bae116ad3becb9d0d674cc60e *src/tripack.f
+e3792af8a0a74b6e4433b564c2e63bfb *src/tripack.f
 463b4103a654fb261add958c8f892082 *tools/acinclude.m4

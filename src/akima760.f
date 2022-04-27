@@ -340,7 +340,20 @@ C     WRITE (*,FMT=9050)
 C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       RETURN
       END
+* converted from statement functions:
+      DOUBLE PRECISION FUNCTION Z2F(XX1,XX2,ZZ0,ZZ1) 
+      IMPLICIT DOUBLE PRECISION (X-Z)
+      Z2F=(ZZ1-ZZ0)*XX2/XX1 + ZZ0
+      RETURN
+      END
 
+      DOUBLE PRECISION FUNCTION Z3F(XX1,XX2,XX3,ZZ0,ZZ1,ZZ2)
+      IMPLICIT DOUBLE PRECISION (X-Z)
+      Z3F=((ZZ2-ZZ0)* (XX3-XX1)/XX2-
+     +      (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
+     +      (XX3/ (XX2-XX1)) + ZZ0
+      RETURN
+      END
 
       SUBROUTINE RGPD3P(NXD,NYD,XD,YD,ZD, PDD)
 *
@@ -392,9 +405,9 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
      +                 DZXY22,DZXY23,DZXY31,DZXY32,DZXY33,DZY01,DZY02,
      +                 DZY03,EPSLN,PEZX,PEZXY,PEZY,SMPEF,SMPEI,SMWTF,
      +                 SMWTI,SX,SXX,SXXY,SXXYY,SXY,SXYY,SXYZ,SXZ,SY,SYY,
-     +                 SYZ,SZ,VOLF,WT,X0,X1,X2,X3,XX1,XX2,XX3,Y0,Y1,Y2,
+     +                 SYZ,SZ,VOLF,WT,X0,X1,X2,X3,Y0,Y1,Y2,
      +                 Y3,Z00,Z01,Z02,Z03,Z10,Z11,Z12,Z13,Z20,Z21,Z22,
-     +                 Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI,ZZ0,ZZ1,ZZ2
+     +                 Z23,Z30,Z31,Z32,Z33,ZXDI,ZXYDI,ZYDI
       INTEGER          IPEX,IPEY,IX0,IX1,IX2,IX3,IY0,IY1,IY2,IY3,JPEXY,
      +                 JXY,NX0,NY0
 *     ..
@@ -414,11 +427,11 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
       DATA             ((IDLT(JXY,JPEXY),JPEXY=1,4),JXY=1,3)/-3,-2,-1,1,
      +                 -2,-1,1,2,-1,1,2,3/
 *     ..
-* Statement Function definitions 
-      Z2F(XX1,XX2,ZZ0,ZZ1) = (ZZ1-ZZ0)*XX2/XX1 + ZZ0
-      Z3F(XX1,XX2,XX3,ZZ0,ZZ1,ZZ2) = ((ZZ2-ZZ0)* (XX3-XX1)/XX2-
-     +                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
-     +                               (XX3/ (XX2-XX1)) + ZZ0
+* Statement Function definitions  -> converted above
+*      Z2F(XX1,XX2,ZZ0,ZZ1) = (ZZ1-ZZ0)*XX2/XX1 + ZZ0
+*      Z3F(XX1,XX2,XX3,ZZ0,ZZ1,ZZ2) = ((ZZ2-ZZ0)* (XX3-XX1)/XX2-
+*     +                               (ZZ1-ZZ0)* (XX3-XX2)/XX1)*
+*     +                               (XX3/ (XX2-XX1)) + ZZ0
 *     ..
 * initialize some variables to silence compiler warnings      
       Z00=0.0D0
@@ -1274,4 +1287,6 @@ C     WRITE (*,FMT=9060) NXD,NYD,NXI,NYI
    10 CONTINUE
       RETURN
       END
+
+
 

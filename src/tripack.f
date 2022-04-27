@@ -3937,6 +3937,16 @@ C
     2 SWPTST = .FALSE.
       RETURN
       END
+C previously a statement function:
+C FRWRD = TRUE iff C is forward of A->B
+C              iff <A->B,A->C> .GE. 0.
+C
+      LOGICAL FUNCTION FRWRD(XA,YA,XB,YB,XC,YC) 
+      IMPLICIT DOUBLE PRECISION (X-Y)
+      FRWRD= (XB-XA)*(XC-XA) +
+     .       (YB-YA)*(YC-YA) .GE. 0.
+      RETURN
+      END
       SUBROUTINE TRFIND (NST,PX,PY,X,Y,LIST,LPTR,LEND, I1,
      .                   I2,I3)
       INTEGER NST, LIST(*), LPTR(*), LEND(*), I1, I2, I3
@@ -4003,13 +4013,7 @@ C
       LOGICAL LEFT
       INTEGER LP, N0, N1, N2, N3, N4, NB, NF, NL, NP, NPP
       LOGICAL FRWRD
-      DOUBLE PRECISION    XA, XB, XC, XP, YA, YB, YC, YP
-C
-C FRWRD = TRUE iff C is forward of A->B
-C              iff <A->B,A->C> .GE. 0.
-C
-      FRWRD(XA,YA,XB,YB,XC,YC) = (XB-XA)*(XC-XA) +
-     .                           (YB-YA)*(YC-YA) .GE. 0.
+      DOUBLE PRECISION XP,YP
 C
       N0 = MAX(NST,1)
       XP = PX

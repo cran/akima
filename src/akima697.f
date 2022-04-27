@@ -4,7 +4,7 @@ C      ALGORITHM 697 , COLLECTED ALGORITHMS FROM ACM.
 C      THIS WORK PUBLISHED IN TRANSACTIONS ON MATHEMATICAL SOFTWARE,
 C      VOL. 17, NO. 3, SEPTEMBER, 1991, PP. 367.
 C
-      SUBROUTINE  UVIP3P(NP,ND,XD,YD,NI,XI, YI, ERR)
+      SUBROUTINE  UVIP3P(NP,ND,XD,YD,NI,XI, YI, IERR)
       IMPLICIT INTEGER (I-N), DOUBLE PRECISION (A-H,O-Z)
 C
 C Univariate Interpolation (Improved Akima Method)
@@ -49,7 +49,7 @@ C
 C The output argument is
 C   YI = array of dimension NI, where the ordinates of the
 C        desired points are to be stored.
-C ERR  = ERROR CODE (added by ThPe)
+C IERR = ERROR CODE (added by ThPe)
 C
 C If an integer value smaller than 3 is given to the NP argument,
 C this subroutine assumes NP = 3.
@@ -390,10 +390,10 @@ C (Cubic interpolation and linear extrapolation)
 C End of Special Case 3
       RETURN
 C Error exit
-   90 ERR=1
+   90 IERR=1
       RETURN
-   91 ERR=2
+   91 IERR=2
       RETURN
-   92 ERR=3
+   92 IERR=3
       RETURN
       END
