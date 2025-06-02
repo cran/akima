@@ -40,7 +40,7 @@ bilinear.grid <- function(x,y,z,xlim=c(min(x),max(x)),ylim=c(min(y),max(y)),
       xi <- seq(xlim[1],xlim[2],by=dx)
       nx <- length(xi)
   } else {
-      xi <- seq(ylim[1],ylim[2],length=nx)
+      xi <- seq(xlim[1],xlim[2],length=nx)
   }
 
   if(!is.null(dx)){

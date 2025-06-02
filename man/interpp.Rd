@@ -116,7 +116,7 @@ interpp(x, y=NULL, z, xo, yo=NULL, linear=TRUE, extrap=FALSE,
   for irregularly spaced input data. These functions are only for
   backward compatibility, use \code{\link{interpp}} instead.
 
-  If \code{linear} is \\code{TRUE}, linear
+  If \code{linear} is \code{TRUE}, linear
   interpolation is used in the triangles bounded by data points, otherwise
   cubic interpolation is done.
 

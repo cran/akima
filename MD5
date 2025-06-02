@@ -1,9 +1,9 @@
-95d014cdfeab60dbe1c73612f494cc06 *DESCRIPTION
+126d9b04530ceb65681ce67de73d8063 *DESCRIPTION
 25856faff6b2326e3e7c774a0b4a6d70 *LICENSE
 09ed5edd41e822a32d295dec50890666 *NAMESPACE
 1e49c05a50df3cc84d7d92b89a9d649b *R/aspline.R
-b298ac6e83df924ba7820e30adc04f55 *R/bicubic.R
-60e55d40dcab8b229c240575065247b6 *R/bilinear.R
+115d84e23cf26e356d9282b7c5465182 *R/bicubic.R
+a5c7390579178d79d30f53bfe7ee3bf3 *R/bilinear.R
 120c6e6c07d4a97e1d3cf159328e3120 *R/franke.R
 6191e14b15b22f23f3d3852ff0575015 *R/interp.R
 09e37fb14ecf155e3c926e6aa793fbdb *R/interp.new.R
@@ -30,7 +30,7 @@ be4a197c94f6884a7c0b98551e2c5a58 *man/franke.data.Rd
 bd4a6ad8009eef7c8fcee4a423ed12b0 *man/interp.Rd
 78c6289c05caf3cc65d1c6de87664e30 *man/interp.old.Rd
 cbc19816fcb783867b0de8285b5a7202 *man/interp2xyz.Rd
-1168355b10b29872ec4552054f7732ed *man/interpp.Rd
+dc8d5dbdeefd5d5c15218d9393a8a774 *man/interpp.Rd
 8e55535ecf137cf2d0df4ad3f3e77493 *man/interpp.old.Rd
 b7b66926fbc5f6a890fe51c320c78cea *src/Makevars.in
 7ffef2238a6e4bfef7ffaf36470fa5fa *src/akima.h

@@ -1,6 +1,6 @@
 Package: akima
-Version: 0.6-3.4
-Date: 2022-04-25
+Version: 0.6-3.6
+Date: 2025-06-02
 Title: Interpolation of Irregularly and Regularly Spaced Data
 Authors@R: c(person("Hiroshi", "Akima", role = c("aut", "cph"),
 		     comment = "Fortran code (TOMS 760, 761, 697 and 433)"),
@@ -22,12 +22,14 @@ Description: Several cubic spline interpolation methods of H. Akima for irregula
   triangulation code which is part of Akimas Fortran code. A bilinear interpolator
   for regular grids was also added for comparison with the bicubic interpolator on
   regular grids.
-License: ACM | file LICENSE
+  Please note that most of the functions are now also covered in package
+  interp, which is a re-implementation from scratch under a free license.
+License: file LICENSE
 Depends: R (>= 2.0.0)
 Imports: sp
 Enhances: tripack
 NeedsCompilation: yes
-Packaged: 2022-04-26 13:46:13 UTC; agebhard
+Packaged: 2025-06-02 08:28:14 UTC; alge
 Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 760, 761, 697 and 433)),
   Albrecht Gebhardt [aut, cre, cph] (R port (interp*, bicubic*
     functions), bilinear code),
@@ -37,4 +39,4 @@ Author: Hiroshi Akima [aut, cph] (Fortran code (TOMS 760, 761, 697 and 433)),
     TOMS 760, 761, 697 and 433)
 License_restricts_use: yes
 Repository: CRAN
-Date/Publication: 2022-04-27 13:50:06 UTC
+Date/Publication: 2025-06-02 13:10:06 UTC
